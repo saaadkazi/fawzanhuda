@@ -43,6 +43,9 @@ const PalaceSilhouette = () => {
 
 export default function Hero() {
   const [particles, setParticles] = useState([]);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isWaveActive, setIsWaveActive] = useState(false);
+  const [isCardTapped, setIsCardTapped] = useState(false);
 
   useEffect(() => {
     // Generate soft drifting particles (gold sparks & burgundy rose petals)
@@ -52,54 +55,105 @@ export default function Hero() {
       size: Math.random() * 2.5 + 1.2,
       type: Math.random() > 0.65 ? "petal" : "spark",
       delay: Math.random() * 4,
-      duration: Math.random() * 7 + 6, // 6s to 13s
+      duration: Math.random() * 7 + 6,
     }));
     setParticles(generated);
+
+    // Screen resize checking
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // Looping wave timeline on mobile every 3.8 seconds
+  useEffect(() => {
+    if (!isMobile) return;
+    const interval = setInterval(() => {
+      setIsWaveActive(true);
+      setTimeout(() => setIsWaveActive(false), 2200);
+    }, 3800);
+    return () => clearInterval(interval);
+  }, [isMobile]);
+
+  const handleCardTap = () => {
+    setIsCardTapped(true);
+    setTimeout(() => setIsCardTapped(false), 1200);
+  };
+
   // Characters split helper for letter-by-letter reveal & spring hover waves
-  const splitName = (name, parentVariant) => {
+  const splitName = (name, parentVariant, isBride = false) => {
     return (
       <motion.span variants={parentVariant} className="inline-flex justify-center flex-wrap gap-x-1 select-none">
-        {name.split("").map((char, index) => (
-          <motion.span
-            key={index}
-            variants={{
-              hidden: { opacity: 0, y: 12, filter: "blur(4px)" },
-              visible: { 
-                opacity: 1, 
-                y: 0, 
-                filter: "blur(0px)", 
-                transition: { duration: 0.45, ease: "easeOut" } 
+        {name.split("").map((char, index) => {
+          const delayOffset = isBride ? 0.6 + index * 0.08 : index * 0.08;
+
+          return (
+            <motion.span
+              key={index}
+              variants={{
+                hidden: { opacity: 0, y: 12, filter: "blur(4px)" },
+                visible: { 
+                  opacity: 1, 
+                  y: 0, 
+                  filter: "blur(0px)", 
+                  transition: { duration: 0.45, ease: "easeOut" } 
+                }
+              }}
+              animate={
+                isMobile && isWaveActive
+                  ? {
+                      y: [0, -7, 0],
+                      color: ["#4A081B", "#D4AF37", "#4A081B"],
+                      textShadow: [
+                        "0 0 0px rgba(212, 175, 55, 0)",
+                        "0 0 12px rgba(212, 175, 55, 0.85)",
+                        "0 0 0px rgba(212, 175, 55, 0)"
+                      ]
+                    }
+                  : "visible"
               }
-            }}
-            whileHover={{
-              y: -8,
-              color: "#D4AF37",
-              textShadow: "0 0 12px rgba(212, 175, 55, 0.85)",
-              transition: { type: "spring", stiffness: 350, damping: 14 }
-            }}
-            className="inline-block cursor-default font-semibold drop-shadow-[0_0_8px_rgba(212,175,55,0.25)] tracking-wide transition-all duration-300"
-          >
-            {char === " " ? "\u00A0" : char}
-          </motion.span>
-        ))}
+              transition={
+                isMobile && isWaveActive
+                  ? {
+                      duration: 0.85,
+                      delay: delayOffset,
+                      ease: "easeInOut"
+                    }
+                  : { duration: 0.45, ease: "easeOut" }
+              }
+              whileHover={
+                !isMobile
+                  ? {
+                      y: -8,
+                      color: "#D4AF37",
+                      textShadow: "0 0 12px rgba(212, 175, 55, 0.85)",
+                      transition: { type: "spring", stiffness: 350, damping: 14 }
+                    }
+                  : {}
+              }
+              className="inline-block cursor-default font-semibold drop-shadow-[0_0_8px_rgba(212,175,55,0.25)] tracking-wide transition-all duration-300"
+            >
+              {char === " " ? "\u00A0" : char}
+            </motion.span>
+          );
+        })}
       </motion.span>
     );
   };
 
-  // Card Float & Tilt Variants
+  // Card Float & Tilt Variants (breathing loops)
   const cardFloatVariants = {
     animate: {
-      y: [0, -8, 0],
-      rotateX: [0, 1.2, 0, -1.2, 0],
-      rotateY: [0, -1.2, 0, 1.2, 0],
-      scale: [1, 1.01, 1],
+      y: [0, -6, 0],
+      rotateX: [0, 0.8, 0, -0.8, 0],
+      rotateY: [0, -0.8, 0, 0.8, 0],
+      scale: [1, 1.008, 1],
       transition: {
-        y: { duration: 5.5, repeat: Infinity, ease: "easeInOut" },
-        rotateX: { duration: 6.8, repeat: Infinity, ease: "easeInOut" },
-        rotateY: { duration: 8.2, repeat: Infinity, ease: "easeInOut" },
-        scale: { duration: 6.0, repeat: Infinity, ease: "easeInOut" }
+        y: { duration: 7.0, repeat: Infinity, ease: "easeInOut" },
+        rotateX: { duration: 8.0, repeat: Infinity, ease: "easeInOut" },
+        rotateY: { duration: 9.5, repeat: Infinity, ease: "easeInOut" },
+        scale: { duration: 7.5, repeat: Infinity, ease: "easeInOut" }
       }
     }
   };
@@ -183,13 +237,15 @@ export default function Hero() {
       {/* ==================================================
           STAGE 4 - FLOATING INVITATION CARD CENTERPIECE
           ================================================== */}
-      <div className="relative z-10 flex flex-col items-center max-w-lg w-full text-center">
+      <div className="relative z-10 flex flex-col items-center max-w-lg w-full text-center select-none">
         
         {/* Embossed Ivory Card Body with Floating Animation wrapper */}
         <motion.div
           variants={cardFloatVariants}
           animate="animate"
-          className="relative w-full max-w-[340px] md:max-w-[410px] bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] px-8 pt-16 pb-12 rounded-[180px_180px_24px_24px] border-[2.2px] border-[#D4AF37]/50 luxury-shadow-heavy shadow-[inset_0_0_24px_rgba(212,175,55,0.08)] flex flex-col items-center overflow-hidden"
+          onClick={handleCardTap}
+          whileTap={{ scale: 0.99 }}
+          className="relative w-full max-w-[340px] md:max-w-[410px] bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] px-8 pt-16 pb-12 rounded-[180px_180px_24px_24px] border-[2.2px] border-[#D4AF37]/50 luxury-shadow-heavy shadow-[inset_0_0_24px_rgba(212,175,55,0.08)] flex flex-col items-center overflow-hidden cursor-pointer"
           style={{ transformStyle: "preserve-3d" }}
         >
           {/* Embossed ivory texture grid pattern */}
@@ -204,11 +260,18 @@ export default function Hero() {
           <div className="absolute inset-[10px] border border-[#D4AF37]/25 rounded-[170px_170px_16px_16px] pointer-events-none z-10" />
           <div className="absolute inset-[13px] border border-dashed border-[#D4AF37]/15 rounded-[167px_167px_13px_13px] pointer-events-none z-10" />
 
-          {/* Soft wave of gold glow pulse that washes card face at 4.2s */}
+          {/* Soft wave of gold glow pulse that washes card face at 4.2s (and on card tap) */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.35, 0] }}
-            transition={{ delay: 4.2, duration: 1.8, ease: "easeInOut" }}
+            animate={
+              isCardTapped
+                ? { opacity: [0, 0.5, 0], scale: [0.98, 1.02, 0.98] }
+                : { opacity: [0, 0.35, 0] }
+            }
+            transition={
+              isCardTapped 
+                ? { duration: 1.0, ease: "easeInOut" } 
+                : { delay: 4.2, duration: 1.8, ease: "easeInOut" }
+            }
             className="absolute inset-0 bg-[#D4AF37]/5 rounded-[170px_170px_16px_16px] pointer-events-none z-0 blur-xl"
           />
 
@@ -256,11 +319,11 @@ export default function Hero() {
               variants={groomStagger}
               className="font-cormorant text-4xl md:text-5xl font-semibold text-[#4A081B] tracking-wide"
             >
-              {splitName("Fauzan", groomStagger)}
+              {splitName("Fauzan", groomStagger, false)}
             </motion.h1>
 
             {/* Premium Gold Star Rosette Divider */}
-            <div className="my-5 w-full flex items-center justify-center gap-4 relative">
+            <div className="my-5 w-full flex items-center justify-center gap-4 relative pointer-events-none">
               <motion.span 
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
@@ -268,17 +331,29 @@ export default function Hero() {
                 style={{ transformOrigin: "right center" }}
                 className="h-[0.5px] w-12 bg-gradient-to-r from-transparent to-[#D4AF37]/50" 
               />
-              <motion.div
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 2.6, ease: "easeOut" }}
-                className="text-[#D4AF37] flex items-center justify-center drop-shadow-[0_0_10px_rgba(212,175,55,0.65)]"
-              >
-                <svg className="w-8 h-8 animate-pulse-slow" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M 50 12 L 61 39 L 88 50 L 61 61 L 50 88 L 39 61 L 12 50 L 39 39 Z" />
-                  <circle cx="50" cy="50" r="7.5" fill="currentColor" />
-                </svg>
-              </motion.div>
+              <div className="relative flex items-center justify-center">
+                {/* Tap Sparkle ring expanding */}
+                <motion.div
+                  animate={
+                    isCardTapped
+                      ? { scale: [1, 2.0, 1], opacity: [0, 0.95, 0] }
+                      : { scale: 1, opacity: 0 }
+                  }
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  className="absolute w-12 h-12 rounded-full border border-[#D4AF37] pointer-events-none z-30"
+                />
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8, delay: 2.6, ease: "easeOut" }}
+                  className="text-[#D4AF37] flex items-center justify-center drop-shadow-[0_0_10px_rgba(212,175,55,0.65)] z-10"
+                >
+                  <svg className="w-8 h-8 animate-pulse-slow" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M 50 12 L 61 39 L 88 50 L 61 61 L 50 88 L 39 61 L 12 50 L 39 39 Z" />
+                    <circle cx="50" cy="50" r="7.5" fill="currentColor" />
+                  </svg>
+                </motion.div>
+              </div>
               <motion.span 
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
@@ -305,7 +380,7 @@ export default function Hero() {
               variants={brideStagger}
               className="font-cormorant text-4xl md:text-5xl font-semibold text-[#4A081B] tracking-wide mb-6"
             >
-              {splitName("Huda", brideStagger)}
+              {splitName("Huda", brideStagger, true)}
             </motion.h1>
 
             {/* Honor request line (Fades in last - starts at 4.0s) */}
