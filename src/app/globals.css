@@ -1,26 +1,413 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-brand-bg: #F6EBDD;
+  --color-brand-secondary: #FFF8ED;
+  --color-brand-card: #FFF8ED;
+  --color-brand-dark: #6D0F2A;
+  --color-brand-soft-dark: #4A081B;
+  --color-brand-gold: #D4AF37;
+  --color-brand-gold-glow: #E8C76A;
+  --color-brand-heading: #4A081B;
+  --color-brand-body: #6D0F2A;
+
+  --font-cinzel: var(--font-cinzel);
+  --font-cormorant: var(--font-cormorant);
+  --font-inter: var(--font-inter);
+  --font-amiri: var(--font-amiri);
+  
+  --animate-pulse-slow: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-float-slow: float-slow 8s ease-in-out infinite;
+  --animate-shimmer: shimmer 2s linear infinite;
+  --animate-fade-in-blur: fade-in-blur 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.04);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1.5deg);
+  }
 }
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes fade-in-blur {
+  0% {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+:root {
+  --background: #F6EBDD;
+  --foreground: #4A081B;
+}
+
+body {
+  background-color: #F6EBDD;
+  color: #4A081B;
+  font-family: var(--font-inter), sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Luxury Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #F6EBDD;
+}
+::-webkit-scrollbar-thumb {
+  background: #D4AF37;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #E8C76A;
+}
+
+/* Premium Gold Shimmer Text */
+.gold-shimmer-text {
+  background: linear-gradient(
+    to right,
+    #D4AF37 20%,
+    #E8C76A 40%,
+    #FFF8ED 60%,
+    #D4AF37 80%
+  );
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Champagne gold border shimmer */
+.gold-border-shimmer {
+  border: 1px solid transparent;
+  background: linear-gradient(#FFF8ED, #FFF8ED) padding-box,
+              linear-gradient(to right, #D4AF37, #E8C76A, #D4AF37) border-box;
+}
+
+/* Custom Islamic pattern background in gold, extremely faint */
+.islamic-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Cpath d='M45 0l45 45-45 45L0 45z' fill='none' stroke='%23D4AF37' stroke-width='0.4' stroke-opacity='0.06'/%3E%3Cpath d='M45 12l33 33-33 33-33-33z' fill='none' stroke='%23D4AF37' stroke-width='0.4' stroke-opacity='0.04'/%3E%3Ccircle cx='45' cy='45' r='6' fill='none' stroke='%23D4AF37' stroke-width='0.4' stroke-opacity='0.06'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+/* Layered Printed Paper Soft Shadows using Burgundy bases */
+.luxury-shadow-card {
+  box-shadow: 
+    0 2px 4px rgba(109, 15, 42, 0.02),
+    0 12px 32px -6px rgba(109, 15, 42, 0.04),
+    0 22px 45px -12px rgba(212, 175, 55, 0.08);
+}
+
+.luxury-shadow-heavy {
+  box-shadow: 
+    0 10px 50px -10px rgba(74, 8, 27, 0.15),
+    0 20px 70px -15px rgba(212, 175, 55, 0.2);
+}
+
+/* Cinematic falloff background shadow vignette using Deep Burgundy */
+.vignette-overlay {
+  background: radial-gradient(
+    circle,
+    rgba(246, 235, 221, 0) 55%,
+    rgba(74, 8, 27, 0.06) 100%
+  );
+}
+
+/* Soft gold glow radial lights */
+.radial-glow-gold {
+  box-shadow: 0 0 50px 15px rgba(212, 175, 55, 0.15);
+}
+
+.radial-glow-dark {
+  box-shadow: 0 0 65px 20px rgba(109, 15, 42, 0.12);
+}
+
+/* Scroll helper */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* --- PREMIUM CINEMATIC DOOR UTILITIES --- */
+
+/* Burgundy Velvet Texture Simulation */
+.walnut-door-texture {
+  background: radial-gradient(
+    circle at 50% 35%,
+    #7E1533 0%,
+    #6D0F2A 35%,
+    #4A081B 70%,
+    #2D040F 100%
+  );
+  position: relative;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.7);
+}
+
+.walnut-door-texture::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.15;
+  background-image: 
+    radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+    radial-gradient(rgba(0, 0, 0, 0.25) 1px, transparent 1px);
+  background-size: 3px 3px, 4px 4px;
+  background-position: 0 0, 1px 1px;
+}
+
+/* Polished Royal Mahogany Palace Door Texture */
+.palace-door-texture {
+  background: linear-gradient(
+    90deg,
+    #2D040F 0%,
+    #4A081B 20%,
+    #3A0513 40%,
+    #5C0C22 60%,
+    #4A081B 80%,
+    #2D040F 100%
+  );
+  position: relative;
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.85);
+}
+
+.palace-door-texture::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.4) 1px, rgba(0, 0, 0, 0.4) 2px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.04) 1px, transparent 1px, transparent 15px);
+}
+
+/* 3D door layout perspective */
+.door-perspective-container {
+  perspective: 1600px;
+  perspective-origin: 50% 50%;
+}
+
+/* Burgundy Velvet + Fine Wood Grain Blended Door Face */
+.burgundy-velvet-wood-door {
+  background: radial-gradient(
+    circle at 50% 35%,
+    #7E1533 0%,
+    #6D0F2A 35%,
+    #4A081B 70%,
+    #2D040F 100%
+  );
+  position: relative;
+  box-shadow: inset 0 0 75px rgba(0,0,0,0.9);
+}
+
+.burgundy-velvet-wood-door::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.14;
+  /* Fine organic wood fiber lines overlaid with velvet felt texture */
+  background-image: 
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 12px),
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.3) 1px, rgba(0, 0, 0, 0.3) 2px),
+    radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: auto, auto, 4px 4px;
+}
+
+/* Upgraded 3D Box Door Faces (128px/5" thickness) */
+.door-3d-box {
+  transform-style: preserve-3d;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.door-face-front {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(64px);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.door-face-back {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(-64px) rotateY(180deg);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.9);
+}
+
+.door-face-edge-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -64px;
+  width: 128px;
+  transform: rotateY(90deg);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  background: linear-gradient(to right, #2D040F, #4A081B, #2D040F);
+  box-shadow: inset 0 0 25px rgba(0,0,0,0.85);
+  border-left: 1.5px solid #D4AF37; /* Gold bevel edges on thickness corners! */
+  border-right: 1.5px solid #D4AF37;
+}
+
+.door-face-edge-left {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -64px;
+  width: 128px;
+  transform: rotateY(-90deg);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  background: linear-gradient(to right, #2D040F, #4A081B, #2D040F);
+  box-shadow: inset 0 0 25px rgba(0,0,0,0.85);
+  border-left: 1.5px solid #D4AF37; /* Gold bevel edges on thickness corners! */
+  border-right: 1.5px solid #D4AF37;
+}
+
+/* Gold Bevel Medallion */
+.gold-medallion-bevel {
+  background: radial-gradient(circle at 35% 35%, #FFF8ED 0%, #D4AF37 40%, #B88E44 80%, #856124 100%);
+  box-shadow:
+    inset 0 3px 6px rgba(255, 255, 255, 0.7),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.6),
+    0 12px 36px rgba(74, 8, 27, 0.5);
+}
+
+.gold-medallion-inner {
+  background: radial-gradient(circle at 45% 45%, #FFF8ED 0%, #F6EBDD 35%, #6D0F2A 80%, #4A081B 100%);
+  box-shadow: 
+    inset 0 2px 4px rgba(255,255,255,0.9),
+    inset 0 -2px 5px rgba(0,0,0,0.6),
+    inset 0 0 12px rgba(109, 15, 42, 0.5);
+}
+
+/* Gold reflection sweep effect */
+@keyframes gold-reflection {
+  0% {
+    transform: translateX(-150%) rotate(25deg);
+  }
+  18% {
+    transform: translateX(150%) rotate(25deg);
+  }
+  100% {
+    transform: translateX(150%) rotate(25deg);
+  }
+}
+
+.reflection-sweep-active {
+  animation: gold-reflection 5.5s ease-in-out infinite;
+}
+
+/* Volumetric light shafts */
+@keyframes volumetric-glow {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.96) translate(-50%, -50%);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05) translate(-50%, -50%);
+  }
+}
+
+.volumetric-bloom {
+  background: radial-gradient(circle, rgba(242, 215, 166, 0.35) 0%, rgba(212, 175, 55, 0.08) 50%, rgba(0,0,0,0) 70%);
+  transform-origin: top left;
+  animation: volumetric-glow 9s ease-in-out infinite;
+}
+
+/* Arch Card Custom Mask/Clipping */
+.arch-card-clip {
+  border-radius: 9999px 9999px 24px 24px;
+}
+
+/* Camera Tension Shake (0.8s wood friction shake) */
+@keyframes tension-shake {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  12% { transform: translate(-2.5px, -1.5px) rotate(-0.6deg); }
+  25% { transform: translate(-1.5px, 2.5px) rotate(0.6deg); }
+  37% { transform: translate(1.5px, -1.5px) rotate(-0.4deg); }
+  50% { transform: translate(-2.5px, 1.5px) rotate(0.5deg); }
+  62% { transform: translate(2.5px, -2.5px) rotate(-0.5deg); }
+  75% { transform: translate(-1.5px, 1.5px) rotate(0.4deg); }
+  87% { transform: translate(2px, 1px) rotate(-0.3deg); }
+}
+
+.camera-tension-shake {
+  animation: tension-shake 0.8s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Orbiting progress star/spark */
+@keyframes orbit-progress {
+  0% { transform: rotate(0deg) translateX(74px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(74px) rotate(-360deg); }
+}
+
+.orbiting-spark-el {
+  animation: orbit-progress 2.5s linear infinite;
+}
+
+/* Moving Rays */
+@keyframes ray-movement {
+  0%, 100% { opacity: 0.15; transform: rotate(0deg) scale(1); }
+  50% { opacity: 0.3; transform: rotate(180deg) scale(1.15); }
+}
+
+.moving-rays-bg {
+  animation: ray-movement 22s linear infinite;
+}
+
+/* Premium luxury hover effect utility class */
+.luxury-hover-lift {
+  transition: transform 450ms cubic-bezier(0.25, 1, 0.5, 1), 
+              box-shadow 450ms cubic-bezier(0.25, 1, 0.5, 1), 
+              filter 450ms cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform, box-shadow;
+}
+.luxury-hover-lift:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 16px 36px -12px rgba(109, 15, 42, 0.22), 
+              0 0 20px rgba(212, 175, 55, 0.25);
+}
+
+
