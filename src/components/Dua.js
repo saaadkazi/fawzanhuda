@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 
 // Section curved transition divider (Venue to Dua)
 const SectionDivider = () => {
@@ -14,7 +14,7 @@ const SectionDivider = () => {
   );
 };
 
-export default function Dua() {
+function Dua() {
   const [stars, setStars] = useState([]);
 
   useEffect(() => {
@@ -122,3 +122,5 @@ export default function Dua() {
     </section>
   );
 }
+
+export default memo(Dua);

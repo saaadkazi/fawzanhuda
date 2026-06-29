@@ -9,9 +9,36 @@ export default function Preloader({ onComplete }) {
   const [isFinished, setIsFinished] = useState(false);
   const [particles, setParticles] = useState([]);
   const [mounted, setMounted] = useState(false);
+  const [assetsReady, setAssetsReady] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+
+    // Asynchronously preload critical fonts and images
+    const preloadAssets = async () => {
+      try {
+        if (typeof document !== "undefined" && document.fonts) {
+          await document.fonts.ready;
+        }
+        
+        const imageUrls = ["/map_preview.png"];
+        const promises = imageUrls.map((url) => {
+          return new Promise((resolve) => {
+            const img = new Image();
+            img.src = url;
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        });
+        await Promise.all(promises);
+      } catch (err) {
+        console.warn("Asset preloading encountered issues:", err);
+      }
+    };
+
+    preloadAssets().then(() => {
+      setAssetsReady(true);
+    });
 
     // Generate drift sparks client-side
     const generated = Array.from({ length: 22 }).map((_, i) => ({
@@ -24,7 +51,6 @@ export default function Preloader({ onComplete }) {
     setParticles(generated);
 
     // Organic loading timing: Ease-out cubic progress curve
-    // Fast initial surge, slows down toward the end to build anticipation, then finishes
     const duration = 3500; // 3.5 seconds
     const intervalTime = 35;
     const totalSteps = duration / intervalTime;
@@ -32,23 +58,27 @@ export default function Preloader({ onComplete }) {
 
     const timer = setInterval(() => {
       currentStep++;
-      const t = currentStep / totalSteps; // 0 to 1
-      
-      // easeOutCubic: starts quickly, slows down exponentially as it approaches 1
+      const t = currentStep / totalSteps;
       const easedT = 1 - Math.pow(1 - t, 3.5);
       const nextProgress = Math.min(Math.round(easedT * 100), 100);
       setProgress(nextProgress);
 
       if (currentStep >= totalSteps) {
         clearInterval(timer);
-        // Play spiritual chime chord on completion
         playChime();
-        onComplete();
+        setIsFinished(true);
       }
     }, intervalTime);
 
     return () => clearInterval(timer);
-  }, [onComplete]);
+  }, []);
+
+  // Wait for both progress to complete and assets to be ready
+  useEffect(() => {
+    if (isFinished && assetsReady) {
+      onComplete();
+    }
+  }, [isFinished, assetsReady, onComplete]);
 
   // SVG Progress Arc Math
   const radius = 64;

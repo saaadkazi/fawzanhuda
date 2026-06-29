@@ -68,8 +68,13 @@ export default function Hero() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    // Generate soft drifting particles (rose petals, stars, sparks, dust)
-    const generated = Array.from({ length: 32 }).map((_, i) => {
+    // Screen resize checking
+    const checkMobileVal = typeof window !== "undefined" && window.innerWidth < 768;
+    setIsMobile(checkMobileVal);
+
+    // Generate soft drifting particles (rose petals, stars, sparks, dust - reduced by 60% on mobile: 32 -> 12)
+    const particleCount = checkMobileVal ? 12 : 32;
+    const generated = Array.from({ length: particleCount }).map((_, i) => {
       const types = ["petal", "spark", "dust", "star"];
       return {
         id: i,
@@ -82,10 +87,8 @@ export default function Hero() {
     });
     setParticles(generated);
 
-    // Screen resize checking
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
 
     // Mouse position listener for 3D parallax
     const handleMouseMove = (e) => {
@@ -98,7 +101,7 @@ export default function Hero() {
     window.addEventListener("mousemove", handleMouseMove);
 
     return () => {
-      window.removeEventListener("resize", checkMobile);
+      window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
     };
   }, []);
@@ -216,15 +219,17 @@ export default function Hero() {
       {/* ==================================================
           MIDDLE LAYER: VOLUMETRIC FOG & ROTATING LIGHT RAYS
           ================================================== */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[600px] pointer-events-none z-[2] volumetric-bloom opacity-45" />
-      <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] md:w-[520px] md:h-[520px] rounded-full bg-[#D4AF37]/10 blur-[90px] pointer-events-none z-[1]" />
+      <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full ${isMobile ? 'h-[300px] opacity-25' : 'h-[600px] opacity-45'} pointer-events-none z-[2] volumetric-bloom`} />
+      <div className={`absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 ${isMobile ? 'w-[200px] h-[200px] blur-[40px] opacity-5' : 'w-[350px] h-[350px] md:w-[520px] md:h-[520px] blur-[90px]'} rounded-full bg-[#D4AF37]/10 pointer-events-none z-[1]`} />
       
-      {/* Conic rotating volumetric rays */}
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 38, repeat: Infinity, ease: "linear" }}
-        className="absolute w-[800px] h-[800px] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(212,175,55,0.06)_45deg,transparent_90deg,rgba(212,175,55,0.06)_135deg,transparent_180deg)] opacity-50 z-[1] pointer-events-none"
-      />
+      {/* Conic rotating volumetric rays (hidden on mobile for rendering speed) */}
+      {!isMobile && (
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 38, repeat: Infinity, ease: "linear" }}
+          className="absolute w-[800px] h-[800px] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(212,175,55,0.06)_45deg,transparent_90deg,rgba(212,175,55,0.06)_135deg,transparent_180deg)] opacity-50 z-[1] pointer-events-none"
+        />
+      )}
 
       {/* ==================================================
           FRONT LAYER: MULTI-TYPE PREMIUM PARTICLES
@@ -305,7 +310,7 @@ export default function Hero() {
           }
           onClick={handleCardTap}
           whileTap={{ scale: 0.99 }}
-          className="relative w-full max-w-[340px] md:max-w-[410px] bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] px-8 pt-16 pb-12 rounded-[180px_180px_24px_24px] border-[2.2px] border-[#D4AF37]/50 luxury-shadow-heavy shadow-[inset_0_0_24px_rgba(212,175,55,0.08)] flex flex-col items-center overflow-hidden cursor-pointer"
+          className={`relative w-full max-w-[340px] md:max-w-[410px] bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] px-8 pt-16 pb-12 rounded-[180px_180px_24px_24px] border-[2.2px] border-[#D4AF37]/50 ${isMobile ? 'shadow-md' : 'luxury-shadow-heavy'} shadow-[inset_0_0_24px_rgba(212,175,55,0.08)] flex flex-col items-center overflow-hidden cursor-pointer`}
           style={{ transformStyle: "preserve-3d" }}
         >
           {/* Elegant Islamic card corner frame ornaments for depth */}

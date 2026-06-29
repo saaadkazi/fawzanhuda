@@ -12,7 +12,7 @@ import {
   playWhoosh 
 } from "@/utils/audioSynth";
 
-export default function GrandOpening({ isOpen, onOpen, children }) {
+export default function GrandOpening({ isOpen, onOpen, onStartOpening, children }) {
   const [stage, setStage] = useState("closed"); // "closed" | "tapping" | "swinging" | "opened"
   const [showDoorsOverlay, setShowDoorsOverlay] = useState(true);
   const [ambientWind, setAmbientWind] = useState(null);
@@ -21,6 +21,7 @@ export default function GrandOpening({ isOpen, onOpen, children }) {
   const [idleParticles, setIdleParticles] = useState([]);
   const [scaleFactor, setScaleFactor] = useState(4.5);
   const [isMobile, setIsMobile] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // DOM Refs for high-performance direct GSAP animations
   const cameraContainerRef = useRef(null);
@@ -95,11 +96,16 @@ export default function GrandOpening({ isOpen, onOpen, children }) {
 
   const handleMedallionTap = (e) => {
     if (e) e.stopPropagation();
-    if (stage !== "closed") return;
+    if (stage !== "closed" || isTransitioning) return;
+    setIsTransitioning(true);
 
     setStage("tapping");
     playMetallicTap();
     triggerWaxMelting();
+
+    if (onStartOpening) {
+      onStartOpening();
+    }
 
     // Create a high-performance GSAP timeline to sequence the entire opening experience
     const tl = gsap.timeline({

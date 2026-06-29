@@ -44,10 +44,13 @@ export default function Home() {
     };
   }, [status]);
 
+  const handleStartOpening = () => {
+    setStatus("transitioning");
+    setIsMusicPlaying(true);
+  };
+
   const handleOpenInvitation = () => {
     setStatus("opened");
-    // Start background music immediately upon unlocking
-    setIsMusicPlaying(true);
   };
 
   return (
@@ -67,17 +70,27 @@ export default function Home() {
 
       {/* 3. Grand Entrance double doors split wrapping Scrollable Content */}
       {status !== "loading" && (
-        <GrandOpening isOpen={status === "opened"} onOpen={handleOpenInvitation}>
-          {status === "opened" && (
+        <GrandOpening 
+          isOpen={status === "opened"} 
+          onOpen={handleOpenInvitation}
+          onStartOpening={handleStartOpening}
+        >
+          {(status === "transitioning" || status === "opened") && (
             <main className="w-full relative flex flex-col min-h-screen">
-              {/* Wedding sections */}
+              {/* Critical Hero preloaded instantly in background during transition */}
               <Hero />
-              <Parents />
-              <ScratchDate />
-              <Countdown />
-              <Venue />
-              <Dua />
-              <Footer />
+              
+              {/* Lazy-load other heavy sections ONLY after doors fully resolve */}
+              {status === "opened" && (
+                <>
+                  <Parents />
+                  <ScratchDate />
+                  <Countdown />
+                  <Venue />
+                  <Dua />
+                  <Footer />
+                </>
+              )}
             </main>
           )}
         </GrandOpening>

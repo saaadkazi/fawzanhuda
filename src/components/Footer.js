@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { memo } from "react";
 
-export default function Footer() {
+function Footer() {
   return (
     <footer className="py-24 px-6 bg-gradient-to-b from-[#2D040F] via-[#4A081B] to-[#2D040F] relative overflow-hidden flex flex-col items-center justify-center">
       
@@ -121,3 +122,5 @@ export default function Footer() {
     </footer>
   );
 }
+
+export default memo(Footer);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { motion } from "framer-motion";
 import { MapPin, Navigation } from "lucide-react";
 import FloralOrnament from "./FloralOrnament";
@@ -39,7 +39,7 @@ const GoldenMapGraphic = () => (
   </svg>
 );
 
-export default function Venue() {
+function Venue() {
   const mapLink = "https://maps.app.goo.gl/mqkn5eL4ZUfMuXE86";
   const [bgParticles, setBgParticles] = useState([]);
 
@@ -211,3 +211,5 @@ export default function Venue() {
     </section>
   );
 }
+
+export default memo(Venue);

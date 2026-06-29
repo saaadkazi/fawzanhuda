@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import FloralOrnament from "./FloralOrnament";
 
@@ -40,7 +40,7 @@ const GoldOrnamentalDivider = () => {
   );
 };
 
-export default function Parents() {
+function Parents() {
   const [groomRipple, setGroomRipple] = useState(false);
   const [brideRipple, setBrideRipple] = useState(false);
   const [bgParticles, setBgParticles] = useState([]);
@@ -366,3 +366,5 @@ export default function Parents() {
     </section>
   );
 }
+
+export default memo(Parents);

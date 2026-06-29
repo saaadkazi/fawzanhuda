@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Section curved transition divider (Countdown to Venue)
@@ -14,7 +14,7 @@ const SectionDivider = () => {
   );
 };
 
-export default function Countdown() {
+function Countdown() {
   const targetDate = new Date("2026-12-09T00:00:00").getTime();
   
   const [timeLeft, setTimeLeft] = useState({
@@ -204,3 +204,5 @@ function CountdownCard({ value, label, format }) {
     </div>
   );
 }
+
+export default memo(Countdown);

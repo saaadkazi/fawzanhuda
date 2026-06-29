@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Section curved transition divider (Parents to ScratchDate)
@@ -260,7 +260,7 @@ function ScratchCard({ value, label, onReveal, index }) {
   );
 }
 
-export default function ScratchDate() {
+function ScratchDate() {
   const [revealedCards, setRevealedCards] = useState([false, false, false]);
   const [celebrationParticles, setCelebrationParticles] = useState([]);
   const [bgStars, setBgStars] = useState([]);
@@ -442,3 +442,5 @@ export default function ScratchDate() {
     </section>
   );
 }
+
+export default memo(ScratchDate);
