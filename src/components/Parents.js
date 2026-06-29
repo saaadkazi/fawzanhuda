@@ -3,15 +3,36 @@
 import { motion } from "framer-motion";
 import FloralOrnament from "./FloralOrnament";
 
+// Gold ornamental divider for top transition
+const GoldOrnamentalDivider = () => {
+  return (
+    <div className="w-48 h-10 text-[#D4AF37]/50 flex items-center justify-center opacity-85 mb-16 pointer-events-none">
+      <svg className="w-full h-full" viewBox="0 0 100 30" fill="none" stroke="currentColor" strokeWidth="1">
+        {/* Swirling scrolls */}
+        <path d="M 10,15 L 42,15 C 46,15 48,11 50,7 C 52,11 54,15 58,15 L 90,15" />
+        <path d="M 30,15 Q 35,9 40,15" />
+        <path d="M 60,15 Q 65,9 70,15" />
+        <circle cx="50" cy="7" r="3" fill="currentColor" />
+        <circle cx="24" cy="15" r="1.8" fill="currentColor" />
+        <circle cx="76" cy="15" r="1.8" fill="currentColor" />
+      </svg>
+    </div>
+  );
+};
+
 export default function Parents() {
   const cardVariants = {
-    hidden: { opacity: 0, y: 40, filter: "blur(6px)" },
+    hidden: { 
+      opacity: 0, 
+      y: 30, 
+      filter: "blur(8px)" 
+    },
     visible: (customDelay) => ({
       opacity: 1,
       y: 0,
       filter: "blur(0px)",
       transition: {
-        duration: 1.2,
+        duration: 1.4,
         delay: customDelay,
         ease: [0.22, 1, 0.36, 1],
       },
@@ -19,15 +40,18 @@ export default function Parents() {
   };
 
   return (
-    <section className="py-28 px-6 bg-gradient-to-b from-[#FFF8ED] via-[#F6EBDD] to-[#FFF8ED] relative overflow-hidden flex flex-col items-center">
+    <section className="py-20 px-6 bg-gradient-to-b from-[#FFF8ED] via-[#F6EBDD] to-[#FFF8ED] relative overflow-hidden flex flex-col items-center">
       {/* Background ambient glows */}
       <div className="absolute top-1/2 left-0 -translate-y-1/2 w-48 h-96 bg-brand-gold/8 rounded-r-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 right-0 -translate-y-1/2 w-48 h-96 bg-brand-dark/5 rounded-l-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 right-0 -translate-y-1/2 w-48 h-96 bg-[#4A081B]/5 rounded-l-full blur-3xl pointer-events-none" />
 
-      <div className="max-w-4xl w-full relative z-10">
+      {/* Luxury divider at the top boundary */}
+      <GoldOrnamentalDivider />
+
+      <div className="max-w-4xl w-full relative z-10 flex flex-col items-center">
         
         {/* Section Heading */}
-        <div className="text-center mb-20">
+        <div className="text-center mb-16">
           <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-brand-gold font-semibold">
             With Praise to Allah
           </span>
@@ -47,24 +71,27 @@ export default function Parents() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}
-            whileHover={{ y: -6, scale: 1.015 }}
-            className="w-full max-w-[340px] bg-brand-card/90 backdrop-blur-sm px-6 py-12 rounded-[140px_140px_20px_20px] border border-brand-gold/20 luxury-shadow-card flex flex-col items-center text-center relative group overflow-hidden transition-shadow duration-500 hover:shadow-[0_15px_40px_rgba(109,15,42,0.15)]"
+            className="w-full max-w-[340px] bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] px-6 py-12 rounded-[140px_140px_20px_20px] border-[2px] border-[#D4AF37]/45 shadow-[0_12px_28px_rgba(75,58,50,0.12)] shadow-[inset_0_0_16px_rgba(212,175,55,0.06)] flex flex-col items-center text-center relative group overflow-hidden transition-all duration-300 luxury-hover-lift"
           >
+            {/* Linen background paper texture */}
+            <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
+                 style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #4A081B 1px, transparent 1px), radial-gradient(circle at 0 0, #4A081B 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
+
             {/* Corner ornaments */}
             <FloralOrnament position="bottom-left" opacity={0.25} />
             <FloralOrnament position="bottom-right" opacity={0.25} />
 
             {/* Subtle inner gold arch borders */}
-            <div className="absolute inset-[8px] border border-brand-gold/15 rounded-[132px_132px_14px_14px] pointer-events-none" />
-            <div className="absolute inset-[11px] border border-dashed border-brand-gold/5 rounded-[129px_129px_11px_11px] pointer-events-none" />
+            <div className="absolute inset-[8px] border border-brand-gold/20 rounded-[132px_132px_14px_14px] pointer-events-none" />
+            <div className="absolute inset-[11px] border border-dashed border-brand-gold/10 rounded-[129px_129px_11px_11px] pointer-events-none" />
             
-            <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.25em] text-brand-gold font-bold mb-6 bg-brand-secondary/45 px-3 py-1 rounded-full border border-brand-gold/10">
+            <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.25em] text-[#4A081B] font-bold mb-6 bg-[#D4AF37]/15 px-3 py-1 rounded-full border border-brand-gold/25 z-10">
               Parents of the Groom
             </span>
 
             {/* SVG Islamic motif inside card */}
-            <div className="w-8 h-8 text-brand-gold/40 mb-6 group-hover:scale-110 transition-transform duration-500">
-              <svg className="w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1">
+            <div className="w-8 h-8 text-brand-gold/60 mb-6 group-hover:scale-110 transition-transform duration-500 z-10">
+              <svg className="w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.2">
                 <path d="M 50 15 L 85 50 L 50 85 L 15 50 Z" />
                 <circle cx="50" cy="50" r="10" />
               </svg>
@@ -72,19 +99,24 @@ export default function Parents() {
 
             <div className="my-2 space-y-5 z-10 relative">
               <div>
-                <p className="font-cormorant text-xl md:text-2xl text-brand-heading tracking-wide font-semibold transition-colors duration-300 group-hover:text-brand-gold">
+                <p className="font-cormorant text-xl md:text-2xl text-[#4A081B] tracking-wide font-semibold select-all">
                   Rafiq Zainuddin Kazi
                 </p>
                 <p className="font-cormorant text-xs italic text-brand-body mt-1">Father</p>
               </div>
-              <div className="w-8 h-[0.5px] bg-brand-gold/30 mx-auto" />
+              <div className="w-8 h-[0.5px] bg-brand-gold/40 mx-auto" />
               <div>
-                <p className="font-cormorant text-xl md:text-2xl text-brand-heading tracking-wide font-semibold transition-colors duration-300 group-hover:text-brand-gold">
+                <p className="font-cormorant text-xl md:text-2xl text-[#4A081B] tracking-wide font-semibold select-all">
                   Hajara Rafiq Kazi
                 </p>
                 <p className="font-cormorant text-xs italic text-brand-body mt-1">Mother</p>
               </div>
             </div>
+
+            {/* Emotional Touch Dua line */}
+            <p className="font-cormorant text-xs italic text-brand-gold mt-6 select-none font-semibold z-10 drop-shadow-[0_0.5px_1px_rgba(255,255,255,0.8)]">
+              “May Allah bless both families with barakah.”
+            </p>
           </motion.div>
 
           {/* Bride Parents Card */}
@@ -94,24 +126,27 @@ export default function Parents() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}
-            whileHover={{ y: -6, scale: 1.015 }}
-            className="w-full max-w-[340px] bg-brand-card/90 backdrop-blur-sm px-6 py-12 rounded-[140px_140px_20px_20px] border border-brand-gold/20 luxury-shadow-card flex flex-col items-center text-center relative group overflow-hidden transition-shadow duration-500 hover:shadow-[0_15px_40px_rgba(109,15,42,0.15)]"
+            className="w-full max-w-[340px] bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] px-6 py-12 rounded-[140px_140px_20px_20px] border-[2px] border-[#D4AF37]/45 shadow-[0_12px_28px_rgba(75,58,50,0.12)] shadow-[inset_0_0_16px_rgba(212,175,55,0.06)] flex flex-col items-center text-center relative group overflow-hidden transition-all duration-300 luxury-hover-lift"
           >
+            {/* Linen background paper texture */}
+            <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
+                 style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #4A081B 1px, transparent 1px), radial-gradient(circle at 0 0, #4A081B 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
+
             {/* Corner ornaments */}
             <FloralOrnament position="bottom-left" opacity={0.25} />
             <FloralOrnament position="bottom-right" opacity={0.25} />
 
             {/* Subtle inner gold arch borders */}
-            <div className="absolute inset-[8px] border border-brand-gold/15 rounded-[132px_132px_14px_14px] pointer-events-none" />
-            <div className="absolute inset-[11px] border border-dashed border-brand-gold/5 rounded-[129px_129px_11px_11px] pointer-events-none" />
+            <div className="absolute inset-[8px] border border-brand-gold/20 rounded-[132px_132px_14px_14px] pointer-events-none" />
+            <div className="absolute inset-[11px] border border-dashed border-brand-gold/10 rounded-[129px_129px_11px_11px] pointer-events-none" />
 
-            <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.25em] text-brand-gold font-bold mb-6 bg-brand-secondary/45 px-3 py-1 rounded-full border border-brand-gold/10">
+            <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.25em] text-[#4A081B] font-bold mb-6 bg-[#D4AF37]/15 px-3 py-1 rounded-full border border-brand-gold/25 z-10">
               Parents of the Bride
             </span>
 
             {/* SVG Islamic motif inside card */}
-            <div className="w-8 h-8 text-brand-gold/40 mb-6 group-hover:scale-110 transition-transform duration-500">
-              <svg className="w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1">
+            <div className="w-8 h-8 text-brand-gold/60 mb-6 group-hover:scale-110 transition-transform duration-500 z-10">
+              <svg className="w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.2">
                 <path d="M 50 15 L 85 50 L 50 85 L 15 50 Z" />
                 <circle cx="50" cy="50" r="10" />
               </svg>
@@ -119,19 +154,24 @@ export default function Parents() {
 
             <div className="my-2 space-y-5 z-10 relative">
               <div>
-                <p className="font-cormorant text-xl md:text-2xl text-brand-heading tracking-wide font-semibold transition-colors duration-300 group-hover:text-brand-gold">
+                <p className="font-cormorant text-xl md:text-2xl text-[#4A081B] tracking-wide font-semibold select-all">
                   Hasham Ismail Kazi
                 </p>
                 <p className="font-cormorant text-xs italic text-brand-body mt-1">Father</p>
               </div>
-              <div className="w-8 h-[0.5px] bg-brand-gold/30 mx-auto" />
+              <div className="w-8 h-[0.5px] bg-brand-gold/40 mx-auto" />
               <div>
-                <p className="font-cormorant text-xl md:text-2xl text-brand-heading tracking-wide font-semibold transition-colors duration-300 group-hover:text-brand-gold">
+                <p className="font-cormorant text-xl md:text-2xl text-[#4A081B] tracking-wide font-semibold select-all">
                   Seemab Hasham Kazi
                 </p>
                 <p className="font-cormorant text-xs italic text-brand-body mt-1">Mother</p>
               </div>
             </div>
+
+            {/* Emotional Touch Dua line */}
+            <p className="font-cormorant text-xs italic text-brand-gold mt-6 select-none font-semibold z-10 drop-shadow-[0_0.5px_1px_rgba(255,255,255,0.8)]">
+              “May Allah bless both families with barakah.”
+            </p>
           </motion.div>
 
         </div>
