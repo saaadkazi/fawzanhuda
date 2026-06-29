@@ -4,6 +4,25 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import FloralOrnament from "./FloralOrnament";
 
+// Card corner ornament subcomponent
+const CardCornerOrnament = ({ position }) => {
+  const classMap = {
+    "top-left": "top-4 left-4 rotate-0",
+    "top-right": "top-4 right-4 rotate-90",
+    "bottom-left": "bottom-4 left-4 -rotate-90",
+    "bottom-right": "bottom-4 right-4 rotate-180",
+  };
+  return (
+    <div className={`absolute w-7 h-7 text-[#D4AF37]/35 pointer-events-none z-10 ${classMap[position]}`}>
+      <svg className="w-full h-full" viewBox="0 0 50 50" fill="none" stroke="currentColor" strokeWidth="1.2">
+        <path d="M 0,0 L 40,0 M 0,0 L 0,40" />
+        <path d="M 6,6 C 12,6 16,12 16,16 C 16,20 20,24 24,24" strokeDasharray="1.5,1.5" />
+        <circle cx="6" cy="6" r="1.2" fill="currentColor" />
+      </svg>
+    </div>
+  );
+};
+
 // Pointed Islamic Arch Outline vector with slow breathing float
 const ArchOutline = ({ className, delay = 0, scale = 1, opacity = 0.2 }) => {
   return (
@@ -46,24 +65,42 @@ export default function Hero() {
   const [isMobile, setIsMobile] = useState(false);
   const [isWaveActive, setIsWaveActive] = useState(false);
   const [isCardTapped, setIsCardTapped] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    // Generate soft drifting particles (gold sparks & burgundy rose petals)
-    const generated = Array.from({ length: 24 }).map((_, i) => ({
-      id: i,
-      left: `${Math.random() * 100}%`,
-      size: Math.random() * 2.5 + 1.2,
-      type: Math.random() > 0.65 ? "petal" : "spark",
-      delay: Math.random() * 4,
-      duration: Math.random() * 7 + 6,
-    }));
+    // Generate soft drifting particles (rose petals, stars, sparks, dust)
+    const generated = Array.from({ length: 32 }).map((_, i) => {
+      const types = ["petal", "spark", "dust", "star"];
+      return {
+        id: i,
+        left: `${Math.random() * 100}%`,
+        size: Math.random() * 3 + 1,
+        type: types[Math.floor(Math.random() * types.length)],
+        delay: Math.random() * 5,
+        duration: Math.random() * 8 + 7,
+      };
+    });
     setParticles(generated);
 
     // Screen resize checking
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+
+    // Mouse position listener for 3D parallax
+    const handleMouseMove = (e) => {
+      if (window.innerWidth < 768) return;
+      setMousePosition({
+        x: (e.clientX - window.innerWidth / 2) / 32,
+        y: (e.clientY - window.innerHeight / 2) / 32,
+      });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
   }, []);
 
   // Looping wave timeline on mobile every 3.8 seconds
@@ -142,22 +179,6 @@ export default function Hero() {
     );
   };
 
-  // Card Float & Tilt Variants (breathing loops)
-  const cardFloatVariants = {
-    animate: {
-      y: [0, -6, 0],
-      rotateX: [0, 0.8, 0, -0.8, 0],
-      rotateY: [0, -0.8, 0, 0.8, 0],
-      scale: [1, 1.008, 1],
-      transition: {
-        y: { duration: 7.0, repeat: Infinity, ease: "easeInOut" },
-        rotateX: { duration: 8.0, repeat: Infinity, ease: "easeInOut" },
-        rotateY: { duration: 9.5, repeat: Infinity, ease: "easeInOut" },
-        scale: { duration: 7.5, repeat: Infinity, ease: "easeInOut" }
-      }
-    }
-  };
-
   // Text Reveal stagger timelines
   const groomStagger = {
     hidden: {},
@@ -193,13 +214,20 @@ export default function Hero() {
       <ArchOutline className="w-[450px] h-[675px] md:w-[800px] md:h-[1200px] z-[4]" scale={1.3} opacity={0.1} delay={0.8} />
 
       {/* ==================================================
-          MIDDLE LAYER: VOLUMETRIC FOG & GLOWS
+          MIDDLE LAYER: VOLUMETRIC FOG & ROTATING LIGHT RAYS
           ================================================== */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[600px] pointer-events-none z-[2] volumetric-bloom opacity-40" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[600px] pointer-events-none z-[2] volumetric-bloom opacity-45" />
       <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] md:w-[520px] md:h-[520px] rounded-full bg-[#D4AF37]/10 blur-[90px] pointer-events-none z-[1]" />
+      
+      {/* Conic rotating volumetric rays */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 38, repeat: Infinity, ease: "linear" }}
+        className="absolute w-[800px] h-[800px] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(212,175,55,0.06)_45deg,transparent_90deg,rgba(212,175,55,0.06)_135deg,transparent_180deg)] opacity-50 z-[1] pointer-events-none"
+      />
 
       {/* ==================================================
-          FRONT LAYER: SPARKS & DRIFTING ROSE PETALS
+          FRONT LAYER: MULTI-TYPE PREMIUM PARTICLES
           ================================================== */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-[4]">
         {particles.map((p) => (
@@ -222,12 +250,20 @@ export default function Hero() {
             style={{ left: p.left }}
           >
             {p.type === "petal" ? (
-              // Tiny burgundy rose petal drifting
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="opacity-50">
+              // Crimson rose petal
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" className="opacity-50">
                 <path d="M 12 2 C 7 2 4 6 4 11 C 4 17 8 22 12 22 C 16 22 20 17 20 11 C 20 6 17 2 12 2 Z" fill="#6D0F2A" />
               </svg>
+            ) : p.type === "star" ? (
+              // Gold star sparkle
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" className="text-[#D4AF37] opacity-65">
+                <path d="M 12,2 L 15,9 L 22,10 L 17,15 L 18,22 L 12,18 L 6,22 L 7,15 L 2,10 L 9,9 Z" fill="currentColor" />
+              </svg>
+            ) : p.type === "dust" ? (
+              // Fine ivory dust
+              <div className="w-1 h-1 rounded-full bg-[#FFF8ED]/30" />
             ) : (
-              // Fine gold dust spark
+              // Gold spark glow
               <div className="w-1.5 h-1.5 rounded-full bg-[#E8C76A]/45 shadow-[0_0_5px_rgba(212,175,55,0.7)]" />
             )}
           </motion.div>
@@ -239,15 +275,45 @@ export default function Hero() {
           ================================================== */}
       <div className="relative z-10 flex flex-col items-center max-w-lg w-full text-center select-none">
         
-        {/* Embossed Ivory Card Body with Floating Animation wrapper */}
+        {/* Embossed Ivory Card Body with Parallax mouse tilt (fallback to float breathing on mobile) */}
         <motion.div
-          variants={cardFloatVariants}
-          animate="animate"
+          animate={
+            isMobile
+              ? {
+                  y: [0, -6, 0],
+                  rotateX: [0, 0.8, 0, -0.8, 0],
+                  rotateY: [0, -0.8, 0, 0.8, 0],
+                  scale: [1, 1.008, 1],
+                }
+              : {
+                  x: mousePosition.x,
+                  y: mousePosition.y - 4,
+                  rotateX: -mousePosition.y * 0.45,
+                  rotateY: mousePosition.x * 0.45,
+                  scale: 1.01,
+                }
+          }
+          transition={
+            isMobile
+              ? {
+                  y: { duration: 7.0, repeat: Infinity, ease: "easeInOut" },
+                  rotateX: { duration: 8.0, repeat: Infinity, ease: "easeInOut" },
+                  rotateY: { duration: 9.5, repeat: Infinity, ease: "easeInOut" },
+                  scale: { duration: 7.5, repeat: Infinity, ease: "easeInOut" },
+                }
+              : { type: "spring", stiffness: 120, damping: 25 }
+          }
           onClick={handleCardTap}
           whileTap={{ scale: 0.99 }}
           className="relative w-full max-w-[340px] md:max-w-[410px] bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] px-8 pt-16 pb-12 rounded-[180px_180px_24px_24px] border-[2.2px] border-[#D4AF37]/50 luxury-shadow-heavy shadow-[inset_0_0_24px_rgba(212,175,55,0.08)] flex flex-col items-center overflow-hidden cursor-pointer"
           style={{ transformStyle: "preserve-3d" }}
         >
+          {/* Elegant Islamic card corner frame ornaments for depth */}
+          <CardCornerOrnament position="top-left" />
+          <CardCornerOrnament position="top-right" />
+          <CardCornerOrnament position="bottom-left" />
+          <CardCornerOrnament position="bottom-right" />
+
           {/* Embossed ivory texture grid pattern */}
           <div className="absolute inset-0 opacity-[0.035] pointer-events-none" 
                style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #4A081B 1px, transparent 1px), radial-gradient(circle at 0 0, #4A081B 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
@@ -405,27 +471,42 @@ export default function Hero() {
           </div>
         </motion.div>
 
-        {/* Redesigned Premium Scroll Down Indicator */}
+        {/* Redesigned Premium Interactive Explore Scroll Down Indicator */}
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: [0.35, 0.95, 0.35] }}
-          transition={{ repeat: Infinity, duration: 2.5, delay: 4.5 }}
-          className="mt-12 flex flex-col items-center gap-3 pointer-events-none"
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.0, delay: 4.5 }}
+          className="mt-14 flex flex-col items-center gap-3 cursor-pointer group pointer-events-auto"
+          onClick={() => {
+            window.scrollTo({
+              top: window.innerHeight * 0.95,
+              behavior: "smooth"
+            });
+          }}
         >
-          <span className="font-cormorant text-[10px] md:text-xs uppercase tracking-[0.3em] text-[#FFF8ED]/80 font-medium">
+          <span className="font-cormorant text-[10px] md:text-xs uppercase tracking-[0.35em] text-[#FFF8ED]/80 font-bold transition-colors duration-300 group-hover:text-[#D4AF37] drop-shadow-[0_0_6px_rgba(212,175,55,0.15)]">
             Explore Invitation
           </span>
-          <div className="w-[1.5px] h-10 bg-gradient-to-b from-[#D4AF37] to-transparent relative overflow-hidden">
+          <div className="w-[1.5px] h-11 bg-gradient-to-b from-[#D4AF37]/40 via-[#D4AF37] to-transparent relative overflow-hidden shadow-[0_0_6px_rgba(212,175,55,0.3)]">
             {/* Moving light pulse line */}
             <motion.div
               animate={{ y: ["-100%", "200%"] }}
-              transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
-              className="absolute top-0 left-0 w-full h-4 bg-[#FFF8ED] shadow-[0_0_6px_#D4AF37]"
+              transition={{ repeat: Infinity, duration: 2.0, ease: "easeInOut" }}
+              className="absolute top-0 left-0 w-full h-5 bg-[#FFF8ED] shadow-[0_0_8px_#D4AF37]"
             />
           </div>
-          <svg className="w-3.5 h-3.5 text-[#D4AF37] animate-bounce" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-          </svg>
+          
+          <div className="relative flex items-center justify-center">
+            {/* Soft glow pulse halo */}
+            <motion.div
+              animate={{ scale: [1, 1.4, 1], opacity: [0.15, 0.45, 0.15] }}
+              transition={{ repeat: Infinity, duration: 2.0, ease: "easeInOut" }}
+              className="absolute w-8 h-8 rounded-full bg-[#D4AF37]/15 blur-sm"
+            />
+            <svg className="w-4 h-4 text-[#D4AF37] animate-bounce z-10" fill="none" stroke="currentColor" strokeWidth="2.4" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
+          </div>
         </motion.div>
 
       </div>

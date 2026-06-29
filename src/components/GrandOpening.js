@@ -20,6 +20,7 @@ export default function GrandOpening({ isOpen, onOpen, children }) {
   const [waxParticles, setWaxParticles] = useState([]);
   const [idleParticles, setIdleParticles] = useState([]);
   const [scaleFactor, setScaleFactor] = useState(4.5);
+  const [isMobile, setIsMobile] = useState(false);
 
   // DOM Refs for high-performance direct GSAP animations
   const cameraContainerRef = useRef(null);
@@ -30,13 +31,16 @@ export default function GrandOpening({ isOpen, onOpen, children }) {
   const godRaysRef = useRef(null);
 
   useEffect(() => {
-    // Dynamic scale factor calculation client-side to prevent hydration mismatch
+    let checkMobile = false;
     if (typeof window !== "undefined") {
-      setScaleFactor(window.innerWidth < 768 ? 3.5 : 4.5);
+      checkMobile = window.innerWidth < 768;
+      setIsMobile(checkMobile);
+      setScaleFactor(checkMobile ? 3.5 : 4.5);
     }
 
-    // Generate organic rose petals and gold sparks for the portal opening
-    const generated = Array.from({ length: 30 }).map((_, i) => ({
+    // Generate organic rose petals and gold sparks for the portal opening (main particles: 30 -> mobile 10)
+    const mainCount = checkMobile ? 10 : 30;
+    const generated = Array.from({ length: mainCount }).map((_, i) => ({
       id: i,
       type: Math.random() > 0.45 ? "petal" : "spark",
       x: Math.random() * 60 - 30, // center offset
@@ -51,8 +55,9 @@ export default function GrandOpening({ isOpen, onOpen, children }) {
     }));
     setParticles(generated);
 
-    // Generate slow drifting ambient dust and sparks for the idle state (in front of closed doors)
-    const generatedIdle = Array.from({ length: 22 }).map((_, i) => ({
+    // Generate slow drifting ambient dust and sparks for the idle state (idle particles: 22 -> mobile 8)
+    const idleCount = checkMobile ? 8 : 22;
+    const generatedIdle = Array.from({ length: idleCount }).map((_, i) => ({
       id: i,
       left: `${10 + Math.random() * 80}%`,
       top: `${15 + Math.random() * 70}%`,
@@ -74,7 +79,9 @@ export default function GrandOpening({ isOpen, onOpen, children }) {
   }, []);
 
   const triggerWaxMelting = () => {
-    const generated = Array.from({ length: 25 }).map((_, i) => ({
+    // wax particles: 25 -> mobile 10
+    const waxCount = isMobile ? 10 : 25;
+    const generated = Array.from({ length: waxCount }).map((_, i) => ({
       id: i,
       x: 0,
       y: 0,
@@ -99,7 +106,9 @@ export default function GrandOpening({ isOpen, onOpen, children }) {
       onComplete: () => {
         setStage("opened");
         onOpen(); // Trigger page state update to mount scroll sections after doors overlay fully resolves
-        setShowDoorsOverlay(false);
+        setTimeout(() => {
+          setShowDoorsOverlay(false);
+        }, 1200);
         if (ambientWind) ambientWind.stop();
       }
     });
@@ -179,7 +188,8 @@ export default function GrandOpening({ isOpen, onOpen, children }) {
     // 4. Fade out overlay container background in the final 800ms to reveal the invitation (4.5s - 5.3s)
     // This completely eliminates any white/ivory flash by matching overlay resolving with content mounting!
     tl.to(cameraContainerRef.current, {
-      opacity: 0,
+      filter: "blur(8px)",
+      scale: scaleFactor * 1.05,
       duration: 0.8,
       ease: "power2.out"
     }, 4.5);
@@ -239,10 +249,10 @@ export default function GrandOpening({ isOpen, onOpen, children }) {
               />
             </div>
 
-            {/* Volumetric Floating Dust Particles & Sparks behind doors (active after click) */}
+            {/* Volumetric Floating Dust Particles & Sparks behind doors (active after click - dust particles: 20 -> mobile 6) */}
             {stage !== "closed" && (
               <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
-                {Array.from({ length: 20 }).map((_, i) => (
+                {Array.from({ length: isMobile ? 6 : 20 }).map((_, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, scale: 0.6, y: 30 }}
@@ -560,7 +570,6 @@ export default function GrandOpening({ isOpen, onOpen, children }) {
               {(stage === "closed" || stage === "tapping") && (
                 <div
                   ref={medallionRef}
-                  onClick={handleMedallionTap}
                   style={{ 
                     transform: "translateZ(114px)", 
                     transformStyle: "preserve-3d",

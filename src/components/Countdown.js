@@ -3,6 +3,17 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Section curved transition divider (Countdown to Venue)
+const SectionDivider = () => {
+  return (
+    <div className="absolute left-0 right-0 w-full h-10 pointer-events-none z-10 text-[#2D040F] bottom-0 rotate-180">
+      <svg className="w-full h-full fill-current" viewBox="0 0 1000 100" preserveAspectRatio="none">
+        <path d="M 0 0 C 300 100 700 100 1000 0 L 1000 100 L 0 100 Z" />
+      </svg>
+    </div>
+  );
+};
+
 export default function Countdown() {
   const targetDate = new Date("2026-12-09T00:00:00").getTime();
   
@@ -13,9 +24,20 @@ export default function Countdown() {
     seconds: 0,
   });
   const [mounted, setMounted] = useState(false);
+  const [bgStars, setBgStars] = useState([]);
 
   useEffect(() => {
     setMounted(true);
+
+    // Generate gold stars
+    const generated = Array.from({ length: 12 }).map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 95}%`,
+      size: Math.random() * 2 + 1,
+      delay: Math.random() * 4,
+      duration: Math.random() * 7 + 7,
+    }));
+    setBgStars(generated);
 
     const calculateTime = () => {
       const now = new Date().getTime();
@@ -42,10 +64,10 @@ export default function Countdown() {
 
   if (!mounted) {
     return (
-      <section className="py-20 px-6 bg-gradient-to-b from-[#EDE3D4]/40 to-[#F6F0E8] flex flex-col items-center">
+      <section className="py-20 px-6 bg-gradient-to-b from-[#2D040F] via-[#4A081B] to-[#2D040F] flex flex-col items-center justify-center">
         <div className="flex gap-4">
           {["DAYS", "HOURS", "MINS", "SECS"].map((label) => (
-            <div key={label} className="w-[72px] h-20 bg-brand-card/85 border border-brand-gold/15 rounded-2xl" />
+            <div key={label} className="w-[72px] h-20 bg-brand-card/85 border border-[#D4AF37]/25 rounded-2xl" />
           ))}
         </div>
       </section>
@@ -55,25 +77,56 @@ export default function Countdown() {
   const formatNumber = (num) => String(num).padStart(2, "0");
 
   return (
-    <section className="py-24 px-6 bg-gradient-to-b from-[#EDE3D4]/30 to-[#F6F0E8] relative overflow-hidden flex flex-col items-center justify-center">
-      {/* Decorative top dividing line */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-[1px] bg-gradient-to-r from-transparent via-brand-gold/40 to-transparent" />
-      
+    <section className="py-24 px-6 bg-gradient-to-b from-[#2D040F] via-[#4A081B] to-[#2D040F] relative overflow-hidden flex flex-col items-center justify-center">
+      {/* Curved section transition divider at the bottom */}
+      <SectionDivider />
+
+      {/* Paper grain luxury texture overlay */}
+      <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
+           style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #FFF8ED 1px, transparent 1px), radial-gradient(circle at 0 0, #FFF8ED 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
+
+      {/* Floating gold background stars */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        {bgStars.map((p) => (
+          <motion.div
+            key={p.id}
+            initial={{ y: "110%", opacity: 0 }}
+            animate={{
+              y: "-10%",
+              opacity: [0, 0.6, 0.6, 0],
+              x: ["0px", `${Math.random() * 40 - 20}px`],
+            }}
+            transition={{
+              duration: p.duration,
+              repeat: Infinity,
+              delay: p.delay,
+              ease: "linear",
+            }}
+            className="absolute rounded-full bg-[#E8C76A] shadow-[0_0_5px_rgba(212,175,55,0.5)]"
+            style={{
+              left: p.left,
+              width: p.size,
+              height: p.size,
+            }}
+          />
+        ))}
+      </div>
+
       {/* Background glow behind timer */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[200px] bg-brand-gold/5 rounded-full blur-[60px] pointer-events-none" />
 
-      <div className="text-center mb-14">
-        <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-brand-gold font-semibold">
+      <div className="text-center mb-14 relative z-10">
+        <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-[#E8C76A] font-semibold">
           Counting the Moments
         </span>
-        <h2 className="font-cormorant text-3xl md:text-4xl text-brand-heading mt-2 tracking-wide font-light">
+        <h2 className="font-cormorant text-3xl md:text-4xl text-[#FFF8ED] mt-2 tracking-wide font-light">
           Until the Nikah
         </h2>
-        <div className="w-12 h-[1px] bg-brand-gold mx-auto mt-4" />
+        <div className="w-12 h-[1px] bg-[#D4AF37]/60 mx-auto mt-4" />
       </div>
 
       {/* Timer Grid with separator colons */}
-      <div className="flex items-center gap-2 md:gap-4 justify-center max-w-lg w-full px-4">
+      <div className="flex items-center gap-2 md:gap-4 justify-center max-w-lg w-full px-4 relative z-10">
         
         <CountdownCard value={timeLeft.days} label="Days" format={formatNumber} />
         
@@ -100,7 +153,7 @@ function SeparatorColon() {
     <motion.div 
       animate={{ opacity: [0.3, 1, 0.3] }}
       transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-      className="flex flex-col gap-2 pb-6 text-brand-gold/60 font-semibold text-lg md:text-xl"
+      className="flex flex-col gap-2 pb-6 text-[#E8C76A] drop-shadow-[0_0_8px_rgba(232,199,106,0.6)] font-semibold text-lg md:text-xl"
     >
       <span>•</span>
       <span>•</span>
@@ -114,14 +167,14 @@ function CountdownCard({ value, label, format }) {
   return (
     <div className="flex flex-col items-center flex-1 max-w-[76px] md:max-w-[88px]">
       
-      {/* Clock Casing with Gold Borders */}
-      <div className="relative w-full h-[76px] md:h-[88px] bg-brand-card/95 backdrop-blur-sm border border-brand-gold/25 rounded-2xl luxury-shadow-card flex items-center justify-center overflow-hidden">
+      {/* Clock Casing with Gold Borders (Ivory panel on dark backdrop) */}
+      <div className="relative w-full h-[76px] md:h-[88px] bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] border border-[#D4AF37]/50 rounded-2xl shadow-[0_12px_28px_rgba(0,0,0,0.35)] shadow-[inset_0_0_12px_rgba(212,175,55,0.05)] flex items-center justify-center overflow-hidden">
         
         {/* Double Inner Frame details */}
-        <div className="absolute inset-[3px] border border-brand-gold/10 rounded-xl pointer-events-none" />
+        <div className="absolute inset-[3px] border border-[#D4AF37]/15 rounded-xl pointer-events-none" />
 
         {/* Physical center-split line simulating mechanical flip clock */}
-        <div className="absolute left-0 right-0 top-1/2 h-[0.5px] bg-brand-gold/20 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.1)]" />
+        <div className="absolute left-0 right-0 top-1/2 h-[0.5px] bg-[#D4AF37]/25 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.1)]" />
         
         {/* Shading gradients top and bottom to create physical depth */}
         <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-black/[0.02] to-transparent pointer-events-none" />
@@ -136,7 +189,7 @@ function CountdownCard({ value, label, format }) {
               animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
               exit={{ y: -24, opacity: 0, filter: "blur(3px)" }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="font-cormorant text-3xl md:text-4xl font-semibold text-brand-gold tracking-widest block drop-shadow-[0_1px_2px_rgba(216,178,110,0.25)]"
+              className="font-cormorant text-3xl md:text-4xl font-semibold text-[#4A081B] tracking-widest block drop-shadow-[0_0.5px_1px_rgba(255,255,255,0.7)]"
             >
               {formattedVal}
             </motion.span>
@@ -145,7 +198,7 @@ function CountdownCard({ value, label, format }) {
       </div>
 
       {/* Card Label */}
-      <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-[#7B685D] mt-4 font-bold">
+      <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-[#FFF8ED]/75 mt-4 font-bold">
         {label}
       </span>
     </div>

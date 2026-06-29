@@ -1,8 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import FloralOrnament from "./FloralOrnament";
+
+// Section corner ornaments
+const SectionCornerOrnament = ({ position }) => {
+  const classMap = {
+    "top-left": "top-8 left-8 rotate-0",
+    "top-right": "top-8 right-8 rotate-90",
+    "bottom-left": "bottom-8 left-8 -rotate-90",
+    "bottom-right": "bottom-8 right-8 rotate-180",
+  };
+  return (
+    <div className={`absolute w-12 h-12 text-[#D4AF37]/15 pointer-events-none z-0 ${classMap[position]}`}>
+      <svg className="w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.8">
+        <path d="M 0,0 L 80,0 M 0,0 L 0,80" />
+        <path d="M 12,12 C 24,12 32,24 32,32 M 12,12 Q 50,12 50,50" strokeDasharray="2,2" />
+        <circle cx="12" cy="12" r="2.5" fill="currentColor" />
+      </svg>
+    </div>
+  );
+};
 
 // Gold ornamental divider for top transition
 const GoldOrnamentalDivider = () => {
@@ -24,6 +43,19 @@ const GoldOrnamentalDivider = () => {
 export default function Parents() {
   const [groomRipple, setGroomRipple] = useState(false);
   const [brideRipple, setBrideRipple] = useState(false);
+  const [bgParticles, setBgParticles] = useState([]);
+
+  useEffect(() => {
+    // Generate slow floating gold particles inside section background
+    const generated = Array.from({ length: 10 }).map((_, i) => ({
+      id: i,
+      left: `${5 + Math.random() * 90}%`,
+      size: Math.random() * 2 + 1,
+      delay: Math.random() * 4,
+      duration: Math.random() * 8 + 8,
+    }));
+    setBgParticles(generated);
+  }, []);
 
   const handleGroomClick = () => {
     setGroomRipple(true);
@@ -66,10 +98,51 @@ export default function Parents() {
   };
 
   return (
-    <section className="py-20 px-6 bg-gradient-to-b from-[#FFF8ED] via-[#F6EBDD] to-[#FFF8ED] relative overflow-hidden flex flex-col items-center">
+    <section className="py-20 px-6 bg-gradient-to-b from-[#FFFDF9] via-[#F6EBDD] to-[#FFFDF9] relative overflow-hidden flex flex-col items-center">
+      
+      {/* Paper grain / luxury linen texture overlay */}
+      <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
+           style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #4A081B 1px, transparent 1px), radial-gradient(circle at 0 0, #4A081B 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
+
+      {/* Soft burgundy radial glow overlay */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(74,8,27,0.06)_0%,transparent_75%)] pointer-events-none" />
+
       {/* Background ambient glows */}
       <div className="absolute top-1/2 left-0 -translate-y-1/2 w-48 h-96 bg-brand-gold/8 rounded-r-full blur-3xl pointer-events-none" />
       <div className="absolute top-1/2 right-0 -translate-y-1/2 w-48 h-96 bg-[#4A081B]/5 rounded-l-full blur-3xl pointer-events-none" />
+
+      {/* Section corner ornaments for visual depth */}
+      <SectionCornerOrnament position="top-left" />
+      <SectionCornerOrnament position="top-right" />
+      <SectionCornerOrnament position="bottom-left" />
+      <SectionCornerOrnament position="bottom-right" />
+
+      {/* Slow floating gold particles */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        {bgParticles.map((p) => (
+          <motion.div
+            key={p.id}
+            initial={{ y: "110%", opacity: 0 }}
+            animate={{
+              y: "-10%",
+              opacity: [0, 0.6, 0.6, 0],
+              x: ["0px", `${Math.random() * 40 - 20}px`],
+            }}
+            transition={{
+              duration: p.duration,
+              repeat: Infinity,
+              delay: p.delay,
+              ease: "linear",
+            }}
+            className="absolute rounded-full bg-[#E8C76A] shadow-[0_0_5px_rgba(212,175,55,0.5)]"
+            style={{
+              left: p.left,
+              width: p.size,
+              height: p.size,
+            }}
+          />
+        ))}
+      </div>
 
       {/* Luxury divider at the top boundary */}
       <GoldOrnamentalDivider />
@@ -109,7 +182,7 @@ export default function Parents() {
               boxShadow: "0 12px 30px rgba(212, 175, 55, 0.35)",
               transition: { duration: 0.22 }
             }}
-            className="w-full max-w-[340px] bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] px-6 py-12 rounded-[140px_140px_20px_20px] border-[2px] border-[#D4AF37]/35 shadow-[0_12px_28px_rgba(75,58,50,0.12)] shadow-[inset_0_0_16px_rgba(212,175,55,0.06)] flex flex-col items-center text-center relative group overflow-hidden cursor-pointer select-none transition-colors duration-300 z-10"
+            className="w-full max-w-[340px] bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] px-6 py-12 rounded-[140px_140px_20px_20px] border-[2px] border-[#D4AF37]/35 shadow-[0_12px_28px_rgba(75,58,50,0.12)] shadow-[inset_0_0_16px_rgba(212,175,55,0.06)] flex flex-col items-center text-center relative group overflow-hidden cursor-pointer select-none transition-all duration-300 hover:shadow-[0_16px_36px_rgba(212,175,55,0.22)] z-10"
             style={{ transformStyle: "preserve-3d" }}
           >
             {/* Automatic diagonal golden shimmer sweep */}
@@ -205,7 +278,7 @@ export default function Parents() {
               boxShadow: "0 12px 30px rgba(212, 175, 55, 0.35)",
               transition: { duration: 0.22 }
             }}
-            className="w-full max-w-[340px] bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] px-6 py-12 rounded-[140px_140px_20px_20px] border-[2px] border-[#D4AF37]/35 shadow-[0_12px_28px_rgba(75,58,50,0.12)] shadow-[inset_0_0_16px_rgba(212,175,55,0.06)] flex flex-col items-center text-center relative group overflow-hidden cursor-pointer select-none transition-colors duration-300 z-10"
+            className="w-full max-w-[340px] bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] px-6 py-12 rounded-[140px_140px_20px_20px] border-[2px] border-[#D4AF37]/35 shadow-[0_12px_28px_rgba(75,58,50,0.12)] shadow-[inset_0_0_16px_rgba(212,175,55,0.06)] flex flex-col items-center text-center relative group overflow-hidden cursor-pointer select-none transition-all duration-300 hover:shadow-[0_16px_36px_rgba(212,175,55,0.22)] z-10"
             style={{ transformStyle: "preserve-3d" }}
           >
             {/* Automatic diagonal golden shimmer sweep */}

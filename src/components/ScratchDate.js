@@ -3,6 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Section curved transition divider (Parents to ScratchDate)
+const SectionDivider = () => {
+  return (
+    <div className="absolute left-0 right-0 w-full h-10 pointer-events-none z-10 text-[#2D040F] top-0">
+      <svg className="w-full h-full fill-current" viewBox="0 0 1000 100" preserveAspectRatio="none">
+        {/* Transparent curve overlay, showing previous section background */}
+        <path d="M 0 0 C 300 100 700 100 1000 0 L 1000 100 L 0 100 Z" />
+      </svg>
+    </div>
+  );
+};
+
 // Web Audio API Synthesizer for high-fidelity luxury party popper sound
 const playPopperSound = () => {
   if (typeof window === "undefined") return;
@@ -73,7 +85,6 @@ function ScratchCard({ value, label, onReveal, index }) {
     const resizeCanvas = () => {
       const container = containerRef.current;
       if (!container) return;
-      // Subtract border padding
       canvas.width = container.clientWidth - 8;
       canvas.height = container.clientHeight - 8;
       drawFoil(canvas);
@@ -148,76 +159,73 @@ function ScratchCard({ value, label, onReveal, index }) {
   };
 
   const startScratching = (e) => {
-    if (isRevealed) return;
     setIsScratching(true);
-    scratch(e);
+    const coords = getCoordinates(e);
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.beginPath();
+        ctx.arc(coords.x, coords.y, 36, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
   };
 
   const scratch = (e) => {
-    if (!isScratching || isRevealed) return;
-    
+    if (!isScratching) return;
+    const coords = getCoordinates(e);
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const { x, y } = getCoordinates(e);
-
-    ctx.globalCompositeOperation = "destination-out";
-    ctx.beginPath();
-    ctx.arc(x, y, 36, 0, Math.PI * 2); // Significantly increased brush radius
-    ctx.fill();
-
-    checkPercentage();
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.beginPath();
+        ctx.arc(coords.x, coords.y, 36, 0, Math.PI * 2);
+        ctx.fill();
+        checkRevealPercentage(canvas);
+      }
+    }
   };
 
   const stopScratching = () => {
     setIsScratching(false);
   };
 
-  const checkPercentage = () => {
-    const canvas = canvasRef.current;
+  const checkRevealPercentage = (canvas) => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
-    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const pixels = imgData.data;
-    let transparent = 0;
-
-    for (let i = 3; i < pixels.length; i += 4) {
-      if (pixels[i] === 0) transparent++;
+    try {
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      let transparentPixels = 0;
+      for (let i = 3; i < imgData.data.length; i += 4) {
+        if (imgData.data[i] === 0) {
+          transparentPixels++;
+        }
+      }
+      const percentage = (transparentPixels / (canvas.width * canvas.height)) * 100;
+      if (percentage >= 35 && !isRevealed) {
+        setIsRevealed(true);
+        onReveal(index);
+      }
+    } catch (err) {
+      console.warn("Canvas security error checking percentage:", err);
     }
-
-    const percent = Math.round((transparent / (pixels.length / 4)) * 100);
-
-    // Reduced threshold to 35% so it triggers instantly with 1-2 strokes
-    if (percent >= 35 && !isRevealed) {
-      revealCard();
-    }
-  };
-
-  const revealCard = () => {
-    setIsRevealed(true);
-    setIsScratching(false);
-    onReveal(index);
   };
 
   return (
-    <div className="flex flex-col items-center gap-2 w-full max-w-[95px] md:max-w-[110px]">
-      <div
+    <div className="flex flex-col items-center flex-1 max-w-[90px] md:max-w-[110px]">
+      <div 
         ref={containerRef}
-        className="w-full h-24 md:h-28 rounded-xl relative shadow-[0_8px_20px_rgba(75,58,50,0.15)] bg-gradient-to-br from-[#4A081B] to-[#20030B] overflow-hidden select-none border border-brand-gold/45 p-[4px] luxury-hover-lift"
-        style={{ transformStyle: "preserve-3d" }}
+        className="w-full h-24 md:h-28 rounded-xl bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] border-[1.5px] border-[#D4AF37]/50 shadow-[0_8px_20px_rgba(0,0,0,0.3)] shadow-[inset_0_0_12px_rgba(212,175,55,0.06)] relative flex items-center justify-center overflow-hidden"
       >
-        {/* Inner gold frame contours */}
-        <div className="absolute inset-[3px] border border-[#D4AF37]/35 rounded-lg pointer-events-none z-20" />
-        <div className="absolute inset-[5px] border border-dashed border-[#D4AF37]/15 rounded-lg pointer-events-none z-20" />
-
-        {/* Hidden Content (Revealed Burgundy Inner Card) */}
-        <div className="absolute inset-[4px] flex flex-col items-center justify-center bg-gradient-to-br from-[#5C0C22] via-[#4A081B] to-[#20030B] rounded-lg">
-          {/* Subtle gold glow under scratch layer */}
-          <div className="absolute w-8 h-8 rounded-full bg-brand-gold/15 blur-md" />
-          
-          <span className="font-cormorant text-2xl md:text-3xl font-semibold tracking-wider text-[#E8C76A] drop-shadow-[0_0_8px_rgba(232,199,106,0.65)] select-all z-10">
+        <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
+             style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #4A081B 1px, transparent 1px), radial-gradient(circle at 0 0, #4A081B 1px, transparent 1px)", backgroundSize: "12px 12px, 6px 6px" }} />
+        
+        {/* Hidden value display */}
+        <div className="flex flex-col items-center z-10">
+          <span className="font-cormorant text-2xl md:text-3xl font-semibold tracking-wider text-[#4A081B] drop-shadow-[0_0.5px_1px_rgba(255,255,255,0.7)] select-all">
             {value}
           </span>
         </div>
@@ -245,7 +253,7 @@ function ScratchCard({ value, label, onReveal, index }) {
           )}
         </AnimatePresence>
       </div>
-      <span className="font-cormorant text-[10px] md:text-xs uppercase tracking-widest text-[#6D0F2A]/70 font-semibold mt-1">
+      <span className="font-cormorant text-[10px] md:text-xs uppercase tracking-widest text-[#FFF8ED]/75 font-semibold mt-2.5">
         {label}
       </span>
     </div>
@@ -255,8 +263,21 @@ function ScratchCard({ value, label, onReveal, index }) {
 export default function ScratchDate() {
   const [revealedCards, setRevealedCards] = useState([false, false, false]);
   const [celebrationParticles, setCelebrationParticles] = useState([]);
+  const [bgStars, setBgStars] = useState([]);
 
   const allRevealed = revealedCards.every((v) => v);
+
+  useEffect(() => {
+    // Generate background gold stars/dust
+    const generated = Array.from({ length: 12 }).map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 95}%`,
+      size: Math.random() * 2 + 1,
+      delay: Math.random() * 4,
+      duration: Math.random() * 7 + 7,
+    }));
+    setBgStars(generated);
+  }, []);
 
   const handleCardReveal = (index) => {
     setRevealedCards((prev) => {
@@ -270,29 +291,35 @@ export default function ScratchDate() {
   };
 
   const triggerCelebration = () => {
-    // Play physical audio synthesis popper sound
     playPopperSound();
 
-    // Spawn 28 luxury popper particles max (mix of gold stars and rose petals)
+    // Spawn popper particles
     const particlesList = Array.from({ length: 28 }).map((_, i) => ({
       id: i,
       type: Math.random() > 0.52 ? "petal" : "gold",
-      x: Math.random() * 40 - 20, // offset near center
-      y: 80, // offset slightly below middle
+      x: Math.random() * 40 - 20, 
+      y: 80, 
       scale: Math.random() * 0.7 + 0.35,
       rotation: Math.random() * 360,
       spin: Math.random() * 240 - 120,
-      driftX: Math.random() * 240 - 120, // horizontal drift
-      driftY: - (Math.random() * 180 + 130), // elegant upward thrust
-      gravity: Math.random() * 110 + 70, // gravity fall multiplier
-      duration: Math.random() * 0.5 + 1.8, // all fade out within 1.8 to 2.3s
+      driftX: Math.random() * 240 - 120, 
+      driftY: - (Math.random() * 180 + 130), 
+      gravity: Math.random() * 110 + 70, 
+      duration: Math.random() * 0.5 + 1.8, 
     }));
     setCelebrationParticles(particlesList);
   };
 
   return (
-    <section className="py-24 px-6 bg-[#F6F0E8] relative flex flex-col items-center justify-center overflow-hidden">
+    <section className="py-24 px-6 bg-gradient-to-b from-[#2D040F] via-[#4A081B] to-[#2D040F] relative flex flex-col items-center justify-center overflow-hidden">
       
+      {/* Top curved section transition divider */}
+      <SectionDivider />
+
+      {/* Paper grain luxury texture overlay */}
+      <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
+           style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #FFF8ED 1px, transparent 1px), radial-gradient(circle at 0 0, #FFF8ED 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
+
       {/* Dynamic Celebration Particles (Classy rose petals & gold sparks) */}
       <AnimatePresence>
         {celebrationParticles.length > 0 && (
@@ -311,7 +338,7 @@ export default function ScratchDate() {
                   x: p.x + p.driftX,
                   y: [p.y + p.driftY, p.y + p.driftY + p.gravity],
                   scale: p.scale,
-                  opacity: [1, 1, 0], // smooth fade out
+                  opacity: [1, 1, 0], 
                   rotate: p.rotation + p.spin
                 }}
                 transition={{
@@ -321,14 +348,13 @@ export default function ScratchDate() {
                 className="absolute"
               >
                 {p.type === "petal" ? (
-                  // Crimson Burgundy Rose Petal
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                     <path 
                       d="M 12 2 C 7 2 4 6 4 11 C 4 17 8 22 12 22 C 16 22 20 17 20 11 C 20 6 17 2 12 2 Z" 
-                      fill="url(#confetti-petal)" 
+                      fill="url(#confetti-petal-date)" 
                     />
                     <defs>
-                      <radialGradient id="confetti-petal" cx="50%" cy="50%" r="50%">
+                      <radialGradient id="confetti-petal-date" cx="50%" cy="50%" r="50%">
                         <stop offset="0%" stopColor="#8F1C3C" />
                         <stop offset="70%" stopColor="#6D0F2A" />
                         <stop offset="100%" stopColor="#4A081B" />
@@ -336,7 +362,6 @@ export default function ScratchDate() {
                     </defs>
                   </svg>
                 ) : (
-                  // Gold Shimmer Spark
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                     <path 
                       d="M 6 0 L 7.5 4.5 L 12 6 L 7.5 7.5 L 6 12 L 4.5 7.5 L 0 6 L 4.5 4.5 Z" 
@@ -351,37 +376,64 @@ export default function ScratchDate() {
         )}
       </AnimatePresence>
 
-      {/* Soft background glows */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] bg-brand-gold/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Floating gold background stars */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        {bgStars.map((p) => (
+          <motion.div
+            key={p.id}
+            initial={{ y: "110%", opacity: 0 }}
+            animate={{
+              y: "-10%",
+              opacity: [0, 0.6, 0.6, 0],
+              x: ["0px", `${Math.random() * 40 - 20}px`],
+            }}
+            transition={{
+              duration: p.duration,
+              repeat: Infinity,
+              delay: p.delay,
+              ease: "linear",
+            }}
+            className="absolute rounded-full bg-[#E8C76A] shadow-[0_0_5px_rgba(212,175,55,0.5)]"
+            style={{
+              left: p.left,
+              width: p.size,
+              height: p.size,
+            }}
+          />
+        ))}
+      </div>
 
-      <div className="text-center mb-12 max-w-sm">
-        <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-brand-gold font-semibold">
+      {/* Soft background glows */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="text-center mb-12 max-w-sm relative z-10">
+        <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-[#E8C76A] font-semibold">
           The Sacred Date
         </span>
-        <h2 className="font-cormorant text-3xl md:text-4xl text-brand-heading mt-2 tracking-wide font-light">
+        <h2 className="font-cormorant text-3xl md:text-4xl text-[#FFF8ED] mt-2 tracking-wide font-light">
           Blessed Union
         </h2>
-        <div className="w-12 h-[1px] bg-brand-gold mx-auto mt-4" />
+        <div className="w-12 h-[1px] bg-[#D4AF37]/60 mx-auto mt-4" />
       </div>
 
       {/* 3 Split Cards Horizontal Layout */}
-      <div className="flex gap-4 md:gap-6 justify-center w-full max-w-[340px] md:max-w-[400px]">
+      <div className="flex gap-4 md:gap-6 justify-center w-full max-w-[340px] md:max-w-[400px] relative z-10">
         <ScratchCard value="09" label="Day" onReveal={handleCardReveal} index={0} />
         <ScratchCard value="12" label="Month" onReveal={handleCardReveal} index={1} />
         <ScratchCard value="2026" label="Year" onReveal={handleCardReveal} index={2} />
       </div>
 
       {/* Progress Helper Indicator */}
-      <div className="mt-8 h-5 flex items-center justify-center text-center">
+      <div className="mt-8 h-5 flex items-center justify-center text-center relative z-10">
         {!allRevealed ? (
-          <p className="font-inter text-[10px] tracking-widest text-[#6D0F2A]/75 uppercase">
+          <p className="font-inter text-[10px] tracking-widest text-[#FFF8ED]/70 uppercase">
             Scratch all cards to reveal union date
           </p>
         ) : (
           <motion.p
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="font-cormorant text-sm text-brand-gold italic font-semibold tracking-wider"
+            className="font-cormorant text-sm text-[#E8C76A] italic font-semibold tracking-wider"
           >
             Looking forward to welcoming you on Wednesday!
           </motion.p>

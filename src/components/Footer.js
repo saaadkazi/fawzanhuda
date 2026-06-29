@@ -4,14 +4,19 @@ import { motion } from "framer-motion";
 
 export default function Footer() {
   return (
-    <footer className="py-24 px-6 bg-gradient-to-b from-[#FFF8ED] via-[#F6EBDD] to-[#FFF8ED] relative overflow-hidden flex flex-col items-center justify-center">
+    <footer className="py-24 px-6 bg-gradient-to-b from-[#2D040F] via-[#4A081B] to-[#2D040F] relative overflow-hidden flex flex-col items-center justify-center">
+      
+      {/* Paper grain luxury texture overlay */}
+      <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
+           style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #FFF8ED 1px, transparent 1px), radial-gradient(circle at 0 0, #FFF8ED 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
+
       {/* Top subtle line */}
-      <div className="w-20 h-[0.5px] bg-brand-gold/30 mb-12" />
+      <div className="w-20 h-[0.5px] bg-[#D4AF37]/40 mb-12 relative z-10" />
 
       <div className="max-w-md mx-auto text-center relative z-10 flex flex-col items-center">
         
         {/* Gratitude Label */}
-        <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-brand-gold font-semibold mb-6">
+        <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-[#E8C76A] font-semibold mb-6">
           With Sincere Gratitude
         </span>
 
@@ -27,7 +32,7 @@ export default function Footer() {
         </motion.p>
 
         {/* Translation */}
-        <p className="font-cormorant italic text-sm text-brand-body tracking-wider mb-8">
+        <p className="font-cormorant italic text-sm text-[#FFF8ED]/75 tracking-wider mb-8">
           May Allah reward you with goodness
         </p>
 
@@ -37,7 +42,7 @@ export default function Footer() {
           whileInView={{ opacity: 0.85, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1.2, delay: 0.2 }}
-          className="font-cormorant text-base md:text-lg text-brand-heading leading-relaxed mb-12 max-w-sm px-4 font-semibold"
+          className="font-cormorant text-base md:text-lg text-[#FFF8ED]/85 leading-relaxed mb-12 max-w-sm px-4 font-semibold"
         >
           Your presence and prayers are the greatest blessings on our new journey. We look forward to celebrating this beautiful day with you.
         </motion.p>
@@ -48,15 +53,15 @@ export default function Footer() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 1, delay: 0.4 }}
-          className="flex justify-center items-center gap-6 font-cormorant text-lg md:text-xl font-light text-brand-heading tracking-widest uppercase mb-16"
+          className="flex justify-center items-center gap-6 font-cormorant text-lg md:text-xl font-light text-[#FFF8ED]/95 tracking-widest uppercase mb-16"
         >
           <span>Kazi Family</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-brand-gold/50" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]/50" />
           <span>Hasham Family</span>
         </motion.div>
 
         {/* Closing Arabesque End Scroll Motif */}
-        <div className="w-24 h-12 text-brand-gold/60 opacity-55 mb-6">
+        <div className="w-24 h-12 text-[#D4AF37]/45 opacity-55 mb-6">
           <svg className="w-full h-full" viewBox="0 0 100 50" fill="none" stroke="currentColor" strokeWidth="1">
             <path d="M 10 25 Q 30 15 50 25 T 90 25" />
             <path d="M 20 25 Q 35 35 50 25 T 80 25" />
@@ -108,7 +113,7 @@ export default function Footer() {
         </div>
 
         {/* Copyright Note */}
-        <span className="font-inter text-[8px] uppercase tracking-[0.25em] text-brand-dark/40 mt-8">
+        <span className="font-inter text-[8px] uppercase tracking-[0.25em] text-[#FFF8ED]/40 mt-8">
           Fauzan & Huda • 2026
         </span>
 
