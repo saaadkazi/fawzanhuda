@@ -236,10 +236,41 @@ export default function GrandOpening({ isOpen, onOpen, onStartOpening, children 
           style={{ willChange: "transform, opacity", transform: "scale(1)" }}
         >
           
-          <div className="w-full h-full relative door-preserve-3d flex items-center justify-center">
+          {/* Subtle slow camera micro zoom container wrapper (paused during swing) */}
+          <motion.div 
+            animate={stage === "closed" ? {
+              scale: [1, 1.012, 1],
+            } : {}}
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="w-full h-full relative door-preserve-3d flex items-center justify-center"
+          >
 
-            {/* PITCH BLACK ROOM INTERIOR BACKGROUND */}
-            <div className="absolute inset-0 bg-[#2D040F] z-0 pointer-events-none" />
+            {/* PITCH BLACK ROOM INTERIOR BACKGROUND WITH RADIAL DEPTH */}
+            <div className="absolute inset-0 velvet-silk-bg z-0 pointer-events-none" />
+
+            {/* Soft radial golden spotlight behind doors */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] md:w-[700px] h-[380px] md:h-[700px] bg-gradient-to-tr from-[#D4AF37]/5 via-[#FFF8ED]/8 to-[#D4AF37]/5 rounded-full blur-[90px] pointer-events-none z-0" />
+
+            {/* Heavenly warm top-down light beam cone */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[160vw] md:w-[80vw] h-[100vh] bg-gradient-to-b from-[#FFF8ED]/12 via-[#FFF8ED]/3 to-transparent pointer-events-none z-15"
+                 style={{ clipPath: "polygon(40% 0, 60% 0, 100% 100%, 0 100%)", filter: "blur(20px)" }} />
+
+            {/* Cinematic vignette overlay around screen edges */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_35%,rgba(0,0,0,0.85)_100%)] pointer-events-none z-25" />
+
+            {/* Slowly shifting background fog/mist layer */}
+            <motion.div
+              animate={{
+                x: ["-5%", "5%", "-5%"],
+                y: ["-5%", "5%", "-5%"],
+              }}
+              transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute inset-[-10%] bg-[radial-gradient(circle_at_center,rgba(74,8,27,0.12)_0%,transparent_60%)] filter blur-3xl pointer-events-none z-0"
+            />
 
             {/* VOLUMETRIC DYNAMIC LIGHT REVEAL SYSTEM */}
             <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none overflow-hidden">
@@ -250,7 +281,7 @@ export default function GrandOpening({ isOpen, onOpen, onStartOpening, children 
                 style={{ 
                   willChange: "transform, opacity",
                   transform: "scaleX(1)",
-                  filter: "blur(20px)" // Static blur to prevent dynamic recalculation lag
+                  filter: "blur(20px)"
                 }}
               />
               
@@ -261,12 +292,12 @@ export default function GrandOpening({ isOpen, onOpen, onStartOpening, children 
                 style={{
                   willChange: "transform, opacity",
                   transform: "scale(0.8)",
-                  filter: "blur(60px)" // Static blur to prevent dynamic recalculation lag
+                  filter: "blur(60px)"
                 }}
               />
             </div>
 
-            {/* Volumetric Floating Dust Particles & Sparks behind doors (active after click - dust particles: 20 -> mobile 6) */}
+            {/* Volumetric Floating Dust Particles & Sparks behind doors (active after click) */}
             {stage !== "closed" && (
               <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
                 {Array.from({ length: isMobile ? 6 : 20 }).map((_, i) => (
@@ -326,7 +357,6 @@ export default function GrandOpening({ isOpen, onOpen, onStartOpening, children 
                     className="absolute"
                   >
                     {p.type === "petal" ? (
-                      // Crimson Burgundy Rose Petal
                       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                         <path 
                           d="M 12 2 C 7 2 4 6 4 11 C 4 17 8 22 12 22 C 16 22 20 17 20 11 C 20 6 17 2 12 2 Z" 
@@ -341,7 +371,6 @@ export default function GrandOpening({ isOpen, onOpen, onStartOpening, children 
                         </defs>
                       </svg>
                     ) : (
-                      // Gold Shimmer Spark
                       <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
                         <path 
                           d="M 6 0 L 7.5 4.5 L 12 6 L 7.5 7.5 L 6 12 L 4.5 7.5 L 0 6 L 4.5 4.5 Z" 
@@ -491,7 +520,7 @@ export default function GrandOpening({ isOpen, onOpen, onStartOpening, children 
               {/* 3D Double Palace Doors in Burgundy Velvet + Wood Grain Texture */}
               <div className="absolute inset-0 flex door-preserve-3d z-10 pointer-events-none">
                 
-                {/* Left Palace Door 3D Box Panel (transform-origin hinged to left center) */}
+                {/* Left Palace Door 3D Box Panel (hinged to left center) */}
                 <div
                   ref={leftDoorRef}
                   style={{ transformOrigin: "left center", willChange: "transform", transform: "rotateY(0deg)" }}
@@ -500,6 +529,14 @@ export default function GrandOpening({ isOpen, onOpen, onStartOpening, children 
                   <div className="door-3d-box">
                     {/* Front Velvet Face */}
                     <div className="door-face-front burgundy-velvet-wood-door border-r border-[#D4AF37]/50 shadow-2xl flex items-center justify-end overflow-hidden">
+                      
+                      {/* Glossy specular reflection glare highlight */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.07] pointer-events-none z-10" />
+                      
+                      {/* Vertical side rim lights */}
+                      <div className="absolute inset-y-0 right-0 w-[1.5px] bg-gradient-to-b from-transparent via-[#FFF8ED]/35 to-transparent pointer-events-none z-15" />
+                      <div className="absolute inset-y-0 left-0 w-[1.5px] bg-gradient-to-b from-[#FFF8ED]/15 via-[#FFF8ED]/30 to-[#FFF8ED]/15 pointer-events-none z-15" />
+
                       {/* Gold metallic double outer border contour (Beveled feel) */}
                       <div className="absolute inset-4 border-[3px] border-[#D4AF37] rounded-l-[24px] pointer-events-none shadow-[inset_0_0_12px_rgba(0,0,0,0.6)]" />
                       <div className="absolute inset-[20px] border border-dashed border-[#D4AF37]/45 rounded-l-[20px] pointer-events-none" />
@@ -507,8 +544,8 @@ export default function GrandOpening({ isOpen, onOpen, onStartOpening, children 
                       {/* Deep Center Seam Crease Shadow */}
                       <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black/90 to-transparent pointer-events-none z-10" />
 
-                      {/* DETAILED ISLAMIC ARABESQUE CARVINGS SVG */}
-                      <svg className="absolute inset-0 w-full h-full text-[#D4AF37]/35 stroke-current fill-none pointer-events-none stroke-[0.8]" viewBox="0 0 100 200" preserveAspectRatio="none">
+                      {/* DETAILED ISLAMIC ARABESQUE CARVINGS SVG with gold offset shadow emboss */}
+                      <svg className="absolute inset-0 w-full h-full text-[#D4AF37]/35 stroke-current fill-none pointer-events-none stroke-[0.8]" viewBox="0 0 100 200" preserveAspectRatio="none" style={{ filter: "drop-shadow(0.5px 0.5px 0px rgba(255,255,255,0.22)) drop-shadow(-0.5px -0.5px 0px rgba(0,0,0,0.65))" }}>
                         {/* Islamic Pointed Mihrab Arch Frame using sharp pointed ogee curves */}
                         <path d="M 8,200 L 8,42 C 8,24 26,20 38,15 C 46,11 48.5,5 50,2 L 50,200" strokeWidth="1.2" />
                         <path d="M 12,200 L 12,43 C 12,27.5 28.5,23.5 39,18.5 C 46.5,14.5 48.5,8 50,5 L 50,200" strokeDasharray="2,2" strokeWidth="0.5" />
@@ -537,7 +574,7 @@ export default function GrandOpening({ isOpen, onOpen, onStartOpening, children 
                   </div>
                 </div>
 
-                {/* Right Palace Door 3D Box Panel (transform-origin hinged to right center) */}
+                {/* Right Palace Door 3D Box Panel (hinged to right center) */}
                 <div
                   ref={rightDoorRef}
                   style={{ transformOrigin: "right center", willChange: "transform", transform: "rotateY(0deg)" }}
@@ -546,6 +583,14 @@ export default function GrandOpening({ isOpen, onOpen, onStartOpening, children 
                   <div className="door-3d-box">
                     {/* Front Velvet Face */}
                     <div className="door-face-front burgundy-velvet-wood-door border-l border-[#D4AF37]/50 shadow-2xl flex items-center justify-start overflow-hidden">
+                      
+                      {/* Glossy specular reflection glare highlight */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.07] pointer-events-none z-10" />
+                      
+                      {/* Vertical side rim lights */}
+                      <div className="absolute inset-y-0 left-0 w-[1.5px] bg-gradient-to-b from-transparent via-[#FFF8ED]/35 to-transparent pointer-events-none z-15" />
+                      <div className="absolute inset-y-0 right-0 w-[1.5px] bg-gradient-to-b from-[#FFF8ED]/15 via-[#FFF8ED]/30 to-[#FFF8ED]/15 pointer-events-none z-15" />
+
                       {/* Gold metallic double outer border contour (Beveled feel) */}
                       <div className="absolute inset-4 border-[3px] border-[#D4AF37] rounded-r-[24px] pointer-events-none shadow-[inset_0_0_12px_rgba(0,0,0,0.6)]" />
                       <div className="absolute inset-[20px] border border-dashed border-[#D4AF37]/45 rounded-r-[20px] pointer-events-none" />
@@ -553,8 +598,8 @@ export default function GrandOpening({ isOpen, onOpen, onStartOpening, children 
                       {/* Deep Center Seam Crease Shadow */}
                       <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black/90 to-transparent pointer-events-none z-10" />
 
-                      {/* DETAILED ISLAMIC ARABESQUE CARVINGS SVG */}
-                      <svg className="absolute inset-0 w-full h-full text-[#D4AF37]/35 stroke-current fill-none pointer-events-none stroke-[0.8]" viewBox="0 0 100 200" preserveAspectRatio="none">
+                      {/* DETAILED ISLAMIC ARABESQUE CARVINGS SVG with gold offset shadow emboss */}
+                      <svg className="absolute inset-0 w-full h-full text-[#D4AF37]/35 stroke-current fill-none pointer-events-none stroke-[0.8]" viewBox="0 0 100 200" preserveAspectRatio="none" style={{ filter: "drop-shadow(0.5px 0.5px 0px rgba(255,255,255,0.22)) drop-shadow(-0.5px -0.5px 0px rgba(0,0,0,0.65))" }}>
                         {/* Islamic Pointed Mihrab Arch Frame using sharp pointed ogee curves */}
                         <path d="M 92,200 L 92,42 C 92,24 74,20 62,15 C 54,11 51.5,5 50,2 L 50,200" strokeWidth="1.2" />
                         <path d="M 88,200 L 88,43 C 88,27.5 71.5,23.5 61,18.5 C 53.5,14.5 51.5,8 50,5 L 50,200" strokeDasharray="2,2" strokeWidth="0.5" />
@@ -605,24 +650,24 @@ export default function GrandOpening({ isOpen, onOpen, onStartOpening, children 
                       }}
                       className="w-full h-full relative flex items-center justify-center pointer-events-auto"
                     >
-                      {/* Physical Click Ripple Wave */}
+                      {/* Physical Click Shockwave Ripple Ring */}
                       {stage === "tapping" && (
                         <motion.div
-                          initial={{ scale: 0.8, opacity: 0.8 }}
-                          animate={{ scale: 2.5, opacity: 0 }}
-                          transition={{ duration: 0.75 }}
-                          className="absolute inset-0 rounded-full border-2 border-[#D4AF37] z-0"
+                          initial={{ scale: 0.8, opacity: 1, filter: "blur(0px)" }}
+                          animate={{ scale: 3.5, opacity: 0, filter: "blur(6px)" }}
+                          transition={{ duration: 0.8, ease: "easeOut" }}
+                          className="absolute w-28 h-28 md:w-40 md:h-40 rounded-full border-4 border-[#FFF8ED] shadow-[0_0_30px_#D4AF37,0_0_60px_#D4AF37] pointer-events-none z-50"
                         />
                       )}
 
                       <motion.button
                         onClick={handleMedallionTap}
-                        whileHover={{ scale: 1.05 }}
+                        whileHover={{ scale: 1.06 }}
                         animate={stage === "closed" ? {
                           scale: [1, 1.03, 1],
                         } : {}}
                         transition={{
-                          duration: 3.5,
+                          duration: 2.0, // Breathing pulse every 2s
                           repeat: Infinity,
                           ease: "easeInOut",
                         }}
@@ -635,15 +680,15 @@ export default function GrandOpening({ isOpen, onOpen, onStartOpening, children 
                             opacity: [0.25, 0.55, 0.25]
                           }}
                           transition={{
-                            duration: 3.5,
+                            duration: 2.0, // breathing glow every 2s
                             repeat: Infinity,
                             ease: "easeInOut"
                           }}
-                          className="absolute inset-[-14px] rounded-full bg-gradient-to-r from-[#D4AF37]/12 to-[#6D0F2A]/8 blur-xl pointer-events-none z-0"
+                          className="absolute inset-[-14px] rounded-full bg-gradient-to-r from-[#D4AF37]/15 to-[#6D0F2A]/10 blur-xl pointer-events-none z-0"
                         />
 
-                        {/* 2. Heavy Royal Medallion Body (Outer Gold Frame with soft bevel highlights) */}
-                        <div className="absolute inset-0 rounded-full p-[5px] bg-gradient-to-tr from-[#856124] via-[#D4AF37] to-[#FFF8ED] shadow-[0_25px_65px_rgba(29,3,8,0.95)] z-10 flex items-center justify-center">
+                        {/* 2. Heavy Royal Medallion Body (Thick Gold Ring with metallic border) */}
+                        <div className="absolute inset-0 rounded-full p-[5px] bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#B38728] shadow-[0_25px_65px_rgba(29,3,8,0.95),inset_0_2px_3px_rgba(255,255,255,0.7)] z-10 flex items-center justify-center">
                           
                           {/* Fine inner gold bevel ring */}
                           <div className="absolute inset-[3px] rounded-full border-[1.2px] border-[#FFF8ED]/35 pointer-events-none" />
@@ -651,6 +696,9 @@ export default function GrandOpening({ isOpen, onOpen, onStartOpening, children 
                           {/* 3. Embossed Burgundy Enamel Center Panel */}
                           <div className="w-full h-full rounded-full bg-gradient-to-br from-[#5C0C22] via-[#4A081B] to-[#20030B] relative overflow-hidden flex flex-col items-center justify-center text-center p-2 md:p-4 shadow-[inset_0_5px_15px_rgba(0,0,0,0.95)]">
                             
+                            {/* Lacquered beveled gloss glare reflection */}
+                            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.04] to-white/[0.08] pointer-events-none z-10" />
+
                             {/* Inner gold circular stamp border */}
                             <div className="absolute inset-[5px] rounded-full border border-[#D4AF37]/25 pointer-events-none z-10" />
 
@@ -687,12 +735,25 @@ export default function GrandOpening({ isOpen, onOpen, onStartOpening, children 
                           </div>
                         </div>
 
-                        {/* 7. Orbiting Gold Spark on Rim (Idle Visual Guide) */}
-                        {stage === "closed" && (
-                          <div className="absolute inset-[-4px] pointer-events-none z-30 orbiting-spark-el">
-                            <div className="w-2 h-2 rounded-full bg-[#FFF8ED] shadow-[0_0_8px_#D4AF37,0_0_15px_#D4AF37]" />
-                          </div>
-                        )}
+                        {/* 7. Orbiting Gold Sparks around Seal (Luxury guide) */}
+                        {stage === "closed" && Array.from({ length: 4 }).map((_, idx) => (
+                          <motion.div
+                            key={idx}
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 4 + idx * 0.8, repeat: Infinity, ease: "linear" }}
+                            className="absolute inset-[-8px] pointer-events-none z-20"
+                          >
+                            <div 
+                              className="w-1.5 h-1.5 rounded-full bg-[#FFF8ED] shadow-[0_0_6px_#D4AF37,0_0_12px_#D4AF37]" 
+                              style={{ 
+                                position: "absolute",
+                                left: "50%",
+                                top: "-4px",
+                                transform: `translateX(${(isMobile ? 50 : 70) + idx * 3}px)`
+                              }}
+                            />
+                          </motion.div>
+                        ))}
 
                       </motion.button>
                     </motion.div>
@@ -702,7 +763,7 @@ export default function GrandOpening({ isOpen, onOpen, onStartOpening, children 
 
             </div>
 
-          </div>
+          </motion.div>
         </div>
       )}
     </div>

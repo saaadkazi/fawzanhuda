@@ -6,9 +6,12 @@ import { motion, AnimatePresence } from "framer-motion";
 // Section curved transition divider (Countdown to Venue)
 const SectionDivider = () => {
   return (
-    <div className="absolute left-0 right-0 w-full h-10 pointer-events-none z-10 text-[#2D040F] bottom-0 rotate-180">
-      <svg className="w-full h-full fill-current" viewBox="0 0 1000 100" preserveAspectRatio="none">
-        <path d="M 0 0 C 300 100 700 100 1000 0 L 1000 100 L 0 100 Z" />
+    <div className="absolute left-0 right-0 w-full h-10 pointer-events-none z-10 bottom-0">
+      <svg className="w-full h-full text-[#FFFDF9] fill-current" viewBox="0 0 1000 100" preserveAspectRatio="none">
+        <path d="M 0 100 C 300 0 700 0 1000 100 L 1000 100 Z" />
+      </svg>
+      <svg className="absolute inset-0 w-full h-full text-[#D4AF37]/50 fill-none pointer-events-none stroke-current" viewBox="0 0 1000 100" preserveAspectRatio="none">
+        <path d="M 0 100 C 300 0 700 0 1000 100" strokeWidth="2" />
       </svg>
     </div>
   );
@@ -64,7 +67,7 @@ function Countdown() {
 
   if (!mounted) {
     return (
-      <section className="py-20 px-6 bg-gradient-to-b from-[#1A0208] via-[#4A081B] to-[#1A0208] flex flex-col items-center justify-center">
+      <section className="py-20 px-6 velvet-silk-bg flex flex-col items-center justify-center">
         <div className="flex gap-4">
           {["DAYS", "HOURS", "MINS", "SECS"].map((label) => (
             <div key={label} className="w-[72px] h-20 bg-brand-card/85 border border-[#D4AF37]/25 rounded-2xl" />
@@ -77,9 +80,19 @@ function Countdown() {
   const formatNumber = (num) => String(num).padStart(2, "0");
 
   return (
-    <section className="py-24 px-6 bg-gradient-to-b from-[#1A0208] via-[#4A081B] to-[#1A0208] relative overflow-hidden flex flex-col items-center justify-center">
+    <section className="py-24 px-6 velvet-silk-bg relative overflow-hidden flex flex-col items-center justify-center">
       {/* Curved section transition divider at the bottom */}
       <SectionDivider />
+
+      {/* Low-opacity repeating Islamic geometric pattern watermark */}
+      <div className="absolute inset-0 opacity-[0.035] pointer-events-none z-0" 
+           style={{ 
+             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
+             backgroundSize: "60px 60px" 
+           }} />
+
+      {/* Ambient dynamic diagonal light sweep */}
+      <div className="ambient-light-sweep" />
 
       {/* Paper grain luxury texture overlay */}
       <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 

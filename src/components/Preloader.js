@@ -103,7 +103,7 @@ export default function Preloader({ onComplete }) {
         scale: 1.12,
         transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] } 
       }}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#4A081B] overflow-hidden"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-b from-[#2A000D] via-[#4A081B] to-[#1A0208] overflow-hidden"
     >
       {/* Moving Golden Rays backdrop (hydration guarded, rounded to 4 decimals) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-20 z-0 flex items-center justify-center">

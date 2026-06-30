@@ -222,17 +222,64 @@ body {
   perspective-origin: 50% 50%;
 }
 
+/* Premium Velvet Silk Surface Background */
+.velvet-silk-bg {
+  background: radial-gradient(
+    circle at center,
+    #7A1230 0%,      /* crimson glow */
+    #5B001D 45%,      /* royal burgundy */
+    #2A000D 100%      /* deep wine */
+  );
+  position: relative;
+  box-shadow: inset 0 0 120px rgba(15, 0, 4, 0.95);
+}
+
+.velvet-silk-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  /* Ultra subtle fabric grain texture */
+  background-image: radial-gradient(rgba(255, 255, 255, 0.15) 0.5px, transparent 0.5px);
+  background-size: 3px 3px;
+  mix-blend-mode: overlay;
+  z-index: 1;
+}
+
+.velvet-silk-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.16;
+  /* Soft diagonal silk folds and beveled sheen reflections */
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.01) 15%,
+    rgba(255, 255, 255, 0.08) 25%,
+    rgba(255, 255, 255, 0.01) 35%,
+    transparent 45%,
+    rgba(255, 255, 255, 0.07) 55%,
+    rgba(255, 255, 255, 0.01) 65%,
+    transparent 100%
+  );
+  mix-blend-mode: overlay;
+  z-index: 1;
+}
+
 /* Burgundy Velvet + Fine Wood Grain Blended Door Face */
 .burgundy-velvet-wood-door {
   background: radial-gradient(
     circle at 50% 35%,
-    #7E1533 0%,
-    #6D0F2A 35%,
-    #4A081B 70%,
-    #2D040F 100%
+    #7A1230 0%,      /* crimson glow */
+    #5B001D 40%,      /* royal burgundy */
+    #2A000D 75%,      /* deep wine */
+    #140106 100%      /* dark vignette edge */
   );
   position: relative;
-  box-shadow: inset 0 0 75px rgba(0,0,0,0.9);
+  box-shadow: inset 0 0 100px rgba(0,0,0,0.95);
 }
 
 .burgundy-velvet-wood-door::before {
@@ -240,13 +287,13 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.14;
-  /* Fine organic wood fiber lines overlaid with velvet felt texture */
+  opacity: 0.16;
+  /* Premium lacquered wood veneer pattern with soft beveled highlights */
   background-image: 
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 12px),
-    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.3) 1px, rgba(0, 0, 0, 0.3) 2px),
-    radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: auto, auto, 4px 4px;
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.35) 1px, rgba(0, 0, 0, 0.35) 2px),
+    radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: auto, auto, 6px 6px;
 }
 
 /* Upgraded 3D Box Door Faces (128px/5" thickness) */
@@ -408,6 +455,47 @@ body {
   transform: translateY(-4px) scale(1.03);
   box-shadow: 0 16px 36px -12px rgba(109, 15, 42, 0.22), 
               0 0 20px rgba(212, 175, 55, 0.25);
+}
+
+/* Ambient dynamic light sweep for velvet silk backdrops */
+@keyframes ambient-sweep {
+  0% {
+    transform: translate(-50%, -50%) rotate(25deg) translateY(-120%);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(25deg) translateY(120%);
+    opacity: 0;
+  }
+}
+
+.ambient-light-sweep {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 250%;
+  height: 250%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 255, 255, 0.0) 25%,
+    rgba(255, 255, 255, 0.015) 45%,
+    rgba(255, 255, 255, 0.03) 50%,
+    rgba(255, 255, 255, 0.015) 55%,
+    rgba(255, 255, 255, 0.0) 75%,
+    transparent 100%
+  );
+  pointer-events: none;
+  transform: translate(-50%, -50%) rotate(25deg);
+  animation: ambient-sweep 11s infinite ease-in-out;
+  mix-blend-mode: overlay;
+  z-index: 1;
 }
 
 

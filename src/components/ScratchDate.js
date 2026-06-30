@@ -607,8 +607,21 @@ function ScratchDate() {
   };
 
   return (
-    <section className="py-24 px-6 bg-gradient-to-b from-[#1A0208] via-[#4A081B] to-[#1A0208] relative flex flex-col items-center justify-center overflow-hidden">
+    <section className="py-24 px-6 velvet-silk-bg relative flex flex-col items-center justify-center overflow-hidden">
       
+      {/* Top Gold Arch Section Divider */}
+      <LuxuryDivider className="absolute top-0 left-0 right-0 z-20 -translate-y-[15px] rotate-180" />
+
+      {/* Low-opacity repeating Islamic geometric pattern watermark */}
+      <div className="absolute inset-0 opacity-[0.035] pointer-events-none z-0" 
+           style={{ 
+             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
+             backgroundSize: "60px 60px" 
+           }} />
+
+      {/* Ambient dynamic diagonal light sweep */}
+      <div className="ambient-light-sweep" />
+
       {/* Paper grain luxury texture overlay */}
       <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
            style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #FFF8ED 1px, transparent 1px), radial-gradient(circle at 0 0, #FFF8ED 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
@@ -802,5 +815,18 @@ function ScratchDate() {
     </section>
   );
 }
+
+// Pointed Islamic Gold Divider Component
+const LuxuryDivider = ({ className = "" }) => (
+  <div className={`w-full flex items-center justify-center pointer-events-none ${className}`}>
+    <div className="flex-1 h-[0.5px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent" />
+    <svg className="w-16 h-8 text-[#D4AF37] fill-none stroke-current" viewBox="0 0 100 50">
+      <path d="M 10,25 C 30,25 35,10 50,5 C 65,10 70,25 90,25" strokeWidth="1.5" />
+      <path d="M 20,25 Q 50,40 80,25" strokeWidth="0.8" strokeDasharray="2,2" />
+      <circle cx="50" cy="20" r="3" fill="currentColor" />
+    </svg>
+    <div className="flex-1 h-[0.5px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent" />
+  </div>
+);
 
 export default memo(ScratchDate);

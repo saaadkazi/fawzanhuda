@@ -5,16 +5,7 @@ import { useEffect, useState, memo } from "react";
 import { createPortal } from "react-dom";
 import confetti from "canvas-confetti";
 
-// Section curved transition divider (Venue to Dua)
-const SectionDivider = () => {
-  return (
-    <div className="absolute left-0 right-0 w-full h-10 pointer-events-none z-10 text-[#2D040F] top-0">
-      <svg className="w-full h-full fill-current" viewBox="0 0 1000 100" preserveAspectRatio="none">
-        <path d="M 0 0 C 300 100 700 100 1000 0 L 1000 100 L 0 100 Z" />
-      </svg>
-    </div>
-  );
-};
+
 
 function Dua() {
   const [stars, setStars] = useState([]);
@@ -129,7 +120,7 @@ function Dua() {
   };
 
   return (
-    <section className="py-32 px-6 bg-gradient-to-b from-[#1A0208] via-[#4A081B] to-[#1A0208] relative overflow-hidden flex flex-col items-center justify-center min-h-[65vh]">
+    <section className="py-32 px-6 velvet-silk-bg relative overflow-hidden flex flex-col items-center justify-center min-h-[65vh]">
       
       {/* Custom Styles for magical CTA sheen sweep and ripple ring animations */}
       <style dangerouslySetInnerHTML={{ __html: `
@@ -175,14 +166,27 @@ function Dua() {
         }
       `}} />
 
-      {/* Top curved section transition divider */}
-      <SectionDivider />
+      {/* Smooth gradient transition at the top from light Venue to dark RSVP */}
+      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#FFFDF9] to-transparent pointer-events-none z-10" />
 
-      {/* Paper grain luxury texture overlay */}
-      <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
-           style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #FFF8ED 1px, transparent 1px), radial-gradient(circle at 0 0, #FFF8ED 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
+      {/* Top Gold Arch Section Divider */}
+      <LuxuryDivider className="absolute top-4 left-0 right-0 z-20 -translate-y-[15px] rotate-180" />
 
-      {/* Soft radial golden glow behind content */}
+      {/* Low-opacity repeating Islamic geometric pattern watermark (matches light theme) */}
+      <div className="absolute inset-0 opacity-[0.035] pointer-events-none z-0" 
+           style={{ 
+             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
+             backgroundSize: "60px 60px" 
+           }} />
+
+      {/* Ambient dynamic diagonal light sweep */}
+      <div className="ambient-light-sweep" />
+
+      {/* Oversized blurred gradient shapes for cinematic color depth */}
+      <div className="absolute top-[-10%] left-[-20%] w-[80%] h-[60%] bg-[#7A1230]/20 rounded-full blur-[120px] pointer-events-none z-0" />
+      <div className="absolute bottom-[-15%] right-[-15%] w-[70%] h-[50%] bg-[#5B001D]/25 rounded-full blur-[140px] pointer-events-none z-0" />
+
+      {/* Soft radial golden glow spotlight behind cards */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[380px] md:w-[600px] md:h-[600px] bg-gradient-to-tr from-brand-gold/5 via-[#FFF8ED]/10 to-brand-gold/5 rounded-full blur-[80px] pointer-events-none z-0" />
 
       {/* Slow ambient light sweep across background */}
@@ -199,6 +203,16 @@ function Dua() {
         }}
         className="absolute w-[600px] h-[600px] bg-gradient-to-tr from-[#D4AF37]/10 to-transparent rounded-full blur-[100px] pointer-events-none z-0"
         style={{ top: "15%", left: "10%" }}
+      />
+
+      {/* Ambient shifting fog/mist behind the card */}
+      <motion.div
+        animate={{
+          scale: [0.95, 1.05, 0.95],
+          opacity: [0.15, 0.28, 0.15]
+        }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute w-[500px] h-[300px] bg-[#7A1230]/30 rounded-full blur-[90px] pointer-events-none z-0"
       />
 
       {/* Floating Gold Stars */}
@@ -647,5 +661,18 @@ function Dua() {
     </section>
   );
 }
+
+// Pointed Islamic Gold Divider Component
+const LuxuryDivider = ({ className = "" }) => (
+  <div className={`w-full flex items-center justify-center pointer-events-none ${className}`}>
+    <div className="flex-1 h-[0.5px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent" />
+    <svg className="w-16 h-8 text-[#D4AF37] fill-none stroke-current" viewBox="0 0 100 50">
+      <path d="M 10,25 C 30,25 35,10 50,5 C 65,10 70,25 90,25" strokeWidth="1.5" />
+      <path d="M 20,25 Q 50,40 80,25" strokeWidth="0.8" strokeDasharray="2,2" />
+      <circle cx="50" cy="20" r="3" fill="currentColor" />
+    </svg>
+    <div className="flex-1 h-[0.5px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent" />
+  </div>
+);
 
 export default memo(Dua);
