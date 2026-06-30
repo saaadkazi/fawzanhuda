@@ -30,7 +30,7 @@ function Countdown() {
     setMounted(true);
 
     // Generate gold stars
-    const generated = Array.from({ length: 12 }).map((_, i) => ({
+    const generated = Array.from({ length: 16 }).map((_, i) => ({
       id: i,
       left: `${Math.random() * 95}%`,
       size: Math.random() * 2 + 1,
@@ -64,7 +64,7 @@ function Countdown() {
 
   if (!mounted) {
     return (
-      <section className="py-20 px-6 bg-gradient-to-b from-[#2D040F] via-[#4A081B] to-[#2D040F] flex flex-col items-center justify-center">
+      <section className="py-20 px-6 bg-gradient-to-b from-[#1A0208] via-[#4A081B] to-[#1A0208] flex flex-col items-center justify-center">
         <div className="flex gap-4">
           {["DAYS", "HOURS", "MINS", "SECS"].map((label) => (
             <div key={label} className="w-[72px] h-20 bg-brand-card/85 border border-[#D4AF37]/25 rounded-2xl" />
@@ -77,13 +77,32 @@ function Countdown() {
   const formatNumber = (num) => String(num).padStart(2, "0");
 
   return (
-    <section className="py-24 px-6 bg-gradient-to-b from-[#2D040F] via-[#4A081B] to-[#2D040F] relative overflow-hidden flex flex-col items-center justify-center">
+    <section className="py-24 px-6 bg-gradient-to-b from-[#1A0208] via-[#4A081B] to-[#1A0208] relative overflow-hidden flex flex-col items-center justify-center">
       {/* Curved section transition divider at the bottom */}
       <SectionDivider />
 
       {/* Paper grain luxury texture overlay */}
       <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
            style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #FFF8ED 1px, transparent 1px), radial-gradient(circle at 0 0, #FFF8ED 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
+
+      {/* Slow ambient light sweep across background */}
+      <motion.div
+        animate={{
+          x: ["-10%", "10%", "-10%"],
+          y: ["-10%", "10%", "-10%"],
+          opacity: [0.12, 0.25, 0.12]
+        }}
+        transition={{
+          duration: 15,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="absolute w-[600px] h-[600px] bg-gradient-to-tr from-[#D4AF37]/10 to-transparent rounded-full blur-[100px] pointer-events-none z-0"
+        style={{ top: "15%", left: "10%" }}
+      />
+
+      {/* Soft radial golden glow behind content */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[380px] md:w-[600px] md:h-[600px] bg-gradient-to-tr from-brand-gold/5 via-[#FFF8ED]/10 to-brand-gold/5 rounded-full blur-[80px] pointer-events-none z-0" />
 
       {/* Floating gold background stars */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
@@ -112,37 +131,46 @@ function Countdown() {
         ))}
       </div>
 
-      {/* Background glow behind timer */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[200px] bg-brand-gold/5 rounded-full blur-[60px] pointer-events-none" />
-
-      <div className="text-center mb-14 relative z-10">
-        <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-[#E8C76A] font-semibold">
+      {/* Heading Viewport Reveal */}
+      <motion.div
+        initial={{ opacity: 0, filter: "blur(12px)", y: 25 }}
+        whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.85, ease: "easeOut" }}
+        className="text-center mb-14 relative z-10"
+      >
+        <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-[#E8C76A] font-semibold flex items-center justify-center gap-1.5">
           Counting the Moments
+          <motion.span 
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ repeat: Infinity, duration: 2.5 }}
+            className="inline-block"
+          >
+            ✦
+          </motion.span>
         </span>
         <h2 className="font-cormorant text-3xl md:text-4xl text-[#FFF8ED] mt-2 tracking-wide font-light">
           Until the Nikah
         </h2>
         <div className="w-12 h-[1px] bg-[#D4AF37]/60 mx-auto mt-4" />
-      </div>
+      </motion.div>
 
-      {/* Timer Grid with separator colons */}
-      <div className="flex items-center gap-2 md:gap-4 justify-center max-w-lg w-full px-4 relative z-10">
-        
+      {/* Timer Grid Viewport Reveal */}
+      <motion.div 
+        initial={{ opacity: 0, filter: "blur(12px)", y: 20 }}
+        whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.85, ease: "easeOut", delay: 0.15 }}
+        className="flex items-center gap-2 md:gap-4 justify-center max-w-lg w-full px-4 relative z-10"
+      >
         <CountdownCard value={timeLeft.days} label="Days" format={formatNumber} />
-        
         <SeparatorColon />
-
         <CountdownCard value={timeLeft.hours} label="Hours" format={formatNumber} />
-        
         <SeparatorColon />
-
         <CountdownCard value={timeLeft.minutes} label="Minutes" format={formatNumber} />
-        
         <SeparatorColon />
-
         <CountdownCard value={timeLeft.seconds} label="Seconds" format={formatNumber} />
-        
-      </div>
+      </motion.div>
     </section>
   );
 }

@@ -607,7 +607,7 @@ function ScratchDate() {
   };
 
   return (
-    <section className="py-24 px-6 bg-gradient-to-b from-[#2D040F] via-[#4A081B] to-[#2D040F] relative flex flex-col items-center justify-center overflow-hidden">
+    <section className="py-24 px-6 bg-gradient-to-b from-[#1A0208] via-[#4A081B] to-[#1A0208] relative flex flex-col items-center justify-center overflow-hidden">
       
       {/* Paper grain luxury texture overlay */}
       <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
@@ -703,12 +703,27 @@ function ScratchDate() {
         ))}
       </div>
 
+      {/* Slow ambient light sweep across background */}
+      <motion.div
+        animate={{
+          x: ["-10%", "10%", "-10%"],
+          y: ["-10%", "10%", "-10%"],
+          opacity: [0.12, 0.25, 0.12]
+        }}
+        transition={{
+          duration: 15,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="absolute w-[600px] h-[600px] bg-gradient-to-tr from-[#D4AF37]/10 to-transparent rounded-full blur-[100px] pointer-events-none z-0"
+        style={{ top: "15%", left: "10%" }}
+      />
+
       {/* Subtle radial spotlight behind medallions */}
       <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] md:w-[500px] h-[380px] md:h-[500px] rounded-full pointer-events-none z-0 animate-pulse"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] md:w-[500px] h-[380px] md:h-[500px] rounded-full pointer-events-none z-0"
         style={{
-          background: "radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(255, 255, 255, 0) 70%)",
-          animationDuration: "5s"
+          background: "radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(255, 255, 255, 0) 70%)"
         }}
       />
 
@@ -731,22 +746,42 @@ function ScratchDate() {
         )}
       </AnimatePresence>
 
-      <div className="text-center mb-12 max-w-sm relative z-10">
-        <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.3em] text-[#E8C76A] font-semibold">
+      {/* Heading Viewport Reveal */}
+      <motion.div 
+        initial={{ opacity: 0, filter: "blur(12px)", y: 25 }}
+        whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.85, ease: "easeOut" }}
+        className="text-center mb-12 max-w-sm relative z-10"
+      >
+        <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.3em] text-[#E8C76A] font-semibold flex items-center justify-center gap-1">
           The Sacred Date
+          <motion.span 
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ repeat: Infinity, duration: 2.5 }}
+            className="inline-block"
+          >
+            ✦
+          </motion.span>
         </span>
         <h2 className="font-cormorant text-3xl md:text-4xl text-[#FFF8ED] mt-2 tracking-wide font-light">
           Union Date Reveal
         </h2>
         <div className="w-12 h-[1px] bg-[#D4AF37]/50 mx-auto mt-4" />
-      </div>
+      </motion.div>
 
-      {/* 3 Medallions Horizontal Layout */}
-      <div className="flex gap-6 md:gap-8 justify-center w-full max-w-[340px] md:max-w-[420px] relative z-10">
+      {/* Medallions Viewport Reveal */}
+      <motion.div 
+        initial={{ opacity: 0, filter: "blur(12px)", y: 20 }}
+        whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.85, ease: "easeOut", delay: 0.15 }}
+        className="flex gap-6 md:gap-8 justify-center w-full max-w-[340px] md:max-w-[420px] relative z-10"
+      >
         <CeremonialMedallion value="09" label="Day" onReveal={handleCardReveal} index={0} />
         <CeremonialMedallion value="12" label="Month" onReveal={handleCardReveal} index={1} />
         <CeremonialMedallion value="2026" label="Year" onReveal={handleCardReveal} index={2} />
-      </div>
+      </motion.div>
 
       {/* Progress Helper Indicator */}
       <div className="mt-10 h-5 flex items-center justify-center text-center relative z-10">

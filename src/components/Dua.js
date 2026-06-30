@@ -31,7 +31,7 @@ function Dua() {
   useEffect(() => {
     setMounted(true);
 
-    // Generate random stars for the background
+    // Generate gold stars
     const generated = Array.from({ length: 32 }).map((_, i) => {
       const size = Math.random() * 2.5 + 1.2;
       const duration = size < 2 ? Math.random() * 6 + 10 : Math.random() * 4 + 6;
@@ -45,8 +45,6 @@ function Dua() {
       };
     });
     setStars(generated);
-
-    // Note: Form persistence on mount is removed per requirements to ensure a fresh empty form on reload.
   }, []);
 
   // Prevent scroll when modal is active
@@ -67,7 +65,7 @@ function Dua() {
   };
 
   const handleButtonClick = (e) => {
-    // Generate coordinate-based ripple effect on button
+    // Generate coordinate-based ripple effect on button click
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -131,7 +129,7 @@ function Dua() {
   };
 
   return (
-    <section className="py-32 px-6 bg-gradient-to-b from-[#2D040F] via-[#4A081B] to-[#2D040F] relative overflow-hidden flex flex-col items-center justify-center min-h-[65vh]">
+    <section className="py-32 px-6 bg-gradient-to-b from-[#1A0208] via-[#4A081B] to-[#1A0208] relative overflow-hidden flex flex-col items-center justify-center min-h-[65vh]">
       
       {/* Custom Styles for magical CTA sheen sweep and ripple ring animations */}
       <style dangerouslySetInnerHTML={{ __html: `
@@ -184,10 +182,26 @@ function Dua() {
       <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
            style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #FFF8ED 1px, transparent 1px), radial-gradient(circle at 0 0, #FFF8ED 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
 
-      {/* Radial Champagne Gold Moon Glow Background */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[380px] md:w-[600px] md:h-[600px] bg-gradient-to-tr from-brand-gold/5 via-[#FFF8ED]/10 to-brand-gold/5 rounded-full blur-[70px] pointer-events-none" />
+      {/* Soft radial golden glow behind content */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[380px] md:w-[600px] md:h-[600px] bg-gradient-to-tr from-brand-gold/5 via-[#FFF8ED]/10 to-brand-gold/5 rounded-full blur-[80px] pointer-events-none z-0" />
 
-      {/* Floating Parallax Gold Stars */}
+      {/* Slow ambient light sweep across background */}
+      <motion.div
+        animate={{
+          x: ["-10%", "10%", "-10%"],
+          y: ["-10%", "10%", "-10%"],
+          opacity: [0.12, 0.25, 0.12]
+        }}
+        transition={{
+          duration: 15,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="absolute w-[600px] h-[600px] bg-gradient-to-tr from-[#D4AF37]/10 to-transparent rounded-full blur-[100px] pointer-events-none z-0"
+        style={{ top: "15%", left: "10%" }}
+      />
+
+      {/* Floating Gold Stars */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-[1]">
         {stars.map((s) => (
           <motion.div
@@ -218,109 +232,147 @@ function Dua() {
 
       <div className="max-w-2xl mx-auto relative z-10 flex flex-col items-center text-center px-4 w-full">
         
-        {/* Soft Moon Outline / Islamic Motif in gold */}
-        <div className="w-14 h-14 border border-[#D4AF37]/35 rounded-full flex items-center justify-center mb-8 opacity-80 shadow-[0_0_15px_rgba(216,178,110,0.15)]">
-          <svg className="w-6 h-6 text-[#E8C76A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" fill="currentColor" fillOpacity="0.12" />
-          </svg>
-        </div>
+        {/* Scroll Viewport Reveal Wrapper */}
+        <motion.div
+          initial={{ opacity: 0, filter: "blur(12px)", y: 20 }}
+          whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.85, ease: "easeOut" }}
+          className="flex flex-col items-center w-full"
+        >
+          {/* Soft Moon Outline / Islamic Motif in gold */}
+          <div className="w-14 h-14 border border-[#D4AF37]/35 rounded-full flex items-center justify-center mb-8 opacity-80 shadow-[0_0_15px_rgba(216,178,110,0.15)]">
+            <svg className="w-6 h-6 text-[#E8C76A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" fill="currentColor" fillOpacity="0.12" />
+            </svg>
+          </div>
 
-        <AnimatePresence mode="wait">
-          {!savedRsvp ? (
-            <motion.div
-              key="rsvp-form"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.6 }}
-              className="w-full max-w-xl bg-gradient-to-br from-[#4A081B]/40 via-[#2D040F]/60 to-[#4A081B]/40 p-8 md:p-12 rounded-[36px] border border-[#D4AF37]/25 shadow-2xl backdrop-blur-md relative overflow-hidden"
-            >
-              <h2 className="font-cormorant text-3xl md:text-4xl text-[#FFF8ED] tracking-wide mb-3 font-light">
-                Confirm Your Presence ✨
-              </h2>
-              
-              <p className="font-cormorant italic text-base md:text-lg text-[#FFF8ED]/85 leading-relaxed max-w-md mx-auto mb-8">
-                Your presence, blessings, and duas would mean the world to us.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
-                {/* Attending Button */}
-                <motion.button
-                  whileHover={{ scale: 1.03, y: -2 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => handleSelectRSVP("attend")}
-                  className="w-full sm:w-auto min-w-[200px] bg-gradient-to-r from-[#D4AF37] via-[#E8C76A] to-[#D4AF37] text-[#4A081B] font-cormorant font-bold uppercase tracking-wider py-4 px-8 rounded-full shadow-[0_4px_20px_rgba(212,175,55,0.3)] transition-shadow duration-300 hover:shadow-[0_4px_30px_rgba(232,199,106,0.6)] cursor-pointer text-sm border-none focus:outline-none"
-                >
-                  InshaAllah, I’ll Attend
-                </motion.button>
-
-                {/* Sending Duas Button */}
-                <motion.button
-                  whileHover={{ scale: 1.03, y: -2 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => handleSelectRSVP("dua")}
-                  className="w-full sm:w-auto min-w-[200px] border-[1.5px] border-[#D4AF37] text-[#FFF8ED] hover:bg-[#D4AF37]/10 font-cormorant font-bold uppercase tracking-wider py-4 px-8 rounded-full transition-colors duration-300 cursor-pointer text-sm focus:outline-none"
-                >
-                  Sending My Duas
-                </motion.button>
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="rsvp-saved"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.5 }}
-              className="w-full max-w-xl bg-gradient-to-br from-[#4A081B]/40 via-[#2D040F]/60 to-[#4A081B]/40 p-8 md:p-12 rounded-[36px] border border-[#D4AF37]/25 shadow-2xl backdrop-blur-md text-center"
-            >
-              <div className="w-12 h-12 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/40 flex items-center justify-center mx-auto mb-6 text-[#E8C76A]">
-                <svg className="w-5.5 h-5.5 text-[#E8C76A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.746 3.746 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
-                </svg>
-              </div>
-
-              <h2 className="font-cormorant text-2xl md:text-3.5xl text-[#FFF8ED] tracking-wide mb-2">
-                JazakAllah Khair!
-              </h2>
-
-              <p className="font-cormorant italic text-base md:text-lg text-[#FFF8ED]/85 leading-relaxed max-w-md mx-auto mb-6">
-                {savedRsvp.rsvp === "attend" 
-                  ? "Thank you! We are delighted to hear you will be joining us to celebrate this blessed union."
-                  : "Thank you for sending your warm prayers and blessings to the couple."}
-              </p>
-
-              {savedRsvp.name && (
-                <div className="bg-[#20030B]/40 rounded-2xl p-5 border border-[#D4AF37]/15 max-w-md mx-auto mb-8 text-left">
-                  <div className="font-inter text-[9px] uppercase tracking-wider text-[#D4AF37] font-semibold mb-1">
-                    Guest Name
-                  </div>
-                  <div className="font-cormorant text-lg text-[#FFF8ED] font-bold mb-3">
-                    {savedRsvp.name}
-                  </div>
-
-                  {savedRsvp.message && (
-                    <>
-                      <div className="font-inter text-[9px] uppercase tracking-wider text-[#D4AF37] font-semibold mb-1">
-                        Your Blessings & Duas
-                      </div>
-                      <p className="font-cormorant italic text-base text-[#FFF8ED]/90 leading-relaxed">
-                        "{savedRsvp.message}"
-                      </p>
-                    </>
-                  )}
-                </div>
-              )}
-
-              <button
-                onClick={handleReset}
-                className="font-inter text-[10px] uppercase tracking-widest text-[#D4AF37]/80 hover:text-[#E8C76A] transition-colors focus:outline-none cursor-pointer"
+          <AnimatePresence mode="wait">
+            {!savedRsvp ? (
+              <motion.div
+                key="rsvp-form"
+                animate={{
+                  y: [0, -6, 0],
+                  boxShadow: [
+                    "0 12px 40px rgba(0,0,0,0.35), 0 0 15px rgba(212,175,55,0.08)",
+                    "0 12px 40px rgba(0,0,0,0.35), 0 0 25px rgba(212,175,55,0.22)",
+                    "0 12px 40px rgba(0,0,0,0.35), 0 0 15px rgba(212,175,55,0.08)"
+                  ]
+                }}
+                transition={{
+                  y: { repeat: Infinity, duration: 4.8, ease: "easeInOut" },
+                  boxShadow: { repeat: Infinity, duration: 4.8, ease: "easeInOut" }
+                }}
+                exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
+                className="w-full max-w-xl bg-gradient-to-br from-[#4A081B]/45 via-[#1E020A]/70 to-[#4A081B]/45 p-8 md:p-12 rounded-[28px] border border-[#D4AF37]/25 shadow-2xl backdrop-blur-md relative overflow-hidden"
               >
-                Update Confirmation
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                {/* Heading with sparkle pulse + rotation */}
+                <h2 className="font-cormorant text-3xl md:text-4xl text-[#FFF8ED] tracking-wide mb-3 font-light flex items-center justify-center gap-2">
+                  Confirm Your Presence
+                  <motion.span 
+                    className="inline-block text-[#E8C76A]"
+                    animate={{ 
+                      rotate: [0, 15, -15, 0],
+                      filter: ["drop-shadow(0 0 2px #E8C76A)", "drop-shadow(0 0 8px #E8C76A)", "drop-shadow(0 0 2px #E8C76A)"]
+                    }}
+                    transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
+                  >
+                    ✨
+                  </motion.span>
+                </h2>
+                
+                <p className="font-cormorant italic text-base md:text-lg text-[#FFF8ED]/85 leading-relaxed max-w-md mx-auto mb-8">
+                  Your presence, blessings, and duas would mean the world to us.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
+                  {/* Attending Button - Gold gradient primary */}
+                  <motion.button
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleSelectRSVP("attend")}
+                    className="w-full sm:w-auto min-w-[200px] px-8 py-4 rounded-full border border-[#856124]/60 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] text-[#2D040F] font-cinzel text-xs font-bold tracking-[0.2em] shadow-[inset_0_2px_3px_rgba(255,255,255,0.85),inset_0_-1.5px_2px_rgba(0,0,0,0.25),0_4px_18px_rgba(212,175,55,0.35)] hover:shadow-[0_6px_25px_rgba(232,199,106,0.6)] cursor-pointer transition-all duration-300 shine-btn-sweep"
+                  >
+                    InshaAllah, I’ll Attend
+                  </motion.button>
+
+                  {/* Sending Duas Button - Outlined burgundy/gold */}
+                  <motion.button
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleSelectRSVP("dua")}
+                    className="w-full sm:w-auto min-w-[200px] border border-[#D4AF37]/65 hover:bg-[#D4AF37]/15 hover:border-[#FCF6BA] text-[#FFFDF9] font-cinzel text-xs font-bold tracking-widest py-4 px-8 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] cursor-pointer focus:outline-none"
+                  >
+                    Sending My Duas
+                  </motion.button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="rsvp-saved"
+                animate={{
+                  y: [0, -6, 0],
+                  boxShadow: [
+                    "0 12px 40px rgba(0,0,0,0.35), 0 0 15px rgba(212,175,55,0.08)",
+                    "0 12px 40px rgba(0,0,0,0.35), 0 0 25px rgba(212,175,55,0.22)",
+                    "0 12px 40px rgba(0,0,0,0.35), 0 0 15px rgba(212,175,55,0.08)"
+                  ]
+                }}
+                transition={{
+                  y: { repeat: Infinity, duration: 4.8, ease: "easeInOut" },
+                  boxShadow: { repeat: Infinity, duration: 4.8, ease: "easeInOut" }
+                }}
+                exit={{ opacity: 0, y: -20 }}
+                className="w-full max-w-xl bg-gradient-to-br from-[#4A081B]/45 via-[#1E020A]/70 to-[#4A081B]/45 p-8 md:p-12 rounded-[28px] border border-[#D4AF37]/25 shadow-2xl backdrop-blur-md text-center"
+              >
+                <div className="w-12 h-12 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/45 flex items-center justify-center mx-auto mb-6 text-[#E8C76A] shadow-[0_0_12px_rgba(212,175,55,0.2)]">
+                  <svg className="w-5.5 h-5.5 text-[#E8C76A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.746 3.746 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+                  </svg>
+                </div>
+
+                <h2 className="font-cormorant text-2xl md:text-3.5xl text-[#FFF8ED] tracking-wide mb-2">
+                  JazakAllah Khair!
+                </h2>
+
+                <p className="font-cormorant italic text-base md:text-lg text-[#FFF8ED]/85 leading-relaxed max-w-md mx-auto mb-6">
+                  {savedRsvp.rsvp === "attend" 
+                    ? "Thank you! We are delighted to hear you will be joining us to celebrate this blessed union."
+                    : "Thank you for sending your warm prayers and blessings to the couple."}
+                </p>
+
+                {savedRsvp.name && (
+                  <div className="bg-[#20030B]/40 rounded-2xl p-5 border border-[#D4AF37]/15 max-w-md mx-auto mb-8 text-left shadow-lg">
+                    <div className="font-inter text-[9px] uppercase tracking-wider text-[#D4AF37] font-semibold mb-1">
+                      Guest Name
+                    </div>
+                    <div className="font-cormorant text-lg text-[#FFF8ED] font-bold mb-3">
+                      {savedRsvp.name}
+                    </div>
+
+                    {savedRsvp.message && (
+                      <>
+                        <div className="font-inter text-[9px] uppercase tracking-wider text-[#D4AF37] font-semibold mb-1">
+                          Your Blessings & Duas
+                        </div>
+                        <p className="font-cormorant italic text-base text-[#FFF8ED]/90 leading-relaxed">
+                          "{savedRsvp.message}"
+                        </p>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                <button
+                  onClick={handleReset}
+                  className="font-cinzel text-[10px] uppercase tracking-widest text-[#D4AF37]/80 hover:text-[#FFF8ED] transition-colors focus:outline-none cursor-pointer hover:drop-shadow-[0_0_8px_rgba(232,199,106,0.5)]"
+                >
+                  Update Confirmation
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </div>
 
       {/* Glassmorphic Form Modal (Using React Portal) */}
@@ -342,7 +394,7 @@ function Dua() {
                 exit={{ scale: 0.9, y: 15 }}
                 transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-md bg-gradient-to-br from-[#3D0615] via-[#2D040F] to-[#3D0615] p-8 rounded-[28px] border border-[#D4AF37]/35 shadow-2xl relative overflow-hidden cursor-default"
+                className="w-full max-w-md bg-gradient-to-br from-[#4A081B]/95 via-[#1E020A]/95 to-[#4A081B]/95 p-8 rounded-[28px] border border-[#D4AF37]/35 shadow-2xl relative overflow-hidden cursor-default backdrop-blur-md"
               >
                 {/* Close button X */}
                 <button
@@ -380,7 +432,7 @@ function Dua() {
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-[#20030B]/50 text-[#FFF8ED] placeholder-[#FFF8ED]/45 border border-[#D4AF37]/25 rounded-xl px-4 py-3 focus:outline-none focus:border-[#E8C76A] focus:ring-1 focus:ring-[#E8C76A]/30 transition-all font-cormorant text-lg mb-4"
+                      className="w-full bg-[#20030B]/50 text-[#FFF8ED] placeholder-[#FFF8ED]/55 border border-[#D4AF37]/25 rounded-xl px-4 py-3 focus:outline-none focus:border-[#E8C76A] focus:ring-1 focus:ring-[#E8C76A]/30 transition-all font-cormorant text-lg mb-4"
                     />
 
                     <label className="font-inter text-[9px] uppercase tracking-widest text-[#D4AF37] mb-1.5 font-bold">
@@ -391,7 +443,7 @@ function Dua() {
                       rows={3}
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      className="w-full bg-[#20030B]/50 text-[#FFF8ED] placeholder-[#FFF8ED]/45 border border-[#D4AF37]/25 rounded-xl px-4 py-3 focus:outline-none focus:border-[#E8C76A] focus:ring-1 focus:ring-[#E8C76A]/30 transition-all font-cormorant text-base mb-6 resize-none"
+                      className="w-full bg-[#20030B]/50 text-[#FFF8ED] placeholder-[#FFF8ED]/55 border border-[#D4AF37]/25 rounded-xl px-4 py-3 focus:outline-none focus:border-[#E8C76A] focus:ring-1 focus:ring-[#E8C76A]/30 transition-all font-cormorant text-base mb-6 resize-none"
                     />
 
                     <motion.button
@@ -400,7 +452,7 @@ function Dua() {
                       type="submit"
                       disabled={isSubmitting}
                       onClick={handleButtonClick}
-                      className="shine-btn-sweep relative overflow-hidden w-full bg-gradient-to-r from-[#B89742] via-[#F3E7C4] to-[#B89742] text-[#4A081B] font-cormorant font-bold uppercase tracking-wider py-4 rounded-full text-sm shadow-[inset_0_2px_4px_rgba(255,255,255,0.45),0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[inset_0_2px_4px_rgba(255,255,255,0.45),0_0_30px_rgba(243,231,196,0.65)] transition-all duration-300 disabled:opacity-75 flex items-center justify-center cursor-pointer border border-[#F3E7C4]/65 select-none"
+                      className="px-10 py-4 rounded-full border border-[#856124]/60 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] text-[#2D040F] font-cinzel text-xs font-bold tracking-[0.2em] shadow-[inset_0_2px_3px_rgba(255,255,255,0.85),inset_0_-1.5px_2px_rgba(0,0,0,0.25),0_4px_18px_rgba(212,175,55,0.35)] cursor-pointer relative overflow-hidden flex items-center justify-center gap-2 shine-btn-sweep w-full text-center"
                     >
                       {/* Ripple elements inside button */}
                       {ripples.map((r) => (
@@ -447,7 +499,7 @@ function Dua() {
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-[#20030B]/50 text-[#FFF8ED] placeholder-[#FFF8ED]/45 border border-[#D4AF37]/25 rounded-xl px-4 py-3 focus:outline-none focus:border-[#E8C76A] focus:ring-1 focus:ring-[#E8C76A]/30 transition-all font-cormorant text-lg mb-4"
+                      className="w-full bg-[#20030B]/50 text-[#FFF8ED] placeholder-[#FFF8ED]/55 border border-[#D4AF37]/25 rounded-xl px-4 py-3 focus:outline-none focus:border-[#E8C76A] focus:ring-1 focus:ring-[#E8C76A]/30 transition-all font-cormorant text-lg mb-4"
                     />
 
                     <label className="font-inter text-[9px] uppercase tracking-widest text-[#D4AF37] mb-1.5 font-bold">
@@ -459,7 +511,7 @@ function Dua() {
                       rows={4}
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      className="w-full bg-[#20030B]/50 text-[#FFF8ED] placeholder-[#FFF8ED]/45 border border-[#D4AF37]/25 rounded-xl px-4 py-3 focus:outline-none focus:border-[#E8C76A] focus:ring-1 focus:ring-[#E8C76A]/30 transition-all font-cormorant text-base mb-6 resize-none"
+                      className="w-full bg-[#20030B]/50 text-[#FFF8ED] placeholder-[#FFF8ED]/55 border border-[#D4AF37]/25 rounded-xl px-4 py-3 focus:outline-none focus:border-[#E8C76A] focus:ring-1 focus:ring-[#E8C76A]/30 transition-all font-cormorant text-base mb-6 resize-none"
                     />
 
                     <motion.button
@@ -468,7 +520,7 @@ function Dua() {
                       type="submit"
                       disabled={isSubmitting}
                       onClick={handleButtonClick}
-                      className="shine-btn-sweep relative overflow-hidden w-full bg-gradient-to-r from-[#B89742] via-[#F3E7C4] to-[#B89742] text-[#4A081B] font-cormorant font-bold uppercase tracking-wider py-4 rounded-full text-sm shadow-[inset_0_2px_4px_rgba(255,255,255,0.45),0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[inset_0_2px_4px_rgba(255,255,255,0.45),0_0_30px_rgba(243,231,196,0.65)] transition-all duration-300 disabled:opacity-75 flex items-center justify-center cursor-pointer border border-[#F3E7C4]/65 select-none"
+                      className="px-10 py-4 rounded-full border border-[#856124]/60 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] text-[#2D040F] font-cinzel text-xs font-bold tracking-[0.2em] shadow-[inset_0_2px_3px_rgba(255,255,255,0.85),inset_0_-1.5px_2px_rgba(0,0,0,0.25),0_4px_18px_rgba(212,175,55,0.35)] cursor-pointer relative overflow-hidden flex items-center justify-center gap-2 shine-btn-sweep w-full text-center"
                     >
                       {/* Ripple elements inside button */}
                       {ripples.map((r) => (
@@ -489,10 +541,10 @@ function Dua() {
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                           </svg>
-                          <span className="font-cormorant tracking-widest font-bold">Sealing Your Presence...</span>
+                          <span className="font-cormorant tracking-widest font-bold">Sending Blessings...</span>
                         </div>
                       ) : (
-                        <span className="font-cormorant tracking-widest font-bold">Seal My Presence</span>
+                        <span className="font-cormorant tracking-widest font-bold">Send My Blessing</span>
                       )}
                     </motion.button>
                   </form>
@@ -523,7 +575,7 @@ function Dua() {
                 exit={{ opacity: 0, scale: 0.93, y: 15 }}
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-md bg-gradient-to-br from-[#3D0615] via-[#2D040F] to-[#3D0615] p-8 rounded-[28px] border border-[#D4AF37]/35 shadow-2xl relative overflow-hidden cursor-default text-center"
+                className="w-full max-w-md bg-gradient-to-br from-[#4A081B]/95 via-[#1E020A]/95 to-[#4A081B]/95 p-8 rounded-[28px] border border-[#D4AF37]/35 shadow-2xl relative overflow-hidden cursor-default text-center backdrop-blur-md"
               >
                 {/* Close button X */}
                 <button
@@ -581,7 +633,7 @@ function Dua() {
                 <button
                   type="button"
                   onClick={handleCloseSuccess}
-                  className="font-inter text-[10px] uppercase tracking-widest bg-gradient-to-r from-[#D4AF37]/15 to-[#E8C76A]/10 text-[#E8C76A] hover:bg-[#D4AF37]/20 border border-[#D4AF37]/45 rounded-full py-2.5 px-6 transition-colors focus:outline-none cursor-pointer"
+                  className="font-cinzel text-[10px] uppercase tracking-widest bg-gradient-to-r from-[#D4AF37]/15 to-[#E8C76A]/10 text-[#E8C76A] hover:bg-[#D4AF37]/20 border border-[#D4AF37]/45 rounded-full py-2.5 px-6 transition-colors focus:outline-none cursor-pointer"
                 >
                   Close
                 </button>

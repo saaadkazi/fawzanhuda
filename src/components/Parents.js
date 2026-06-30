@@ -47,7 +47,7 @@ function Parents() {
 
   useEffect(() => {
     // Generate slow floating gold particles inside section background
-    const generated = Array.from({ length: 10 }).map((_, i) => ({
+    const generated = Array.from({ length: 12 }).map((_, i) => ({
       id: i,
       left: `${5 + Math.random() * 90}%`,
       size: Math.random() * 2 + 1,
@@ -98,17 +98,24 @@ function Parents() {
   };
 
   return (
-    <section className="py-20 px-6 bg-gradient-to-b from-[#FFFDF9] via-[#F6EBDD] to-[#FFFDF9] relative overflow-hidden flex flex-col items-center">
+    <section className="py-24 px-6 bg-gradient-to-b from-[#FFFDF9] via-[#F6EBDD] to-[#FFFDF9] relative overflow-hidden flex flex-col items-center">
       
       {/* Paper grain / luxury linen texture overlay */}
-      <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
+      <div className="absolute inset-0 opacity-[0.02] pointer-events-none" 
            style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #4A081B 1px, transparent 1px), radial-gradient(circle at 0 0, #4A081B 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
 
-      {/* Soft burgundy radial glow overlay */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(74,8,27,0.06)_0%,transparent_75%)] pointer-events-none" />
+      {/* Subtle repeating Islamic geometric star pattern overlay at low opacity (3.5%) */}
+      <div className="absolute inset-0 opacity-[0.035] pointer-events-none" 
+           style={{ 
+             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%234A081B' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%234A081B' stroke-width='1'/%3E%3C/svg%3E")`, 
+             backgroundSize: "60px 60px" 
+           }} />
 
-      {/* Background ambient glows */}
-      <div className="absolute top-1/2 left-0 -translate-y-1/2 w-48 h-96 bg-brand-gold/8 rounded-r-full blur-3xl pointer-events-none" />
+      {/* Centered soft radial golden glow spotlight behind cards */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] md:w-[600px] h-[380px] md:h-[600px] bg-gradient-to-tr from-[#D4AF37]/5 via-[#FFF8ED]/8 to-[#D4AF37]/5 rounded-full blur-[80px] pointer-events-none z-0" />
+
+      {/* Background ambient side glows */}
+      <div className="absolute top-1/2 left-0 -translate-y-1/2 w-48 h-96 bg-[#D4AF37]/8 rounded-r-full blur-3xl pointer-events-none" />
       <div className="absolute top-1/2 right-0 -translate-y-1/2 w-48 h-96 bg-[#4A081B]/5 rounded-l-full blur-3xl pointer-events-none" />
 
       {/* Section corner ornaments for visual depth */}
@@ -157,13 +164,14 @@ function Parents() {
           variants={headingVariants}
           className="text-center mb-16"
         >
-          <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-brand-gold font-semibold">
+          <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-[#856124] font-semibold flex items-center justify-center gap-1.5">
             With Praise to Allah
+            <span className="inline-block text-[#D4AF37] animate-pulse">✦</span>
           </span>
-          <h2 className="font-cormorant text-3xl md:text-4xl text-brand-heading mt-2 tracking-wide font-light">
+          <h2 className="font-cormorant text-3xl md:text-4xl text-[#4A081B] mt-2 tracking-wide font-light">
             The Beloved Parents
           </h2>
-          <div className="w-12 h-[1px] bg-brand-gold mx-auto mt-4" />
+          <div className="w-12 h-[1px] bg-[#D4AF37]/50 mx-auto mt-4" />
         </motion.div>
 
         {/* Responsive Grid */}
@@ -182,9 +190,12 @@ function Parents() {
               boxShadow: "0 12px 30px rgba(212, 175, 55, 0.35)",
               transition: { duration: 0.22 }
             }}
-            className="w-full max-w-[340px] bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] px-6 py-12 rounded-[140px_140px_20px_20px] border-[2px] border-[#D4AF37]/35 shadow-[0_12px_28px_rgba(75,58,50,0.12)] shadow-[inset_0_0_16px_rgba(212,175,55,0.06)] flex flex-col items-center text-center relative group overflow-hidden cursor-pointer select-none transition-all duration-300 hover:shadow-[0_16px_36px_rgba(212,175,55,0.22)] z-10"
+            className="w-full max-w-[340px] bg-gradient-to-br from-[#FFFDF9]/95 via-[#FFFDF9]/98 to-[#F6EBDD]/95 px-6 py-12 rounded-[140px_140px_20px_20px] border border-[#D4AF37]/45 shadow-[0_16px_36px_rgba(74,8,27,0.06),0_4px_12px_rgba(0,0,0,0.02),inset_0_1.5px_3px_rgba(255,255,255,0.65)] backdrop-blur-md flex flex-col items-center text-center relative group overflow-hidden cursor-pointer select-none transition-all duration-300 hover:shadow-[0_20px_45px_rgba(212,175,55,0.18)] z-10"
             style={{ transformStyle: "preserve-3d" }}
           >
+            {/* Subtle burgundy radial inner glow */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(74,8,27,0.02)_0%,transparent_75%)] pointer-events-none z-0" />
+
             {/* Automatic diagonal golden shimmer sweep */}
             <motion.div 
               animate={{
@@ -207,13 +218,13 @@ function Parents() {
                   animate={{ scale: 2.2, opacity: 0 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="absolute inset-0 rounded-[140px_140px_20px_20px] border-[2px] border-[#D4AF37] pointer-events-none z-30"
+                  className="absolute inset-0 rounded-[140px_140px_20px_20px] border border-[#D4AF37] pointer-events-none z-30"
                 />
               )}
             </AnimatePresence>
 
             {/* Linen background paper texture */}
-            <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
+            <div className="absolute inset-0 opacity-[0.02] pointer-events-none" 
                  style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #4A081B 1px, transparent 1px), radial-gradient(circle at 0 0, #4A081B 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
 
             {/* Corner ornaments */}
@@ -221,8 +232,8 @@ function Parents() {
             <FloralOrnament position="bottom-right" opacity={0.25} />
 
             {/* Subtle inner gold arch borders */}
-            <div className="absolute inset-[8px] border border-brand-gold/20 rounded-[132px_132px_14px_14px] pointer-events-none" />
-            <div className="absolute inset-[11px] border border-dashed border-brand-gold/10 rounded-[129px_129px_11px_11px] pointer-events-none" />
+            <div className="absolute inset-[8px] border border-[#D4AF37]/20 rounded-[132px_132px_14px_14px] pointer-events-none" />
+            <div className="absolute inset-[11px] border border-dashed border-[#D4AF37]/10 rounded-[129px_129px_11px_11px] pointer-events-none" />
             
             {/* Nested infinite float loop wrapper */}
             <motion.div 
@@ -230,12 +241,12 @@ function Parents() {
               transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
               className="w-full flex flex-col items-center z-10"
             >
-              <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.25em] text-[#4A081B] font-bold mb-6 bg-[#D4AF37]/15 px-3 py-1 rounded-full border border-brand-gold/25">
+              <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.25em] text-[#856124] font-bold mb-6 bg-[#D4AF37]/15 px-3 py-1 rounded-full border border-[#D4AF37]/25">
                 Parents of the Groom
               </span>
 
               {/* SVG Islamic motif inside card */}
-              <div className="w-8 h-8 text-brand-gold/60 mb-6 group-hover:scale-110 transition-transform duration-500">
+              <div className="w-8 h-8 text-[#D4AF37]/60 mb-6 group-hover:scale-110 transition-transform duration-500">
                 <svg className="w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.2">
                   <path d="M 50 15 L 85 50 L 50 85 L 15 50 Z" />
                   <circle cx="50" cy="50" r="10" />
@@ -247,19 +258,19 @@ function Parents() {
                   <p className="font-cormorant text-xl md:text-2xl text-[#4A081B] tracking-wide font-semibold select-all">
                     Rafiq Zainuddin Kazi
                   </p>
-                  <p className="font-cormorant text-xs italic text-brand-body mt-1">Father</p>
+                  <p className="font-cormorant text-xs italic text-[#753A3A] mt-1">Father</p>
                 </div>
-                <div className="w-8 h-[0.5px] bg-brand-gold/40 mx-auto" />
+                <div className="w-8 h-[0.5px] bg-[#D4AF37]/40 mx-auto" />
                 <div>
                   <p className="font-cormorant text-xl md:text-2xl text-[#4A081B] tracking-wide font-semibold select-all">
                     Hajara Rafiq Kazi
                   </p>
-                  <p className="font-cormorant text-xs italic text-brand-body mt-1">Mother</p>
+                  <p className="font-cormorant text-xs italic text-[#753A3A] mt-1">Mother</p>
                 </div>
               </div>
 
               {/* Emotional Touch Dua line */}
-              <p className="font-cormorant text-xs italic text-brand-gold mt-6 select-none font-semibold drop-shadow-[0_0.5px_1px_rgba(255,255,255,0.8)]">
+              <p className="font-cormorant text-xs italic text-[#856124] mt-6 select-none font-semibold drop-shadow-[0_0.5px_1px_rgba(255,255,255,0.8)]">
                 “May Allah bless both families with barakah.”
               </p>
             </motion.div>
@@ -278,9 +289,12 @@ function Parents() {
               boxShadow: "0 12px 30px rgba(212, 175, 55, 0.35)",
               transition: { duration: 0.22 }
             }}
-            className="w-full max-w-[340px] bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] px-6 py-12 rounded-[140px_140px_20px_20px] border-[2px] border-[#D4AF37]/35 shadow-[0_12px_28px_rgba(75,58,50,0.12)] shadow-[inset_0_0_16px_rgba(212,175,55,0.06)] flex flex-col items-center text-center relative group overflow-hidden cursor-pointer select-none transition-all duration-300 hover:shadow-[0_16px_36px_rgba(212,175,55,0.22)] z-10"
+            className="w-full max-w-[340px] bg-gradient-to-br from-[#FFFDF9]/95 via-[#FFFDF9]/98 to-[#F6EBDD]/95 px-6 py-12 rounded-[140px_140px_20px_20px] border border-[#D4AF37]/45 shadow-[0_16px_36px_rgba(74,8,27,0.06),0_4px_12px_rgba(0,0,0,0.02),inset_0_1.5px_3px_rgba(255,255,255,0.65)] backdrop-blur-md flex flex-col items-center text-center relative group overflow-hidden cursor-pointer select-none transition-all duration-300 hover:shadow-[0_20px_45px_rgba(212,175,55,0.18)] z-10"
             style={{ transformStyle: "preserve-3d" }}
           >
+            {/* Subtle burgundy radial inner glow */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(74,8,27,0.02)_0%,transparent_75%)] pointer-events-none z-0" />
+
             {/* Automatic diagonal golden shimmer sweep */}
             <motion.div 
               animate={{
@@ -303,13 +317,13 @@ function Parents() {
                   animate={{ scale: 2.2, opacity: 0 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="absolute inset-0 rounded-[140px_140px_20px_20px] border-[2px] border-[#D4AF37] pointer-events-none z-30"
+                  className="absolute inset-0 rounded-[140px_140px_20px_20px] border border-[#D4AF37] pointer-events-none z-30"
                 />
               )}
             </AnimatePresence>
 
             {/* Linen background paper texture */}
-            <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
+            <div className="absolute inset-0 opacity-[0.02] pointer-events-none" 
                  style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #4A081B 1px, transparent 1px), radial-gradient(circle at 0 0, #4A081B 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
 
             {/* Corner ornaments */}
@@ -317,8 +331,8 @@ function Parents() {
             <FloralOrnament position="bottom-right" opacity={0.25} />
 
             {/* Subtle inner gold arch borders */}
-            <div className="absolute inset-[8px] border border-brand-gold/20 rounded-[132px_132px_14px_14px] pointer-events-none" />
-            <div className="absolute inset-[11px] border border-dashed border-brand-gold/10 rounded-[129px_129px_11px_11px] pointer-events-none" />
+            <div className="absolute inset-[8px] border border-[#D4AF37]/20 rounded-[132px_132px_14px_14px] pointer-events-none" />
+            <div className="absolute inset-[11px] border border-dashed border-[#D4AF37]/10 rounded-[129px_129px_11px_11px] pointer-events-none" />
 
             {/* Nested infinite float loop wrapper */}
             <motion.div 
@@ -326,12 +340,12 @@ function Parents() {
               transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
               className="w-full flex flex-col items-center z-10"
             >
-              <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.25em] text-[#4A081B] font-bold mb-6 bg-[#D4AF37]/15 px-3 py-1 rounded-full border border-brand-gold/25">
+              <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.25em] text-[#856124] font-bold mb-6 bg-[#D4AF37]/15 px-3 py-1 rounded-full border border-[#D4AF37]/25">
                 Parents of the Bride
               </span>
 
               {/* SVG Islamic motif inside card */}
-              <div className="w-8 h-8 text-brand-gold/60 mb-6 group-hover:scale-110 transition-transform duration-500">
+              <div className="w-8 h-8 text-[#D4AF37]/60 mb-6 group-hover:scale-110 transition-transform duration-500">
                 <svg className="w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.2">
                   <path d="M 50 15 L 85 50 L 50 85 L 15 50 Z" />
                   <circle cx="50" cy="50" r="10" />
@@ -343,19 +357,19 @@ function Parents() {
                   <p className="font-cormorant text-xl md:text-2xl text-[#4A081B] tracking-wide font-semibold select-all">
                     Hasham Ismail Kazi
                   </p>
-                  <p className="font-cormorant text-xs italic text-brand-body mt-1">Father</p>
+                  <p className="font-cormorant text-xs italic text-[#753A3A] mt-1">Father</p>
                 </div>
-                <div className="w-8 h-[0.5px] bg-brand-gold/40 mx-auto" />
+                <div className="w-8 h-[0.5px] bg-[#D4AF37]/40 mx-auto" />
                 <div>
                   <p className="font-cormorant text-xl md:text-2xl text-[#4A081B] tracking-wide font-semibold select-all">
                     Seemab Hasham Kazi
                   </p>
-                  <p className="font-cormorant text-xs italic text-brand-body mt-1">Mother</p>
+                  <p className="font-cormorant text-xs italic text-[#753A3A] mt-1">Mother</p>
                 </div>
               </div>
 
               {/* Emotional Touch Dua line */}
-              <p className="font-cormorant text-xs italic text-brand-gold mt-6 select-none font-semibold drop-shadow-[0_0.5px_1px_rgba(255,255,255,0.8)]">
+              <p className="font-cormorant text-xs italic text-[#856124] mt-6 select-none font-semibold drop-shadow-[0_0.5px_1px_rgba(255,255,255,0.8)]">
                 “May Allah bless both families with barakah.”
               </p>
             </motion.div>

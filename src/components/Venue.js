@@ -45,7 +45,7 @@ function Venue() {
 
   useEffect(() => {
     // Generate slow floating gold particles inside section background
-    const generated = Array.from({ length: 10 }).map((_, i) => ({
+    const generated = Array.from({ length: 12 }).map((_, i) => ({
       id: i,
       left: `${5 + Math.random() * 90}%`,
       size: Math.random() * 2 + 1,
@@ -61,17 +61,21 @@ function Venue() {
   };
 
   return (
-    <section className="py-20 px-6 bg-gradient-to-b from-[#FFFDF9] via-[#F6EBDD] to-[#FFFDF9] relative overflow-hidden flex flex-col items-center justify-center">
+    <section className="py-24 px-6 bg-gradient-to-b from-[#FFFDF9] via-[#F6EBDD] to-[#FFFDF9] relative overflow-hidden flex flex-col items-center justify-center">
       
       {/* Paper grain luxury texture overlay */}
-      <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
+      <div className="absolute inset-0 opacity-[0.02] pointer-events-none" 
            style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #4A081B 1px, transparent 1px), radial-gradient(circle at 0 0, #4A081B 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
 
-      {/* Soft burgundy radial glow overlay */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(74,8,27,0.06)_0%,transparent_75%)] pointer-events-none" />
+      {/* Subtle repeating Islamic geometric star pattern overlay at low opacity (3.5%) */}
+      <div className="absolute inset-0 opacity-[0.035] pointer-events-none" 
+           style={{ 
+             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%234A081B' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%234A081B' stroke-width='1'/%3E%3C/svg%3E")`, 
+             backgroundSize: "60px 60px" 
+           }} />
 
-      {/* Background glow ornament */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] bg-brand-secondary/30 rounded-full blur-[75px] pointer-events-none" />
+      {/* Soft radial golden glow spotlight centered behind card */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] md:w-[600px] h-[380px] md:h-[600px] bg-gradient-to-tr from-[#D4AF37]/5 via-[#FFF8ED]/8 to-[#D4AF37]/5 rounded-full blur-[80px] pointer-events-none z-0" />
 
       {/* Slow floating gold particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
@@ -102,27 +106,31 @@ function Venue() {
 
       <div className="max-w-md w-full relative z-10">
         
-        {/* Section Title */}
+        {/* Section Title with deep burgundy and antique gold */}
         <div className="text-center mb-12">
-          <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-brand-gold font-semibold">
+          <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-[#856124] font-semibold flex items-center justify-center gap-1.5">
             The Celebration
+            <span className="inline-block text-[#D4AF37] animate-pulse">✦</span>
           </span>
-          <h2 className="font-cormorant text-3xl md:text-4xl text-brand-heading mt-2 tracking-wide font-light">
+          <h2 className="font-cormorant text-3xl md:text-4xl text-[#4A081B] mt-2 tracking-wide font-light">
             Venue & Location
           </h2>
-          <div className="w-12 h-[1px] bg-brand-gold mx-auto mt-4" />
+          <div className="w-12 h-[1px] bg-[#D4AF37]/50 mx-auto mt-4" />
         </div>
 
-        {/* Content Card (Luxury Pearl Printed style with Arch Top) */}
+        {/* Content Card (Premium Ivory Glass style with Arch Top) */}
         <motion.div
           initial={{ opacity: 0, y: 30, filter: "blur(6px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] px-6 py-10 md:px-10 rounded-[140px_140px_20px_20px] border-[2px] border-[#D4AF37]/45 shadow-[0_15px_40px_rgba(75,58,50,0.12)] shadow-[inset_0_0_20px_rgba(212,175,55,0.06)] flex flex-col items-center text-center relative overflow-hidden transition-all duration-300 hover:shadow-[0_16px_36px_rgba(212,175,55,0.22)]"
+          className="w-full bg-gradient-to-br from-[#FFFDF9]/95 via-[#FFFDF9]/98 to-[#F6EBDD]/95 px-6 py-10 md:px-10 rounded-[140px_140px_20px_20px] border border-[#D4AF37]/45 shadow-[0_16px_36px_rgba(74,8,27,0.06),0_4px_16px_rgba(0,0,0,0.03),inset_0_1.5px_3px_rgba(255,255,255,0.65)] backdrop-blur-md flex flex-col items-center text-center relative overflow-hidden transition-all duration-300 hover:shadow-[0_20px_45px_rgba(212,175,55,0.18)]"
         >
+          {/* Subtle burgundy radial inner glow */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(74,8,27,0.02)_0%,transparent_75%)] pointer-events-none z-0" />
+
           {/* Embossed ivory texture grid pattern */}
-          <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
+          <div className="absolute inset-0 opacity-[0.02] pointer-events-none" 
                style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #4A081B 1px, transparent 1px), radial-gradient(circle at 0 0, #4A081B 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
 
           {/* Corner ornaments */}
@@ -140,16 +148,17 @@ function Venue() {
             className="w-full flex flex-col items-center z-10"
           >
             {/* Map Pin Icon */}
-            <div className="w-10 h-10 bg-[#D4AF37]/15 rounded-full flex items-center justify-center text-brand-gold border border-brand-gold/35 mb-5">
-              <MapPin className="w-4.5 h-4.5 text-brand-gold" />
+            <div className="w-10 h-10 bg-[#D4AF37]/15 rounded-full flex items-center justify-center text-[#856124] border border-[#D4AF37]/35 mb-5 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
+              <MapPin className="w-4.5 h-4.5 text-[#856124]" />
             </div>
 
-            {/* Venue Details */}
+            {/* Venue Details (headings in deep burgundy) */}
             <h3 className="font-cormorant text-xl md:text-2xl text-[#4A081B] tracking-wide font-semibold mb-2 select-all">
               Elly Kadoorie Hall
             </h3>
 
-            <p className="font-inter text-[11px] md:text-xs text-brand-body leading-relaxed max-w-[280px] mb-6 font-semibold select-all">
+            {/* Location (body text in warm rose-brown) */}
+            <p className="font-inter text-[11px] md:text-xs text-[#753A3A] leading-relaxed max-w-[280px] mb-6 font-semibold select-all">
               Opposite Chaitya Temple, Tadwadi, Mazgaon, Mumbai 400010
             </p>
 

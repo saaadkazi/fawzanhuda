@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect, memo } from "react";
 import confetti from "canvas-confetti";
 
-// Reusable Custom Premium Social Button component with breathing glow, coordinate ripple, and radial sparks
+// Reusable Custom Premium Social Button component with transparent glass, gold borders, and burgundy hover fill
 const SocialButton = ({ href, children, ariaLabel }) => {
   const [ripples, setRipples] = useState([]);
   const [sparks, setSparks] = useState([]);
@@ -45,28 +45,14 @@ const SocialButton = ({ href, children, ariaLabel }) => {
         whileHover={{ 
           scale: 1.08, 
           y: -3, 
-          boxShadow: "0 0 25px rgba(232, 199, 106, 0.65)" 
+          boxShadow: "0 0 20px rgba(212,175,55,0.4)" 
         }}
         whileTap={{ scale: 0.92 }}
-        animate={{
-          boxShadow: [
-            "0 0 10px rgba(212,175,55,0.15)",
-            "0 0 18px rgba(212,175,55,0.4)",
-            "0 0 10px rgba(212,175,55,0.15)"
-          ]
-        }}
-        transition={{
-          boxShadow: {
-            repeat: Infinity,
-            duration: 3.5,
-            ease: "easeInOut"
-          }
-        }}
         href={href}
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleTap}
-        className="w-10 h-10 rounded-full border border-[#D4AF37]/50 bg-gradient-to-b from-[#4A081B]/95 to-[#2D040F]/95 flex items-center justify-center text-[#E8C76A] hover:text-[#FFF8ED] transition-colors duration-300 shadow-[inset_0_1.5px_3px_rgba(255,255,255,0.22),0_4px_12px_rgba(0,0,0,0.3)] relative overflow-hidden cursor-pointer"
+        className="w-10 h-10 rounded-full border border-[#D4AF37]/45 bg-[#FFFDF9]/50 hover:bg-[#4A081B] text-[#856124] hover:text-[#FFF8ED] flex items-center justify-center transition-all duration-500 ease-in-out shadow-[0_4px_12px_rgba(74,8,27,0.04)] relative overflow-hidden cursor-pointer"
         aria-label={ariaLabel}
       >
         {/* Click ripple animation */}
@@ -82,7 +68,7 @@ const SocialButton = ({ href, children, ariaLabel }) => {
           />
         ))}
 
-        <span className="relative z-10 select-none pointer-events-none">
+        <span className="relative z-10 select-none pointer-events-none transition-colors duration-500">
           {children}
         </span>
       </motion.a>
@@ -111,15 +97,18 @@ const SocialButton = ({ href, children, ariaLabel }) => {
   );
 };
 
-// Premium Blessing Orb Experience component
-const BlessingOrb = () => {
+// Premium Interactive Royal Blessing Seal component
+const RoyalSeal = ({ setGlobalStage }) => {
   const [progress, setProgress] = useState(0);
   const [isHolding, setIsHolding] = useState(false);
+  const [stage, setStage] = useState("locked"); // "locked" | "charging" | "freeze" | "broken" | "unlocked"
   const [unlocked, setUnlocked] = useState(false);
   
-  const [showFlash, setShowFlash] = useState(false);
   const [burstRipples, setBurstRipples] = useState([]);
   const [burstSparks, setBurstSparks] = useState([]);
+  const [ameenClicked, setAmeenClicked] = useState(false);
+  const [risingParticles, setRisingParticles] = useState([]);
+  const [settleParticlesList, setSettleParticlesList] = useState([]);
 
   const holdIntervalRef = useRef(null);
   const startTimeRef = useRef(null);
@@ -132,9 +121,11 @@ const BlessingOrb = () => {
 
   const startHold = (e) => {
     if (e.cancelable) e.preventDefault();
-    if (unlocked) return;
+    if (unlocked || stage !== "locked") return;
     
     setIsHolding(true);
+    setStage("charging");
+    setGlobalStage("charging");
     startTimeRef.current = Date.now() - (progress / 100) * 1500;
     
     if (holdIntervalRef.current) clearInterval(holdIntervalRef.current);
@@ -146,12 +137,13 @@ const BlessingOrb = () => {
       
       if (pct >= 100) {
         clearInterval(holdIntervalRef.current);
-        triggerBurst();
+        triggerAnticipationFreeze();
       }
     }, 16);
   };
 
   const endHold = () => {
+    if (unlocked || stage !== "charging") return;
     setIsHolding(false);
     if (holdIntervalRef.current) clearInterval(holdIntervalRef.current);
     
@@ -159,111 +151,202 @@ const BlessingOrb = () => {
       setProgress((prev) => {
         if (prev <= 0) {
           clearInterval(holdIntervalRef.current);
+          setStage("locked");
+          setGlobalStage("locked");
           return 0;
         }
-        return Math.max(prev - 3, 0);
+        return Math.max(prev - 4, 0);
       });
     }, 15);
   };
 
-  const triggerBurst = () => {
-    setShowFlash(true);
+  const triggerAnticipationFreeze = () => {
     setIsHolding(false);
+    setStage("freeze");
+    setGlobalStage("freeze");
     
-    const waveId = Date.now();
-    setBurstRipples([{ id: waveId }]);
+    // 200ms Anticipation Freeze
     setTimeout(() => {
-      setBurstRipples([]);
-      setShowFlash(false);
-    }, 600);
+      triggerBreakSequence();
+    }, 200);
+  };
 
-    const sparkCount = 20;
-    const generated = Array.from({ length: sparkCount }).map((_, i) => {
-      const angle = (i * 2 * Math.PI) / sparkCount + (Math.random() * 0.3 - 0.15);
-      const distance = Math.random() * 110 + 70;
+  const triggerBreakSequence = () => {
+    setStage("broken");
+    setGlobalStage("broken");
+
+    // Spawn shockwave ripples
+    setBurstRipples([{ id: Date.now() }]);
+
+    // Explode wax sparks in all directions
+    const sparkCount = 28;
+    const generatedSparks = Array.from({ length: sparkCount }).map((_, i) => {
+      const angle = (i * 2 * Math.PI) / sparkCount + (Math.random() * 0.2 - 0.1);
+      const distance = Math.random() * 120 + 80;
       return {
         id: i,
         x: Math.cos(angle) * distance,
         y: Math.sin(angle) * distance,
-        scale: Math.random() * 0.7 + 0.45,
+        scale: Math.random() * 0.75 + 0.5,
       };
     });
-    setBurstSparks(generated);
-    setTimeout(() => {
-      setBurstSparks([]);
-    }, 1000);
+    setBurstSparks(generatedSparks);
 
-    setUnlocked(true);
+    // Cross-fade reveal the Blessing Card after 650ms
+    setTimeout(() => {
+      setStage("unlocked");
+      setGlobalStage("unlocked");
+      setUnlocked(true);
+
+      // Generate 12 slow-drifting gold sparks that settle down over the card
+      const generatedSettle = Array.from({ length: 12 }).map((_, i) => ({
+        id: i,
+        x: Math.random() * 260 - 130,
+        startY: -120 - Math.random() * 60,
+        endY: 80 + Math.random() * 80,
+        scale: Math.random() * 0.5 + 0.4,
+        duration: Math.random() * 2.5 + 2.0,
+      }));
+      setSettleParticlesList(generatedSettle);
+      setTimeout(() => {
+        setSettleParticlesList([]);
+      }, 4500);
+
+    }, 650);
   };
 
   const handleAmeen = () => {
+    setAmeenClicked(true);
+
+    // Confetti spray
     confetti({
-      particleCount: 100,
-      spread: 70,
+      particleCount: 120,
+      spread: 75,
       origin: { y: 0.75 },
       colors: ["#E8C76A", "#D4AF37", "#FFF8ED", "#4A081B"],
     });
 
+    // 12 rising particles that float upwards and fade out
+    const generatedRising = Array.from({ length: 12 }).map((_, i) => ({
+      id: i,
+      x: Math.random() * 160 - 80,
+      startY: 40,
+      endY: -220 - Math.random() * 80,
+      scale: Math.random() * 0.6 + 0.45,
+      duration: Math.random() * 1.5 + 1.2,
+    }));
+    setRisingParticles(generatedRising);
+
+    // After 2.8s, softly dissolve card and reset back to seal
     setTimeout(() => {
-      setUnlocked(false);
+      setStage("locked");
+      setGlobalStage("locked");
       setProgress(0);
-      setIsHolding(false);
-    }, 1000);
+      setUnlocked(false);
+      setAmeenClicked(false);
+      setRisingParticles([]);
+      setSettleParticlesList([]);
+    }, 2800);
   };
 
   const particleConfig = [
-    { delay: 0, duration: 3.6, radiusX: 68, radiusY: 30 },
-    { delay: 0.6, duration: 3.0, radiusX: -58, radiusY: 38 },
-    { delay: 1.2, duration: 4.2, radiusX: 74, radiusY: -22 },
-    { delay: 1.8, duration: 3.4, radiusX: -64, radiusY: -32 },
+    { delay: 0, duration: 4.2, radiusX: 84, radiusY: 34, size: 2 },
+    { delay: 0.5, duration: 3.6, radiusX: -72, radiusY: 44, size: 1.5 },
+    { delay: 1.0, duration: 4.8, radiusX: 90, radiusY: -28, size: 2.5 },
+    { delay: 1.5, duration: 4.0, radiusX: -78, radiusY: -38, size: 1.8 },
+    { delay: 2.0, duration: 4.5, radiusX: 96, radiusY: 24, size: 1.2 },
+    { delay: 2.5, duration: 3.8, radiusX: -82, radiusY: -48, size: 2.2 },
+    { delay: 3.0, duration: 5.0, radiusX: 74, radiusY: -42, size: 1.6 },
+    { delay: 3.5, duration: 3.4, radiusX: -92, radiusY: 32, size: 2.0 },
   ];
 
-  return (
-    <div className="w-full flex flex-col items-center justify-center relative">
-      
-      {/* Flash overlay during burst */}
-      <AnimatePresence>
-        {showFlash && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.95 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="absolute inset-0 bg-gradient-to-r from-[#E8C76A] via-[#FFF8ED] to-[#E8C76A] mix-blend-screen pointer-events-none z-40 rounded-3xl"
-          />
-        )}
-      </AnimatePresence>
+  const crackOpacity = progress >= 40 ? (progress - 40) / 60 : 0;
 
+  // Render internal seal geometry and star details
+  const renderSealContent = () => (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      {/* Specular Glare Crescent for 3D depth */}
+      <div className="absolute top-1.5 left-8 right-8 h-5 bg-gradient-to-b from-white/20 to-transparent rounded-full opacity-65 pointer-events-none" />
+      {/* Inner shadowing depth ring */}
+      <div className="absolute inset-0 rounded-full shadow-[inset_0_4px_10px_rgba(255,255,255,0.25),inset_0_-4px_10px_rgba(0,0,0,0.5)] pointer-events-none" />
+      
+      {/* Thick double metallic gold rim inside */}
+      <div className="absolute inset-1 rounded-full border-[3px] border-[#D4AF37] pointer-events-none" style={{ boxShadow: "inset 0 0 10px rgba(0,0,0,0.6)" }} />
+
+      <svg className="w-22 h-22 text-[#E8C76A] drop-shadow-[0_2.5px_5px_rgba(0,0,0,0.6)]" viewBox="0 0 100 100" fill="currentColor">
+        {/* Rub el Hizb 8-pointed star shape outline */}
+        <path d="M50 5 L63 25 L85 25 L75 47 L95 60 L73 73 L75 95 L50 82 L25 95 L27 73 L5 60 L25 47 L15 25 L37 25 Z" fillOpacity="0.25" stroke="currentColor" strokeWidth="2.2" />
+        {/* Geometric circles & lines inside seal */}
+        <circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <circle cx="50" cy="50" r="24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeDasharray="3,2" />
+        <path d="M50 34 L50 66 M34 50 L66 50" stroke="currentColor" strokeWidth="1" />
+        <path d="M50 20 L80 50 L50 80 L20 50 Z" fill="none" stroke="currentColor" strokeWidth="1.2" strokeDasharray="2,2" />
+        <circle cx="50" cy="50" r="10" fill="currentColor" fillOpacity="0.3" stroke="currentColor" strokeWidth="1" />
+      </svg>
+
+      {/* Jagged golden cracks that appear after 40% hold progress */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" fill="none" stroke="#E8C76A" strokeWidth="2.8" strokeLinecap="round">
+        <path 
+          d="M 50 50 L 32 38 L 22 45 M 50 50 L 64 35 L 78 30 M 50 50 L 45 68 L 28 78 M 50 50 L 68 64 L 82 72" 
+          style={{
+            opacity: crackOpacity,
+            filter: "drop-shadow(0 0 4px #E8C76A) drop-shadow(0 0 8px #BF953F)",
+            transition: "opacity 0.05s linear"
+          }}
+        />
+      </svg>
+    </div>
+  );
+
+  return (
+    <div className="w-full flex flex-col items-center justify-center relative select-none">
       <AnimatePresence mode="wait">
         {!unlocked ? (
           <motion.div
-            key="orb-stage"
+            key="seal-stage"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.5 }}
             className="flex flex-col items-center justify-center py-6 select-none"
           >
-            {/* Section Headings */}
-            <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-[#E8C76A] font-semibold mb-3">
-              Unlock a Blessing ✨
+            {/* Section Headings - Antique gold and burgundy */}
+            <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-[#856124] font-semibold mb-3">
+              Break the Sacred Seal ✨
             </span>
-            <p className="font-cormorant italic text-sm text-[#FFF8ED]/75 tracking-wider mb-10 max-w-xs text-center">
-              Touch and hold the sacred orb to send your blessings.
+            <p className="font-cormorant italic text-sm text-[#4A081B]/75 tracking-wider mb-10 max-w-xs text-center">
+              Touch and hold to unlock a hidden blessing.
             </p>
 
-            {/* Hold Element Container */}
-            <div className="relative w-48 h-48 flex items-center justify-center">
+            {/* Medallion Hold Container */}
+            <div className="relative w-56 h-56 flex items-center justify-center">
               
-              {/* Outer Shockwave Ripple on Burst */}
+              {/* Outer radial aura fading smoothly into background */}
+              <div className="absolute w-[380px] h-[380px] rounded-full pointer-events-none z-0"
+                   style={{
+                     background: "radial-gradient(circle, rgba(212,175,55,0.08) 0%, rgba(212,175,55,0) 75%)"
+                   }} />
+
+              {/* Inner soft golden bloom directly behind seal center (intensifies during hold) */}
+              <div className="absolute rounded-full pointer-events-none z-0 transition-all duration-75"
+                   style={{
+                     width: `${200 + progress * 0.5}px`,
+                     height: `${200 + progress * 0.5}px`,
+                     background: `radial-gradient(circle, rgba(212,175,55,${0.22 + (progress/100)*0.18}) 0%, rgba(212,175,55,0) 70%)`
+                   }} />
+
+              {/* Subtle circular shadow under seal for depth */}
+              <div className="absolute w-[160px] h-[160px] md:w-[180px] md:h-[180px] rounded-full bg-black/20 blur-md pointer-events-none z-0" />
+
+              {/* Outer Shockwave Ripple on Seal Break */}
               {burstRipples.map((r) => (
                 <span
                   key={r.id}
-                  className="absolute w-32 h-32 rounded-full border-2 border-[#E8C76A]/80 pointer-events-none animate-shockwave z-20"
+                  className="absolute w-36 h-36 rounded-full border-2 border-[#E8C76A]/80 pointer-events-none animate-shockwave z-20"
                 />
               ))}
 
-              {/* Gold Sparks on Burst */}
+              {/* Exploded Wax Sparks on Burst */}
               <AnimatePresence>
                 {burstSparks.map((s) => (
                   <motion.span
@@ -271,10 +354,10 @@ const BlessingOrb = () => {
                     initial={{ x: 0, y: 0, opacity: 1, scale: 0.2 }}
                     animate={{ x: s.x, y: s.y, opacity: 0, scale: s.scale }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.9, ease: "easeOut" }}
+                    transition={{ duration: 0.95, ease: "easeOut" }}
                     className="absolute w-2 h-2 rounded-full bg-[#E8C76A] pointer-events-none z-30"
                     style={{
-                      boxShadow: "0 0 10px rgba(232, 199, 106, 0.9)",
+                      boxShadow: "0 0 10px rgba(232, 199, 106, 0.95), 0 0 4px #FFF8ED",
                       top: "50%",
                       left: "50%",
                       marginTop: "-4px",
@@ -284,8 +367,8 @@ const BlessingOrb = () => {
                 ))}
               </AnimatePresence>
 
-              {/* Orbiting particles */}
-              {particleConfig.map((p, i) => {
+              {/* Slow Floating Gold Dust Particles around Seal */}
+              {stage !== "freeze" && stage !== "broken" && particleConfig.map((p, i) => {
                 const currentRadiusX = p.radiusX * (1 - (progress / 100) * 0.55);
                 const currentRadiusY = p.radiusY * (1 - (progress / 100) * 0.55);
                 const speedMultiplier = 1 - (progress / 100) * 0.65;
@@ -298,7 +381,7 @@ const BlessingOrb = () => {
                       x: [0, currentRadiusX, 0, -currentRadiusX, 0],
                       y: [currentRadiusY, 0, -currentRadiusY, 0, currentRadiusY],
                       scale: [0.8, 1.1, 0.9, 1.2, 0.8],
-                      opacity: [0.3, 0.85, 0.3, 0.85, 0.3],
+                      opacity: [0.3, 0.75, 0.3, 0.75, 0.3],
                     }}
                     transition={{
                       repeat: Infinity,
@@ -306,138 +389,244 @@ const BlessingOrb = () => {
                       ease: "easeInOut",
                       delay: p.delay,
                     }}
-                    className="absolute w-1.5 h-1.5 rounded-full bg-[#E8C76A] pointer-events-none z-10"
+                    className="absolute rounded-full bg-[#D4AF37] pointer-events-none z-10"
                     style={{
-                      boxShadow: "0 0 8px #E8C76A",
+                      width: `${p.size}px`,
+                      height: `${p.size}px`,
+                      boxShadow: "0 0 6px #E8C76A",
                       top: "50%",
                       left: "50%",
-                      marginTop: "-3px",
-                      marginLeft: "-3px",
+                      marginTop: `-${p.size/2}px`,
+                      marginLeft: `-${p.size/2}px`,
                     }}
                   />
                 );
               })}
 
-              {/* Floating Animation Wrapper */}
+              {/* Medallion scale breath and vibration shake */}
               <motion.div
                 animate={{
-                  y: isHolding ? 0 : [0, -6, 0]
+                  scale: stage === "freeze" 
+                    ? 1.06 
+                    : isHolding 
+                      ? 1.03 
+                      : [1, 1.025, 1],
+                  x: stage === "charging" && progress >= 70 ? [0, -1.2, 1.2, -1, 1, 0] : 0,
+                  y: stage === "charging" && progress >= 70 ? [0, 1, -1.2, 1.2, -1, 0] : 0,
                 }}
                 transition={{
-                  repeat: Infinity,
-                  duration: 3,
-                  ease: "easeInOut"
+                  scale: { duration: stage === "freeze" ? 0.2 : 0.3, ease: "easeOut" },
+                  x: { repeat: Infinity, duration: 0.08, ease: "linear" },
+                  y: { repeat: Infinity, duration: 0.08, ease: "linear" },
+                  default: { repeat: Infinity, duration: 3.2, ease: "easeInOut" }
                 }}
-                onMouseDown={startHold}
-                onMouseUp={endHold}
-                onMouseLeave={endHold}
-                onTouchStart={startHold}
-                onTouchEnd={endHold}
-                className="w-32 h-32 md:w-36 md:h-36 rounded-full border border-[#D4AF37]/50 bg-gradient-to-tr from-[#E8C76A]/20 via-[#4A081B]/40 to-[#FFF8ED]/30 backdrop-blur-md shadow-[inset_0_4px_12px_rgba(255,255,255,0.4),inset_0_-4px_12px_rgba(212,175,55,0.3)] relative flex items-center justify-center cursor-pointer transition-transform duration-300 ease-out active:scale-[0.98]"
-                style={{
-                  boxShadow: isHolding 
-                    ? `0 0 ${25 + (progress * 0.55)}px rgba(232, 199, 106, ${0.35 + (progress * 0.005)})`
-                    : "0 0 15px rgba(232, 199, 106, 0.22)",
-                  transform: isHolding ? "scale(1.03)" : "scale(1)"
-                }}
+                className="w-38 h-38 md:w-44 md:h-44 rounded-full relative flex items-center justify-center cursor-pointer select-none touch-none"
               >
-                {/* SVG Progress Ring */}
+                {/* SVG Progress Ring surrounding seal */}
                 <svg className="absolute -inset-4 w-[calc(100%+32px)] h-[calc(100%+32px)] -rotate-90 pointer-events-none" viewBox="0 0 100 100">
                   <circle
                     cx="50"
                     cy="50"
                     r="44"
-                    className="stroke-[#FFF8ED]/10 fill-none"
+                    className="stroke-[#4A081B]/8 fill-none"
                     strokeWidth="1.5"
                   />
                   <circle
                     cx="50"
                     cy="50"
                     r="44"
-                    className="stroke-[#E8C76A] fill-none"
+                    className="stroke-[#D4AF37] fill-none"
                     strokeWidth="2.5"
                     strokeDasharray={2 * Math.PI * 44}
                     strokeDashoffset={2 * Math.PI * 44 * (1 - progress / 100)}
                     strokeLinecap="round"
                     style={{
-                      filter: "drop-shadow(0 0 5px #E8C76A)",
+                      filter: "drop-shadow(0 0 5px #D4AF37)",
                     }}
                   />
                 </svg>
 
-                {/* Golden Energy Core */}
+                {/* Left Half of Medallion (Physical Split Animation) */}
                 <motion.div
                   animate={{
-                    scale: isHolding ? [1, 1.2, 1] : [1, 1.08, 1],
-                    opacity: isHolding ? 0.95 : 0.65,
+                    x: stage === "broken" ? -100 : 0,
+                    rotate: stage === "broken" ? -20 : 0,
+                    opacity: stage === "broken" ? 0 : 1,
                   }}
-                  transition={{
-                    repeat: Infinity,
-                    duration: isHolding ? 0.65 : 2.5,
-                    ease: "easeInOut"
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="absolute inset-0 rounded-full border border-[#D4AF37]/50 bg-gradient-to-tr from-[#3D0312] via-[#4A081B] to-[#5A0C22] shadow-[inset_0_3px_10px_rgba(255,255,255,0.2),inset_0_-3px_10px_rgba(0,0,0,0.4)] overflow-hidden"
+                  style={{ 
+                    clipPath: "inset(0 50% 0 0)"
                   }}
-                  className="absolute w-12 h-12 rounded-full bg-[#E8C76A] blur-[8px]"
-                  style={{
-                    boxShadow: `0 0 ${18 + (progress * 0.35)}px ${6 + (progress * 0.15)}px #E8C76A`,
-                  }}
-                />
+                  onMouseDown={startHold}
+                  onMouseUp={endHold}
+                  onMouseLeave={endHold}
+                  onTouchStart={startHold}
+                  onTouchEnd={endHold}
+                >
+                  {renderSealContent()}
+                </motion.div>
 
-                <div className="absolute inset-2 border border-dashed border-[#FFF8ED]/20 rounded-full animate-[spin_12s_linear_infinite]" />
+                {/* Right Half of Medallion (Physical Split Animation) */}
+                <motion.div
+                  animate={{
+                    x: stage === "broken" ? 100 : 0,
+                    rotate: stage === "broken" ? 20 : 0,
+                    opacity: stage === "broken" ? 0 : 1,
+                  }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="absolute inset-0 rounded-full border border-[#D4AF37]/50 bg-gradient-to-tr from-[#3D0312] via-[#4A081B] to-[#5A0C22] shadow-[inset_0_3px_10px_rgba(255,255,255,0.2),inset_0_-3px_10px_rgba(0,0,0,0.4)] overflow-hidden"
+                  style={{ 
+                    clipPath: "inset(0 0 0 50%)"
+                  }}
+                  onMouseDown={startHold}
+                  onMouseUp={endHold}
+                  onMouseLeave={endHold}
+                  onTouchStart={startHold}
+                  onTouchEnd={endHold}
+                >
+                  {renderSealContent()}
+                </motion.div>
               </motion.div>
             </div>
 
             {/* Instruction / Loading State */}
-            <span className="font-cormorant tracking-[0.15em] text-xs font-semibold text-[#E8C76A] mt-6 transition-all duration-300">
+            <span className="font-cormorant tracking-[0.15em] text-xs font-semibold text-[#856124] mt-6 transition-all duration-300">
               {isHolding ? (
                 <span className="flex items-center gap-1.5 animate-pulse">
-                  Charging Blessings... {Math.round(progress)}%
+                  Unlocking Seal... {Math.round(progress)}%
                 </span>
               ) : (
-                "Hold Orb"
+                "Hold Seal"
               )}
             </span>
           </motion.div>
         ) : (
           <motion.div
             key="card-stage"
-            initial={{ opacity: 0, scale: 0.85, y: 15 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: -15 }}
-            transition={{ type: "spring", stiffness: 130, damping: 14 }}
-            className="w-full max-w-md bg-gradient-to-b from-[#4A081B]/95 to-[#2D040F]/95 border border-[#D4AF37]/50 rounded-3xl p-8 shadow-[0_20px_50px_rgba(29,3,8,0.5),inset_0_1.5px_3px_rgba(255,255,255,0.22)] backdrop-blur-md relative z-10 flex flex-col items-center text-center mt-6 mx-4"
+            initial={{ opacity: 0, scale: 0.75, filter: "blur(12px)", y: 30 }}
+            animate={{ opacity: 1, scale: [0.75, 1.04, 1], filter: "blur(0px)", y: 0 }}
+            exit={{ opacity: 0, scale: 0.75, filter: "blur(12px)", y: -30 }}
+            transition={{ duration: 0.85, ease: [0.34, 1.56, 0.64, 1] }}
+            className="w-full max-w-md bg-gradient-to-b from-[#FFFDF9]/95 to-[#F6EBDD]/95 border border-[#D4AF37]/50 rounded-3xl p-8 shadow-[0_24px_60px_rgba(74,8,27,0.12),inset_0_1.5px_3px_rgba(255,255,255,0.7)] backdrop-blur-lg relative z-10 flex flex-col items-center text-center mt-6 mx-4 overflow-hidden"
           >
-            <span className="font-cormorant text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#E8C76A] font-semibold mb-4">
+            {/* Elegant corner ornaments using geometric borders */}
+            <div className="absolute top-3 left-3 w-5 h-5 border-t border-l border-[#D4AF37]/50 rounded-tl-sm pointer-events-none" />
+            <div className="absolute top-3 right-3 w-5 h-5 border-t border-r border-[#D4AF37]/50 rounded-tr-sm pointer-events-none" />
+            <div className="absolute bottom-3 left-3 w-5 h-5 border-b border-l border-[#D4AF37]/50 rounded-bl-sm pointer-events-none" />
+            <div className="absolute bottom-3 right-3 w-5 h-5 border-b border-r border-[#D4AF37]/50 rounded-br-sm pointer-events-none" />
+
+            {/* Subtle center burgundy radial glow backing */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(74,8,27,0.045)_0%,transparent_70%)] pointer-events-none" />
+
+            {/* Rising Sparks particles on Ameen Click */}
+            {ameenClicked && risingParticles.map((p) => (
+              <motion.span
+                key={p.id}
+                initial={{ x: p.x, y: p.startY, opacity: 0.9, scale: p.scale }}
+                animate={{ y: p.endY, opacity: 0, scale: p.scale * 0.5 }}
+                transition={{ duration: p.duration, ease: "easeOut" }}
+                className="absolute w-1.5 h-1.5 rounded-full bg-[#E8C76A] pointer-events-none z-30"
+                style={{
+                  boxShadow: "0 0 6px #E8C76A",
+                  left: "50%",
+                  marginLeft: "-3px",
+                }}
+              />
+            ))}
+
+            {/* Slow Drifting Gold Settle Particles on Card Reveal */}
+            {settleParticlesList.map((p) => (
+              <motion.span
+                key={p.id}
+                initial={{ x: p.x, y: p.startY, opacity: 0.85, scale: p.scale }}
+                animate={{ y: p.endY, opacity: 0 }}
+                transition={{ duration: p.duration, ease: "linear" }}
+                className="absolute w-1.2 h-1.2 rounded-full bg-[#E8C76A] pointer-events-none z-10"
+                style={{
+                  boxShadow: "0 0 6px #E8C76A",
+                  left: "50%",
+                  marginLeft: "-2px",
+                }}
+              />
+            ))}
+
+            <span className="font-cormorant text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#856124] font-semibold mb-4 relative z-10">
               A Blessed Dua
             </span>
 
-            {/* Sacred Arabic Calligraphy */}
-            <p className="font-amiri text-[1.8rem] md:text-[2.2rem] leading-none tracking-wide text-center text-[#E8C76A] font-bold mb-4 drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.5)]">
+            {/* Sacred Arabic Calligraphy in deep burgundy contrast */}
+            <p className={`font-amiri text-[1.8rem] md:text-[2.2rem] leading-none tracking-wide text-center text-[#4A081B] font-bold mb-4 drop-shadow-[0_1px_1px_rgba(212,175,55,0.4)] transition-transform duration-700 relative z-10 ${
+              ameenClicked ? "scale-110" : ""
+            }`}>
               بَارَكَ ٱللَّٰهُ لَكُمَا وَبَارَكَ عَلَيْكُمَا
             </p>
 
             {/* Transliteration */}
-            <p className="font-cormorant italic text-sm text-[#FFF8ED]/85 tracking-wider mb-2 font-medium">
+            <p className="font-cormorant italic text-sm text-[#4A081B]/85 tracking-wider mb-2 font-medium relative z-10">
               “BarakAllahu Lakuma wa Baraka Alaikuma”
             </p>
 
             {/* Translation */}
-            <p className="font-cormorant text-[#FFF8ED]/75 text-sm md:text-base leading-relaxed max-w-xs mb-8">
+            <p className="font-cormorant text-[#4A081B]/70 text-sm md:text-base leading-relaxed max-w-xs mb-8 relative z-10">
               “May Allah bless your union and shower mercy upon you.”
             </p>
 
-            {/* Ameen CTA button */}
-            <motion.button
-              whileHover={{ scale: 1.05, boxShadow: "0 0 18px rgba(232, 199, 106, 0.55)" }}
-              whileTap={{ scale: 0.95 }}
-              animate={{
-                boxShadow: ["0 0 8px rgba(212,175,55,0.15)", "0 0 15px rgba(212,175,55,0.35)", "0 0 8px rgba(212,175,55,0.15)"]
-              }}
-              transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut" }}
-              onClick={handleAmeen}
-              className="px-8 py-2.5 rounded-full border border-[#D4AF37]/50 bg-gradient-to-r from-[#D4AF37] to-[#E8C76A] text-[#2D040F] font-cinzel text-xs font-bold tracking-[0.2em] shadow-[0_4px_12px_rgba(0,0,0,0.3)] cursor-pointer animate-pulse"
-            >
-              Ameen 🤍
-            </motion.button>
+            {/* Interactive Ameen CTA Gold Capsule button / success state */}
+            <div className="h-12 flex items-center justify-center w-full relative z-10">
+              <motion.button
+                key="ameen-btn"
+                whileHover={{ scale: 1.05, boxShadow: "0 6px 30px rgba(232, 199, 106, 0.75)" }}
+                whileTap={{ scale: 0.95 }}
+                animate={{
+                  boxShadow: ameenClicked
+                    ? "0 0 0px transparent"
+                    : ["0 4px 18px rgba(212,175,55,0.25)", "0 4px 28px rgba(212,175,55,0.55)", "0 4px 18px rgba(212,175,55,0.25)"]
+                }}
+                transition={{ repeat: ameenClicked ? 0 : Infinity, duration: 2.2, ease: "easeInOut" }}
+                onClick={handleAmeen}
+                disabled={ameenClicked}
+                className="px-12 py-3.5 rounded-full border border-[#856124]/60 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] text-[#2D040F] font-cinzel text-xs font-bold tracking-[0.25em] shadow-[inset_0_2px_3px_rgba(255,255,255,0.85),inset_0_-1.5px_2px_rgba(0,0,0,0.25),0_4px_18px_rgba(212,175,55,0.35)] cursor-pointer relative overflow-hidden flex items-center justify-center gap-2 min-w-[240px]"
+              >
+                {/* Custom shine sweep */}
+                {!ameenClicked && (
+                  <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+                    <motion.div
+                      animate={{ x: ["-100%", "200%"] }}
+                      transition={{ repeat: Infinity, duration: 4, ease: "linear", delay: 1 }}
+                      className="absolute inset-0 w-1/3 h-full bg-gradient-to-r from-transparent via-white/55 to-transparent skew-x-12"
+                    />
+                  </div>
+                )}
+
+                {/* Text transition */}
+                <AnimatePresence mode="wait">
+                  {!ameenClicked ? (
+                    <motion.span
+                      key="text-ameen"
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 5 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex items-center gap-1.5"
+                    >
+                      AMEEN 🤍
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="text-received"
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 5 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex items-center gap-1.5 text-[#2D040F] drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]"
+                    >
+                      Blessing Received ✨
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -446,10 +635,16 @@ const BlessingOrb = () => {
 };
 
 function Footer() {
+  const [globalStage, setGlobalStage] = useState("locked"); // tracks seal stages for wrapper blur styles
+
   return (
-    <footer className="py-36 px-6 bg-gradient-to-b from-[#2D040F] via-[#4A081B] to-[#2D040F] relative overflow-hidden flex flex-col items-center justify-center">
+    <footer className={`py-36 px-6 relative overflow-hidden flex flex-col items-center justify-center transition-all duration-1000 ${
+      globalStage === "broken" || globalStage === "unlocked" 
+        ? "backdrop-blur-[3px] bg-gradient-to-b from-[#FFFDF9]/95 via-[#F6EBDD]/90 to-[#FFFDF9]/95" 
+        : "bg-gradient-to-b from-[#FFFDF9] via-[#F6EBDD] to-[#FFFDF9]"
+    }`}>
       
-      {/* Custom Styles for social click ripples and shockwave bursts */}
+      {/* Custom Styles for ripples and shockwaves */}
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes ripple {
           0% {
@@ -482,19 +677,26 @@ function Footer() {
         }
       `}} />
 
-      {/* Paper grain luxury texture overlay */}
+      {/* Repeating light Islamic geometric star tile pattern overlay */}
+      <div className="absolute inset-0 opacity-[0.035] pointer-events-none"
+           style={{
+             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%234A081B' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%234A081B' stroke-width='1'/%3E%3C/svg%3E")`,
+             backgroundSize: "60px 60px"
+           }} />
+
+      {/* Paper grain luxury texture overlay using burgundy contrast dot grid */}
       <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
-           style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #FFF8ED 1px, transparent 1px), radial-gradient(circle at 0 0, #FFF8ED 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
+           style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #4A081B 1px, transparent 1px), radial-gradient(circle at 0 0, #4A081B 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
 
       {/* Cinematic ambient gold spotlight */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-t from-brand-gold/8 via-[#E8C76A]/4 to-transparent rounded-full blur-[70px] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-t from-[#D4AF37]/15 via-[#E8C76A]/6 to-transparent rounded-full blur-[70px] pointer-events-none" />
 
       {/* Animated Golden Divider with sheen sweep */}
       <div className="w-56 h-[1.5px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent mb-16 relative z-10 overflow-hidden">
         <motion.div
           animate={{ x: ["-100%", "200%"] }}
           transition={{ repeat: Infinity, duration: 3.5, ease: "linear" }}
-          className="absolute inset-0 w-1/3 h-full bg-gradient-to-r from-transparent via-[#FFF8ED]/50 to-transparent"
+          className="absolute inset-0 w-1/3 h-full bg-gradient-to-r from-transparent via-white/55 to-transparent"
         />
       </div>
 
@@ -502,28 +704,69 @@ function Footer() {
         
         {/* Subtle Glowing Islamic Crescent / Ornament */}
         <div className="relative w-16 h-16 flex items-center justify-center mb-8">
-          <div className="absolute inset-0 bg-[#D4AF37]/8 rounded-full blur-[12px] animate-pulse" />
-          <svg className="w-10 h-10 text-[#E8C76A] drop-shadow-[0_0_8px_rgba(232,199,106,0.45)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+          <div className="absolute inset-0 bg-[#D4AF37]/15 rounded-full blur-[12px] animate-pulse" />
+          <svg className="w-10 h-10 text-[#856124] drop-shadow-[0_0_8px_rgba(212,175,55,0.35)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
             <path d="M12 3a9 9 0 0 0 9 9 9 9 0 1 1-9-9Z" fill="currentColor" fillOpacity="0.08" />
             <path d="M12.5 7.5l.8 1.6 1.7.3-1.2 1.2.3 1.7-1.6-.8-1.6.8.3-1.7-1.2-1.2 1.7-.3.8-1.6z" fill="currentColor" />
           </svg>
         </div>
 
-        {/* Interactive Blessing Orb Experience */}
+        {/* Interactive Royal Blessing Seal */}
         <div className="mb-12 w-full">
-          <BlessingOrb />
+          <RoyalSeal setGlobalStage={setGlobalStage} />
         </div>
 
-        {/* Minimal Premium Developer Signature for Saad Kazi */}
-        <div className="flex flex-col items-center gap-2 mt-8 z-10">
-          <span className="font-cormorant text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#FFF8ED]/60 font-semibold">
+        {/* Animated Premium Signature Plate for Saad Kazi */}
+        <div className="flex flex-col items-center gap-3 mt-8 z-10">
+          <span className="font-cormorant text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#4A081B]/60 font-semibold">
             Handcrafted with love by
           </span>
-          <span className="font-cormorant text-sm md:text-base font-semibold tracking-widest text-[#E8C76A] drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.4)]">
-            Saad Kazi
-          </span>
           
-          {/* Luxury gold social icons with hover glow + rotation + click ripples and sparks */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.96 }}
+            animate={{
+              boxShadow: [
+                "0 4px 12px rgba(74, 8, 27, 0.12), 0 0 10px rgba(212, 175, 55, 0.15)",
+                "0 4px 18px rgba(74, 8, 27, 0.18), 0 0 18px rgba(212, 175, 55, 0.35)",
+                "0 4px 12px rgba(74, 8, 27, 0.12), 0 0 10px rgba(212, 175, 55, 0.15)"
+              ]
+            }}
+            transition={{
+              boxShadow: { repeat: Infinity, duration: 4.0, ease: "easeInOut" }
+            }}
+            className="px-8 py-2.5 rounded-full border border-[#D4AF37]/50 bg-gradient-to-r from-[#4A081B] via-[#2D040F] to-[#4A081B] flex items-center justify-center gap-3 shadow-[inset_0_1px_2px_rgba(255,255,255,0.2),0_4px_12px_rgba(74,8,27,0.15)] cursor-pointer relative overflow-hidden"
+          >
+            {/* Tiny gold star sparkle ornament on left */}
+            <motion.span
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut" }}
+              className="text-[#E8C76A] text-xs select-none"
+            >
+              ✦
+            </motion.span>
+
+            {/* Signature Text with metallic sheen gradient animation */}
+            <motion.span
+              animate={{ backgroundPosition: ["0% center", "200% center"] }}
+              transition={{ repeat: Infinity, duration: 5.0, ease: "linear" }}
+              className="bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] via-[#FFF8ED] via-[#FCF6BA] to-[#B38728] bg-[length:200%_auto] bg-clip-text text-transparent font-cinzel font-semibold text-base md:text-lg tracking-[0.2em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] select-none pointer-events-none"
+            >
+              Saad Kazi
+            </motion.span>
+
+            {/* Tiny gold star sparkle ornament on right */}
+            <motion.span
+              animate={{ opacity: [1, 0.5, 1] }}
+              transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut" }}
+              className="text-[#E8C76A] text-xs select-none"
+            >
+              ✦
+            </motion.span>
+          </motion.div>
+        </div>
+          
+          {/* Luxury transparent gold social icons with hover burgundy solid fill */}
           <div className="flex gap-4 items-center mt-3">
             {/* WhatsApp */}
             <SocialButton 
@@ -547,7 +790,6 @@ function Footer() {
               </svg>
             </SocialButton>
           </div>
-        </div>
 
         {/* Final Copyright Text with Tiny Twinkling Sparkles */}
         <div className="relative mt-12 flex items-center justify-center z-10">
@@ -555,12 +797,12 @@ function Footer() {
           <motion.span
             animate={{ opacity: [0.2, 0.9, 0.2], scale: [0.7, 1.2, 0.7] }}
             transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
-            className="text-[9px] text-[#E8C76A] mr-2"
+            className="text-[9px] text-[#856124] mr-2"
           >
             ✦
           </motion.span>
           
-          <span className="font-inter text-[8px] uppercase tracking-[0.3em] text-[#FFF8ED]/35 select-none">
+          <span className="font-inter text-[8px] uppercase tracking-[0.3em] text-[#4A081B]/45 select-none">
             Fauzan & Huda • 2026
           </span>
 
@@ -568,7 +810,7 @@ function Footer() {
           <motion.span
             animate={{ opacity: [0.9, 0.2, 0.9], scale: [1.2, 0.7, 1.2] }}
             transition={{ repeat: Infinity, duration: 2.1, ease: "easeInOut" }}
-            className="text-[9px] text-[#E8C76A] ml-2"
+            className="text-[9px] text-[#856124] ml-2"
           >
             ✦
           </motion.span>
