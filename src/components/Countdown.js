@@ -80,16 +80,46 @@ function Countdown() {
   const formatNumber = (num) => String(num).padStart(2, "0");
 
   return (
-    <section className="py-24 px-6 velvet-silk-bg relative overflow-hidden flex flex-col items-center justify-center">
+    <section 
+      style={{
+        background: `linear-gradient(to bottom, #7a1438 0%, #6f0028 40%, #4a0018 75%, #2A000C 100%)`
+      }}
+      className="pt-8 pb-24 px-6 relative overflow-hidden flex flex-col items-center justify-center"
+    >
       {/* Curved section transition divider at the bottom */}
       <SectionDivider />
 
-      {/* Low-opacity repeating Islamic geometric pattern watermark */}
+      {/* Velvet fabric grain overlay (2.5% opacity) */}
+      <div 
+        className="absolute inset-0 opacity-[0.025] pointer-events-none mix-blend-overlay z-0" 
+        style={{ 
+          backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.12) 0.5px, transparent 0.5px)`, 
+          backgroundSize: "2px 2px" 
+        }} 
+      />
+
+      {/* Low-opacity repeating Islamic geometric pattern watermark (3.5% opacity, large scale) */}
       <div className="absolute inset-0 opacity-[0.035] pointer-events-none z-0" 
            style={{ 
-             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
-             backgroundSize: "60px 60px" 
+             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
+             backgroundSize: "80px 80px",
+             filter: "blur(0.5px)"
            }} />
+
+      {/* Layer 2: Centered Grand Islamic Rosette Geometric Silhouette (Reduced to 3.5% for visual continuity) */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] z-0 filter blur-[0.5px]">
+        <svg className="w-80 h-80 md:w-[500px] md:h-[500px] text-[#D4AF37] stroke-current fill-none stroke-[0.8]" viewBox="0 0 100 100">
+          <polygon points="50,5 64,19 83,19 83,38 97,52 83,66 83,85 64,85 50,99 36,85 17,85 17,66 3,52 17,38 17,19 36,19" />
+          <polygon points="50,15 60,25 75,25 75,40 85,50 75,60 75,75 60,75 50,85 40,75 25,75 25,60 15,50 25,40 25,25 40,25" />
+          <circle cx="50" cy="50" r="16" />
+          <circle cx="50" cy="50" r="8" />
+        </svg>
+      </div>
+
+      {/* Layer 3: Opposing diagonal spotlights (top-left ruby bloom and bottom-right gold bloom) */}
+      <div className="absolute -top-12 -left-12 w-80 h-80 bg-[radial-gradient(circle,rgba(142,17,58,0.28)_0%,transparent_75%)] rounded-full blur-[60px] pointer-events-none z-0" />
+      <div className="absolute -bottom-12 -right-12 w-80 h-80 bg-[radial-gradient(circle,rgba(212,175,55,0.06)_0%,transparent_75%)] rounded-full blur-[60px] pointer-events-none z-0" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] md:w-[600px] h-[350px] md:h-[600px] bg-[radial-gradient(circle,rgba(142,17,58,0.22)_0%,transparent_80%)] rounded-full blur-[70px] pointer-events-none z-0" />
 
       {/* Ambient dynamic diagonal light sweep */}
       <div className="ambient-light-sweep" />
@@ -208,33 +238,40 @@ function CountdownCard({ value, label, format }) {
   return (
     <div className="flex flex-col items-center flex-1 max-w-[76px] md:max-w-[88px]">
       
-      {/* Clock Casing with Gold Borders (Ivory panel on dark backdrop) */}
-      <div className="relative w-full h-[76px] md:h-[88px] bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] border border-[#D4AF37]/50 rounded-2xl shadow-[0_12px_28px_rgba(0,0,0,0.35)] shadow-[inset_0_0_12px_rgba(212,175,55,0.05)] flex items-center justify-center overflow-hidden">
+      {/* Clock Casing with Gold Gradient Borders (Ivory panel on dark backdrop) */}
+      <div className="relative w-full h-[76px] md:h-[88px] bg-gradient-to-br from-[#8E7037] via-[#F3DA90] to-[#8E7037] p-[3px] rounded-2xl shadow-[0_12px_28px_rgba(0,0,0,0.35)] flex items-center justify-center overflow-hidden">
         
-        {/* Double Inner Frame details */}
-        <div className="absolute inset-[3px] border border-[#D4AF37]/15 rounded-xl pointer-events-none" />
+        {/* Inner core textured cream marble paper casing */}
+        <div className="w-full h-full rounded-xl bg-gradient-to-br from-[#FDF8F0] via-[#FAF5EC] to-[#F8F2E8] p-[2px] flex items-center justify-center relative shadow-[inset_0_2px_8px_rgba(0,0,0,0.1)] overflow-hidden">
+          
+          {/* Burgundy Inset Layer border */}
+          <div className="absolute inset-1 rounded-lg border border-[#8F1C3C]/30 pointer-events-none z-0" />
+          
+          {/* Double Inner Frame details */}
+          <div className="absolute inset-[3px] border border-[#D4AF37]/15 rounded-xl pointer-events-none" />
 
-        {/* Physical center-split line simulating mechanical flip clock */}
-        <div className="absolute left-0 right-0 top-1/2 h-[0.5px] bg-[#D4AF37]/25 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.1)]" />
-        
-        {/* Shading gradients top and bottom to create physical depth */}
-        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-black/[0.02] to-transparent pointer-events-none" />
-        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/[0.015] to-transparent pointer-events-none" />
+          {/* Physical center-split line simulating mechanical flip clock */}
+          <div className="absolute left-0 right-0 top-1/2 h-[0.5px] bg-[#D4AF37]/25 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.1)]" />
+          
+          {/* Shading gradients top and bottom to create physical depth */}
+          <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-black/[0.02] to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/[0.015] to-transparent pointer-events-none" />
 
-        {/* Rolling Number */}
-        <div className="relative overflow-hidden h-10 flex items-center justify-center z-20">
-          <AnimatePresence mode="popLayout">
-            <motion.span
-              key={formattedVal}
-              initial={{ y: 24, opacity: 0, filter: "blur(3px)" }}
-              animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-              exit={{ y: -24, opacity: 0, filter: "blur(3px)" }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="font-cormorant text-3xl md:text-4xl font-semibold text-[#4A081B] tracking-widest block drop-shadow-[0_0.5px_1px_rgba(255,255,255,0.7)]"
-            >
-              {formattedVal}
-            </motion.span>
-          </AnimatePresence>
+          {/* Rolling Number */}
+          <div className="relative overflow-hidden h-10 flex items-center justify-center z-20">
+            <AnimatePresence mode="popLayout">
+              <motion.span
+                key={formattedVal}
+                initial={{ y: 24, opacity: 0, filter: "blur(3px)" }}
+                animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+                exit={{ y: -24, opacity: 0, filter: "blur(3px)" }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="font-cormorant text-2xl md:text-3.5xl font-semibold text-[#4A081B] tracking-widest block drop-shadow-[0_0.5px_1px_rgba(255,255,255,0.7)]"
+              >
+                {formattedVal}
+              </motion.span>
+            </AnimatePresence>
+          </div>
         </div>
       </div>
 

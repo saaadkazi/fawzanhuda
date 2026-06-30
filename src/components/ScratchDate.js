@@ -3,64 +3,49 @@
 import { useEffect, useRef, useState, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Web Audio API Synthesizer for high-fidelity luxury party popper sound
-const playPopperSound = () => {
+// Web Audio API Synthesizer for high-fidelity luxury chime sound
+const playChimeSound = () => {
   if (typeof window === "undefined") return;
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
     const ctx = new AudioContext();
 
-    // 1. Noise burst for the "Pop/Blast"
-    const bufferSize = ctx.sampleRate * 0.35; // 0.35s duration
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = Math.random() * 2 - 1;
-    }
+    const playTone = (freq, time, vol) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, time);
+      gain.gain.setValueAtTime(vol, time);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + 2.0); // Slow decay
 
-    const noiseSource = ctx.createBufferSource();
-    noiseSource.buffer = buffer;
+      // High pass filter for crystal clarity
+      const filter = ctx.createBiquadFilter();
+      filter.type = "highpass";
+      filter.frequency.value = 800;
 
-    const noiseFilter = ctx.createBiquadFilter();
-    noiseFilter.type = "bandpass";
-    noiseFilter.frequency.setValueAtTime(900, ctx.currentTime);
-    noiseFilter.frequency.exponentialRampToValueAtTime(250, ctx.currentTime + 0.28);
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(time);
+      osc.stop(time + 2.2);
+    };
 
-    const noiseGain = ctx.createGain();
-    noiseGain.gain.setValueAtTime(0.12, ctx.currentTime);
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.32);
-
-    noiseSource.connect(noiseFilter);
-    noiseFilter.connect(noiseGain);
-    noiseGain.connect(ctx.destination);
-
-    noiseSource.start();
-    noiseSource.stop(ctx.currentTime + 0.35);
-
-    // 2. High-frequency chime ring for "Chime Accent"
-    const chime = ctx.createOscillator();
-    const chimeGain = ctx.createGain();
-    
-    chime.type = "sine";
-    chime.frequency.setValueAtTime(1350, ctx.currentTime);
-    chime.frequency.exponentialRampToValueAtTime(550, ctx.currentTime + 0.25);
-
-    chimeGain.gain.setValueAtTime(0.04, ctx.currentTime);
-    chimeGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
-
-    chime.connect(chimeGain);
-    chimeGain.connect(ctx.destination);
-    chime.start();
-    chime.stop(ctx.currentTime + 0.26);
+    // Arpeggiated sequence of celestial chime frequencies
+    const now = ctx.currentTime;
+    playTone(523.25, now, 0.08);        // C5
+    playTone(659.25, now + 0.1, 0.08);  // E5
+    playTone(783.99, now + 0.2, 0.08);  // G5
+    playTone(1046.50, now + 0.3, 0.08); // C6
+    playTone(1318.51, now + 0.4, 0.08); // E6
 
   } catch (err) {
     console.warn("Audio synthesis failed:", err);
   }
 };
 
-// Luxury Frosted Pearl Ceremonial Medallion Sub-component
-function CeremonialMedallion({ value, label, onReveal, index }) {
+// Luxury Ceremonial Medallion Sub-component (Brushed Gold Casing & Burgundy Enamel Foil)
+function CeremonialMedallion({ value, label, onReveal, index, isAllRevealed }) {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
   const lastCoordsRef = useRef(null);
@@ -100,8 +85,9 @@ function CeremonialMedallion({ value, label, onReveal, index }) {
     const resizeCanvas = () => {
       const container = containerRef.current;
       if (!container) return;
-      canvas.width = container.clientWidth - 8;
-      canvas.height = container.clientHeight - 8;
+      // Get padding-adjusted dimensions for rectangular shape
+      canvas.width = container.clientWidth - 10;
+      canvas.height = container.clientHeight - 10;
       drawMedallionFoil(canvas);
     };
 
@@ -115,67 +101,52 @@ function CeremonialMedallion({ value, label, onReveal, index }) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const cx = canvas.width / 2;
-    const cy = canvas.height / 2;
-    const r = Math.min(canvas.width, canvas.height) / 2;
+    const w = canvas.width;
+    const h = canvas.height;
 
-    // 1. Brushed Champagne Gold/Satin Beige gradient (rich and darker than outer rim)
-    const foilGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, r);
-    foilGrad.addColorStop(0, "#D5C09B"); // Brushed champagne center
-    foilGrad.addColorStop(0.35, "#C0AD54"); // Satin gold mid
-    foilGrad.addColorStop(0.72, "#A89467"); // Muted metallic beige
-    foilGrad.addColorStop(1, "#836C3D"); // Darker gold/bronze outer edge
+    // 1. Deep Burgundy Enamel base background gradient
+    const foilGrad = ctx.createLinearGradient(0, 0, w, h);
+    foilGrad.addColorStop(0, "#5E001F"); // Deep burgundy center
+    foilGrad.addColorStop(0.7, "#3B0013"); // Rich wine midtone
+    foilGrad.addColorStop(1, "#1A0008"); // Dark wine border
 
     ctx.fillStyle = foilGrad;
     ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    // Draw rounded rect path for foil canvas
+    const r = 8; // rounded corner radius
+    ctx.moveTo(r, 0);
+    ctx.lineTo(w - r, 0);
+    ctx.quadraticCurveTo(w, 0, w, r);
+    ctx.lineTo(w, h - r);
+    ctx.quadraticCurveTo(w, h, w - r, h);
+    ctx.lineTo(r, h);
+    ctx.quadraticCurveTo(0, h, 0, h - r);
+    ctx.lineTo(0, r);
+    ctx.quadraticCurveTo(0, 0, r, 0);
+    ctx.closePath();
     ctx.fill();
 
-    // 2. Fine diagonal brushed metal lines for physical foil feel
-    ctx.save();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
-    ctx.lineWidth = 0.5;
-    for (let i = -r; i < r; i += 3) {
-      ctx.beginPath();
-      ctx.moveTo(cx + i, cy - r);
-      ctx.lineTo(cx + i + r, cy + r);
-      ctx.stroke();
-    }
-    ctx.restore();
-
-    // 3. Stamped micro-glass dust & metallic texture noise
-    ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
-    for (let i = 0; i < 150; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const dist = Math.random() * r;
-      const x = cx + Math.cos(angle) * dist;
-      const y = cy + Math.sin(angle) * dist;
-      const size = Math.random() * 1.5;
-      ctx.fillRect(x, y, size, size);
-    }
-
-    ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
-    for (let i = 0; i < 80; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const dist = Math.random() * r;
-      const x = cx + Math.cos(angle) * dist;
-      const y = cy + Math.sin(angle) * dist;
+    // 2. Micro-grain enamel reflections
+    ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+    for (let i = 0; i < 90; i++) {
+      const x = Math.random() * w;
+      const y = Math.random() * h;
       const size = Math.random() * 1.2;
       ctx.fillRect(x, y, size, size);
     }
 
-    // 4. Bright reflective gold highlights at the outer edge for high border contrast
-    ctx.strokeStyle = "rgba(255, 248, 237, 0.65)";
-    ctx.lineWidth = 1.8;
-    ctx.beginPath();
-    ctx.arc(cx, cy, r - 1.2, 0, Math.PI * 2);
-    ctx.stroke();
+    // 3. Bright inner reflection gold highlight border
+    ctx.strokeStyle = "rgba(243, 218, 144, 0.35)";
+    ctx.lineWidth = 1.2;
+    ctx.strokeRect(3, 3, w - 6, h - 6);
 
-    // 5. Delicate Islamic geometric emboss pattern (Rub el Hizb 8-pointed star)
+    // 4. Stamped Embossed Arabesque/Islamic Star Pattern (Rub el Hizb 8-pointed star)
     const drawIslamicPattern = () => {
       ctx.save();
+      const cx = w / 2;
+      const cy = h / 2;
       const points = 8;
-      const outerR = r - 14;
+      const outerR = Math.min(w, h) * 0.32;
       const innerR = outerR * 0.72;
 
       const drawPath = (ox, oy) => {
@@ -191,48 +162,47 @@ function CeremonialMedallion({ value, label, onReveal, index }) {
         ctx.closePath();
         ctx.stroke();
 
-        // Inner geometric lattice circles
+        // Inner geometric circles
         ctx.beginPath();
         ctx.arc(cx + ox, cy + oy, outerR * 0.5, 0, Math.PI * 2);
         ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(cx + ox, cy + oy, outerR * 0.3, 0, Math.PI * 2);
-        ctx.stroke();
       };
 
-      // Stamped emboss shadow
-      ctx.strokeStyle = "rgba(45, 30, 10, 0.28)";
-      ctx.lineWidth = 0.8;
+      // Stamped emboss shadow (darker deep burgundy/black)
+      ctx.strokeStyle = "rgba(10, 0, 2, 0.85)";
+      ctx.lineWidth = 0.9;
       drawPath(0.6, 0.6);
 
-      // Stamped emboss highlight
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.45)";
-      ctx.lineWidth = 0.8;
+      // Stamped emboss highlight (champagne gold)
+      ctx.strokeStyle = "rgba(243, 218, 144, 0.65)";
+      ctx.lineWidth = 0.9;
       drawPath(-0.6, -0.6);
 
       ctx.restore();
     };
     drawIslamicPattern();
 
-    // 6. Stamped "SCRATCH TO REVEAL" high-contrast double-line typography
+    // 5. Embossed Gold Stamped typography
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.font = "bold 9px 'Cinzel', serif";
     ctx.letterSpacing = "1.5px";
 
-    // Embossed shadow offsets
-    ctx.fillStyle = "rgba(45, 30, 10, 0.55)";
+    const cx = w / 2;
+    const cy = h / 2;
+
+    // Embossed shadow text (dark wine/black)
+    ctx.fillStyle = "rgba(10, 0, 2, 0.85)";
     ctx.fillText("SCRATCH", cx + 0.6, cy - 4.5);
     ctx.fillText("TO REVEAL", cx + 0.6, cy + 5.5);
 
-    // Embossed highlight offsets
-    ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+    // Embossed highlight text (champagne gold reflection)
+    ctx.fillStyle = "rgba(243, 218, 144, 0.65)";
     ctx.fillText("SCRATCH", cx - 0.5, cy - 5.5);
     ctx.fillText("TO REVEAL", cx - 0.5, cy + 4.5);
 
-    // Main typography fill (deep burgundy for maximum legibility and contrast)
-    ctx.fillStyle = "rgba(74, 8, 27, 0.88)";
+    // Main text fill in luxury champagne gold
+    ctx.fillStyle = "#F3DA90";
     ctx.fillText("SCRATCH", cx, cy - 5);
     ctx.fillText("TO REVEAL", cx, cy + 5);
   };
@@ -251,20 +221,19 @@ function CeremonialMedallion({ value, label, onReveal, index }) {
     };
   };
 
-  // Spawns glass dust (white shards) and golden sparkles (glowing points)
+  // Spawns burgundy enamel fragments and golden sparks on scratch
   const spawnDissolvingParticles = (x, y) => {
-    const glassCount = 2;
+    const enamelCount = 2;
     const goldCount = 2;
-
     const newParticles = [];
 
-    // Glass Shard Dust
-    for (let i = 0; i < glassCount; i++) {
+    // Deep Burgundy Enamel Fragments
+    for (let i = 0; i < enamelCount; i++) {
       const angle = Math.random() * Math.PI * 2;
       const speed = 0.8 + Math.random() * 1.5;
       newParticles.push({
         id: Math.random(),
-        type: "glass",
+        type: "enamel",
         x,
         y,
         vx: Math.cos(angle) * speed,
@@ -273,7 +242,7 @@ function CeremonialMedallion({ value, label, onReveal, index }) {
         fadeSpeed: 0.03,
         scale: Math.random() * 0.5 + 0.2,
         opacity: 0.9,
-        color: "rgba(255, 255, 255, 0.85)",
+        color: "rgba(94, 0, 31, 0.85)", 
       });
     }
 
@@ -392,13 +361,13 @@ function CeremonialMedallion({ value, label, onReveal, index }) {
 
   return (
     <motion.div 
-      className="flex flex-col items-center"
+      className="flex flex-col items-center w-full animate-float-tile"
       animate={{ y: [0, -5, 0] }}
       whileHover={{ 
-        scale: 1.08,
+        scale: 1.05,
         transition: { duration: 0.25, ease: "easeOut" }
       }}
-      whileTap={{ scale: 0.95 }}
+      whileTap={{ scale: 0.98 }}
       transition={{
         y: {
           duration: 4.5,
@@ -410,40 +379,61 @@ function CeremonialMedallion({ value, label, onReveal, index }) {
     >
       <div 
         ref={containerRef}
-        className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-[#FFFDF9] via-[#FFFBF5] to-[#FFF9F0] border-2 border-[#D4AF37] shadow-[0_12px_28px_rgba(0,0,0,0.3),_0_0_12px_rgba(212,175,55,0.12)] hover:shadow-[0_15px_35px_rgba(212,175,55,0.35),_0_0_20px_rgba(212,175,55,0.2)] relative flex items-center justify-center overflow-hidden transition-shadow duration-300"
+        className={`w-full aspect-[2/3] rounded-xl bg-gradient-to-br from-[#8E7037] via-[#F3DA90] to-[#8E7037] p-[4px] relative flex items-center justify-center overflow-hidden transition-all duration-1000 ${
+          isAllRevealed 
+            ? "shadow-[0_0_35px_rgba(212,175,55,0.75),_inset_0_1.5px_2px_rgba(255,255,255,0.85)] scale-102" 
+            : "shadow-[0_12px_28px_rgba(0,0,0,0.45),inset_0_1.5px_2px_rgba(255,255,255,0.75)]"
+        }`}
       >
-        {/* Subtle inner shadow for depth */}
-        <div className="absolute inset-0 rounded-full pointer-events-none z-10 shadow-[inset_0_2px_8px_rgba(212,175,55,0.05)]" />
-        
-        {/* Hidden value display with blur-to-sharp animation and gold bloom shadow */}
-        <motion.div 
-          className="flex flex-col items-center z-10"
-          initial={false}
-          animate={isRevealed ? {
-            filter: ["blur(10px)", "blur(0px)"],
-            scale: [0.85, 1.12, 1],
-          } : {
-            filter: "blur(0px)",
-            scale: 1
-          }}
-          transition={{
-            duration: 0.9,
-            ease: "easeOut",
-          }}
-        >
-          <span 
-            className="font-cormorant text-2.5xl md:text-3.5xl font-bold tracking-widest text-[#4A081B] select-all transition-all duration-700"
-            style={{
-              textShadow: isRevealed 
-                ? "0 0 14px rgba(232, 199, 106, 0.9), 0 0 4px rgba(212, 175, 55, 0.45)" 
-                : "none"
+        {/* Inner core textured cream marble paper casing */}
+        <div className="w-full h-full rounded-lg bg-gradient-to-br from-[#FDF8F0] via-[#FAF5EC] to-[#F8F2E8] p-[3px] flex flex-col items-center justify-center relative shadow-[inset_0_2px_8px_rgba(0,0,0,0.1)] overflow-hidden">
+          
+          {/* Burgundy Inset Layer border */}
+          <div className="absolute inset-1.5 rounded-md border border-[#8F1C3C]/35 pointer-events-none z-0" />
+          
+          {/* Subtle Islamic geometric pattern watermark inside card */}
+          <div className="absolute inset-0 opacity-[0.02] pointer-events-none z-0" 
+               style={{ 
+                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
+                 backgroundSize: "60px 60px" 
+               }} />
+
+          {/* Hidden value display with blur-to-sharp animation and gold bloom shadow */}
+          <motion.div 
+            className="flex flex-col items-center z-10 w-full"
+            initial={false}
+            animate={isRevealed ? {
+              filter: ["blur(10px)", "blur(0px)"],
+              scale: [0.9, 1.1, 1],
+            } : {
+              filter: "blur(0px)",
+              scale: 1
+            }}
+            transition={{
+              duration: 0.9,
+              ease: "easeOut",
             }}
           >
-            {value}
-          </span>
-        </motion.div>
+            {/* Label header above value */}
+            <span className="font-cinzel text-[8px] md:text-[9px] uppercase tracking-wider text-[#753A3A] mb-2 opacity-85 font-semibold">
+              {label}
+            </span>
 
-        {/* Scratch Canvas (Brushed Gold/Beige Luxury Layer) */}
+            {/* Large luxury serif typography date value */}
+            <span 
+              className="font-cormorant text-2xl md:text-5xl font-bold tracking-normal text-[#4A081B] select-all transition-all duration-700 leading-none"
+              style={{
+                textShadow: isRevealed 
+                  ? "0 0 16px rgba(232, 199, 106, 0.95), 0 0 4px rgba(212, 175, 55, 0.45)" 
+                  : "none"
+              }}
+            >
+              {value}
+            </span>
+          </motion.div>
+        </div>
+
+        {/* Scratch Canvas (Burgundy Enamel Luxury Layer) */}
         <AnimatePresence>
           {!isRevealed && (
             <motion.canvas
@@ -461,16 +451,16 @@ function CeremonialMedallion({ value, label, onReveal, index }) {
               onTouchStart={startScratching}
               onTouchMove={scratch}
               onTouchEnd={stopScratching}
-              className="absolute inset-[3px] rounded-full z-30 cursor-pointer touch-none"
+              className="absolute inset-[4px] rounded-lg z-30 cursor-pointer touch-none"
             />
           )}
         </AnimatePresence>
 
         {/* Luxury Reflection Sweep Overlay (Brighter for interactive guide) */}
         {!isRevealed && (
-          <div className="absolute inset-[3px] rounded-full overflow-hidden pointer-events-none z-35">
+          <div className="absolute inset-[4px] rounded-lg overflow-hidden pointer-events-none z-35">
             <motion.div
-              className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/70 to-transparent skew-x-30"
+              className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/45 to-transparent skew-x-30"
               animate={{
                 left: ["-150%", "200%"],
               }}
@@ -518,7 +508,7 @@ function CeremonialMedallion({ value, label, onReveal, index }) {
           </AnimatePresence>
         </div>
 
-        {/* Scratch Drag Particles Overlay (Dissolving Glass & Gold Dust) */}
+        {/* Scratch Drag Particles Overlay (Dissolving Enamel & Gold Dust) */}
         <div className="absolute inset-0 pointer-events-none z-35 overflow-hidden">
           {dragParticles.map((p) => (
             <div
@@ -527,19 +517,19 @@ function CeremonialMedallion({ value, label, onReveal, index }) {
               style={{
                 left: p.x,
                 top: p.y,
-                width: `${p.scale * (p.type === "glass" ? 12 : 7)}px`,
-                height: `${p.scale * (p.type === "glass" ? 12 : 7)}px`,
+                width: `${p.scale * (p.type === "enamel" ? 12 : 7)}px`,
+                height: `${p.scale * (p.type === "enamel" ? 12 : 7)}px`,
                 backgroundColor: p.color,
                 opacity: p.opacity,
                 transform: "translate(-50%, -50%) rotate(45deg)",
                 boxShadow: p.type === "gold" ? `0 0 6px ${p.color}` : "none",
-                borderRadius: p.type === "glass" ? "1px" : "50%",
+                borderRadius: p.type === "enamel" ? "1px" : "50%",
               }}
             />
           ))}
         </div>
       </div>
-      <span className="font-cormorant text-[10px] md:text-xs uppercase tracking-widest text-[#FFF8ED]/75 font-semibold mt-2.5">
+      <span className="font-cormorant text-[10px] md:text-xs uppercase tracking-widest text-[#FFF8ED]/75 font-semibold mt-3">
         {label}
       </span>
     </motion.div>
@@ -551,6 +541,7 @@ function ScratchDate() {
   const [celebrationParticles, setCelebrationParticles] = useState([]);
   const [bgStars, setBgStars] = useState([]);
   const [shimmerActive, setShimmerActive] = useState(false);
+  const [showRewardText, setShowRewardText] = useState(false);
 
   const allRevealed = revealedCards.every((v) => v);
 
@@ -558,9 +549,9 @@ function ScratchDate() {
     // Generate background gold/champagne slow floating dust
     const generated = Array.from({ length: 24 }).map((_, i) => ({
       id: i,
-      left: `${Math.random() * 98}%`,
+      left: `${Math.random() * 100}%`,
       size: Math.random() * 2.2 + 1.2,
-      delay: Math.random() * 5,
+      delay: Math.random() * 4,
       duration: Math.random() * 9 + 7,
       opacity: Math.random() * 0.35 + 0.15,
     }));
@@ -574,50 +565,93 @@ function ScratchDate() {
       if (next.every((v) => v)) {
         setShimmerActive(true);
         triggerCelebration();
+        setTimeout(() => {
+          setShowRewardText(true);
+        }, 600);
       }
       return next;
     });
   };
 
   const triggerCelebration = () => {
-    playPopperSound();
+    playChimeSound();
 
-    // Spawn luxury celebration particles (champagne, silver, gold sparks, and white rose petals)
-    const particlesList = Array.from({ length: 70 }).map((_, i) => {
+    // Spawn luxury celebration particles (cream rose petals, gold sparks, and gold foil chips)
+    const particlesList = Array.from({ length: 90 }).map((_, i) => {
       const typeRand = Math.random();
-      let type = "champagne";
+      let type = "gold";
       if (typeRand < 0.35) type = "petal";
-      else if (typeRand < 0.7) type = "gold-star";
+      else if (typeRand < 0.7) type = "sparkle";
 
       return {
         id: i,
         type,
-        x: Math.random() * 60 - 30, // Centered zone
-        y: 40,
-        scale: Math.random() * 0.75 + 0.4,
+        x: 0,
+        y: 0,
+        scale: Math.random() * 0.8 + 0.3,
         rotation: Math.random() * 360,
-        spin: Math.random() * 360 - 180,
-        driftX: Math.random() * 400 - 200, 
-        driftY: -(Math.random() * 250 + 170), // Pop height
-        gravity: Math.random() * 140 + 90, // gravity fall
-        duration: Math.random() * 0.8 + 2.3, // lifetime
+        spin: Math.random() * 180 - 90,
+        vx: (Math.random() * 200 - 100) * 0.8,
+        vy: -(Math.random() * 180 + 120) * 0.8,
+        gravity: Math.random() * 40 + 30, // low gravity slow fall
+        duration: Math.random() * 1.5 + 2.5, // 2.5s - 4.0s slow drift
       };
     });
     setCelebrationParticles(particlesList);
   };
 
   return (
-    <section className="py-24 px-6 velvet-silk-bg relative flex flex-col items-center justify-center overflow-hidden">
+    <section 
+      style={{
+        background: `linear-gradient(to bottom, #2A000C 0%, #4a0018 30%, #5A001E 70%, #7a1438 100%)`
+      }}
+      className="pt-24 pb-8 px-6 relative flex flex-col items-center justify-center overflow-hidden"
+    >
       
       {/* Top Gold Arch Section Divider */}
       <LuxuryDivider className="absolute top-0 left-0 right-0 z-20 -translate-y-[15px] rotate-180" />
 
-      {/* Low-opacity repeating Islamic geometric pattern watermark */}
+      {/* Velvet fabric grain overlay (2.5% opacity) */}
+      <div 
+        className="absolute inset-0 opacity-[0.025] pointer-events-none mix-blend-overlay z-0" 
+        style={{ 
+          backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.12) 0.5px, transparent 0.5px)`, 
+          backgroundSize: "2px 2px" 
+        }} 
+      />
+
+      {/* Low-opacity repeating Islamic geometric pattern watermark (3.5% opacity, large scale) */}
       <div className="absolute inset-0 opacity-[0.035] pointer-events-none z-0" 
            style={{ 
-             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
-             backgroundSize: "60px 60px" 
+             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
+             backgroundSize: "80px 80px",
+             filter: "blur(0.5px)"
            }} />
+
+      {/* Faint oversized Islamic arch and crescent lines for depth */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-[0.03]">
+        <svg className="w-[450px] h-[750px] md:w-[800px] md:h-[1250px] text-[#D4AF37] stroke-current fill-none stroke-[0.8] filter blur-[0.5px]" viewBox="0 0 100 150" preserveAspectRatio="none">
+          <path d="M 5,150 L 5,60 C 5,30 25,10 50,10 C 75,10 95,30 95,60 L 95,150" />
+          <path d="M 15,150 A 35,35 0 0,1 85,150" />
+        </svg>
+      </div>
+
+      {/* Layer 3: Top-heavy gold glow bleeding & center spotlight glow behind card */}
+      <div className="absolute top-0 left-0 right-0 h-40 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.12)_0%,transparent_70%)] pointer-events-none z-0" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] md:w-[600px] h-[350px] md:h-[600px] bg-[radial-gradient(circle,rgba(142,17,58,0.32)_0%,rgba(94,0,31,0.08)_50%,transparent_100%)] rounded-full blur-[60px] pointer-events-none z-0" />
+
+      {/* Center bloom burst when all are revealed */}
+      <AnimatePresence>
+        {allRevealed && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 0.75, scale: 1.2 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] md:w-[650px] h-[350px] md:h-[650px] bg-[radial-gradient(circle,rgba(212,175,55,0.25)_0%,rgba(142,17,58,0.1)_50%,transparent_100%)] rounded-full blur-[50px] pointer-events-none z-0"
+          />
+        )}
+      </AnimatePresence>
 
       {/* Ambient dynamic diagonal light sweep */}
       <div className="ambient-light-sweep" />
@@ -641,43 +675,47 @@ function ScratchDate() {
                   rotate: p.rotation 
                 }}
                 animate={{
-                  x: p.x + p.driftX,
-                  y: [p.y, p.y + p.driftY, p.y + p.driftY + p.gravity],
+                  x: p.vx * 1.8,
+                  y: [0, p.vy * 0.7, p.vy * 0.7 + p.gravity * 2.5],
                   scale: p.scale,
                   opacity: [1, 1, 0], 
                   rotate: p.rotation + p.spin
                 }}
                 transition={{
                   duration: p.duration,
-                  ease: "easeOut"
+                  ease: [0.22, 1, 0.36, 1]
                 }}
                 className="absolute"
               >
                 {p.type === "petal" ? (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  // Elegant white/cream flower petal
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path 
                       d="M 12 2 C 7 2 4 6 4 11 C 4 17 8 22 12 22 C 16 22 20 17 20 11 C 20 6 17 2 12 2 Z" 
                       fill="url(#confetti-petal-date)" 
+                      className="opacity-90"
                     />
                     <defs>
                       <radialGradient id="confetti-petal-date" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stopColor="#FFFFFF" />
-                        <stop offset="60%" stopColor="#FFF2E0" />
-                        <stop offset="100%" stopColor="#EADBC8" />
+                        <stop offset="0%" stopColor="#FFFDF9" />
+                        <stop offset="70%" stopColor="#FAF5EC" />
+                        <stop offset="100%" stopColor="#D4AF37" stopOpacity="0.4" />
                       </radialGradient>
                     </defs>
                   </svg>
-                ) : p.type === "gold-star" ? (
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                ) : p.type === "sparkle" ? (
+                  // Twinkling golden sparkle star
+                  <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
                     <path 
                       d="M 6 0 L 7.5 4.5 L 12 6 L 7.5 7.5 L 6 12 L 4.5 7.5 L 0 6 L 4.5 4.5 Z" 
-                      fill="#FFF9E6" 
-                      className="drop-shadow-[0_0_5px_#E8C76A]"
+                      fill="#F3DA90" 
+                      className="drop-shadow-[0_0_6px_#E8C76A]"
                     />
                   </svg>
                 ) : (
+                  // Luxury gold foil chip
                   <div 
-                    className="w-3.5 h-2.5 bg-gradient-to-r from-[#D4AF37] to-[#E8C76A] rounded-sm shadow-[0_1px_3px_rgba(0,0,0,0.15)]"
+                    className="w-3.5 h-2 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] rounded-xs shadow-[0_1px_3px_rgba(0,0,0,0.15)]"
                     style={{
                       transform: `rotate(${Math.random() * 45}deg)`,
                     }}
@@ -732,7 +770,7 @@ function ScratchDate() {
         style={{ top: "15%", left: "10%" }}
       />
 
-      {/* Subtle radial spotlight behind medallions */}
+      {/* Subtle radial spotlight behind tiles */}
       <div 
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] md:w-[500px] h-[380px] md:h-[500px] rounded-full pointer-events-none z-0"
         style={{
@@ -783,24 +821,54 @@ function ScratchDate() {
         <div className="w-12 h-[1px] bg-[#D4AF37]/50 mx-auto mt-4" />
       </motion.div>
 
-      {/* Medallions Viewport Reveal */}
+      {/* Rectangular Reveal Tiles Container */}
       <motion.div 
         initial={{ opacity: 0, filter: "blur(12px)", y: 20 }}
         whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.85, ease: "easeOut", delay: 0.15 }}
-        className="flex gap-6 md:gap-8 justify-center w-full max-w-[340px] md:max-w-[420px] relative z-10"
+        className="grid grid-cols-3 gap-4 sm:gap-6 justify-center w-full max-w-[340px] md:max-w-[480px] relative z-10"
       >
-        <CeremonialMedallion value="09" label="Day" onReveal={handleCardReveal} index={0} />
-        <CeremonialMedallion value="12" label="Month" onReveal={handleCardReveal} index={1} />
-        <CeremonialMedallion value="2026" label="Year" onReveal={handleCardReveal} index={2} />
+        <CeremonialMedallion value="09" label="Day" onReveal={handleCardReveal} index={0} isAllRevealed={allRevealed} />
+        <CeremonialMedallion value="DEC" label="Month" onReveal={handleCardReveal} index={1} isAllRevealed={allRevealed} />
+        <CeremonialMedallion value="2026" label="Year" onReveal={handleCardReveal} index={2} isAllRevealed={allRevealed} />
       </motion.div>
+
+      {/* Alhamdulillah Sacred Date Revealed Text Overlay */}
+      <AnimatePresence>
+        {showRewardText && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+            className="flex flex-col items-center mt-8 text-center relative z-20"
+          >
+            <motion.h3 
+              className="font-cormorant text-2xl md:text-3xl text-[#E8C76A] tracking-[0.15em] font-medium"
+              animate={{ 
+                textShadow: [
+                  "0 0 10px rgba(232,199,106,0.2)",
+                  "0 0 20px rgba(232,199,106,0.6)",
+                  "0 0 10px rgba(232,199,106,0.2)"
+                ]
+              }}
+              transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+            >
+              Alhamdulillah ✨
+            </motion.h3>
+            <p className="font-cinzel text-[10px] md:text-xs uppercase tracking-[0.3em] text-[#FFF8ED]/90 mt-2 font-semibold">
+              Sacred Date Revealed
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Progress Helper Indicator */}
       <div className="mt-10 h-5 flex items-center justify-center text-center relative z-10">
         {!allRevealed ? (
           <p className="font-inter text-[9px] tracking-[0.25em] text-[#FFF8ED]/70 uppercase">
-            Scratch the luxury medallions to reveal union date
+            Scratch the luxury tiles to reveal union date
           </p>
         ) : (
           <motion.p

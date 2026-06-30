@@ -5,8 +5,6 @@ import { useEffect, useState, memo } from "react";
 import { createPortal } from "react-dom";
 import confetti from "canvas-confetti";
 
-
-
 function Dua() {
   const [stars, setStars] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -22,9 +20,9 @@ function Dua() {
   useEffect(() => {
     setMounted(true);
 
-    // Generate gold stars
+    // Generate gold sparks dust
     const generated = Array.from({ length: 32 }).map((_, i) => {
-      const size = Math.random() * 2.5 + 1.2;
+      const size = Math.random() * 2.2 + 1.2;
       const duration = size < 2 ? Math.random() * 6 + 10 : Math.random() * 4 + 6;
       return {
         id: i,
@@ -112,7 +110,6 @@ function Dua() {
     setSavedRsvp(null);
     setName("");
     setMessage("");
-    setRsvpType(null);
   };
 
   const handleCloseSuccess = () => {
@@ -120,7 +117,12 @@ function Dua() {
   };
 
   return (
-    <section className="py-32 px-6 velvet-silk-bg relative overflow-hidden flex flex-col items-center justify-center min-h-[65vh]">
+    <section 
+      style={{
+        background: `radial-gradient(circle at center, #7A1237 0%, #5A001E 50%, #2A000C 100%)`
+      }}
+      className="py-32 px-6 relative overflow-hidden flex flex-col items-center justify-center min-h-[65vh] shadow-[inset_0_0_140px_rgba(10,0,2,0.98),inset_0_0_60px_rgba(0,0,0,0.9)]"
+    >
       
       {/* Custom Styles for magical CTA sheen sweep and ripple ring animations */}
       <style dangerouslySetInnerHTML={{ __html: `
@@ -166,28 +168,36 @@ function Dua() {
         }
       `}} />
 
-      {/* Smooth gradient transition at the top from light Venue to dark RSVP */}
-      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#FFFDF9] to-transparent pointer-events-none z-10" />
+      {/* Layer 1.1: Velvet fabric grain overlay (2.5% opacity) */}
+      <div 
+        className="absolute inset-0 opacity-[0.025] pointer-events-none mix-blend-overlay z-0" 
+        style={{ 
+          backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.12) 0.5px, transparent 0.5px)`, 
+          backgroundSize: "2px 2px" 
+        }} 
+      />
 
       {/* Top Gold Arch Section Divider */}
       <LuxuryDivider className="absolute top-4 left-0 right-0 z-20 -translate-y-[15px] rotate-180" />
 
-      {/* Low-opacity repeating Islamic geometric pattern watermark (matches light theme) */}
-      <div className="absolute inset-0 opacity-[0.035] pointer-events-none z-0" 
+      {/* Low-opacity repeating Islamic geometric pattern watermark (Reduced to 2%) */}
+      <div className="absolute inset-0 opacity-[0.02] pointer-events-none z-0" 
            style={{ 
              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
              backgroundSize: "60px 60px" 
            }} />
 
+      {/* Layer 2: Giant faint Islamic Arch Silhouette Frame with soft glow */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+        <div className="absolute w-[420px] h-[650px] md:w-[720px] md:h-[1050px] bg-[radial-gradient(circle,rgba(212,175,55,0.06)_0%,transparent_70%)] blur-[40px] pointer-events-none" />
+        <svg className="w-[320px] h-[550px] md:w-[580px] md:h-[950px] text-[#D4AF37] stroke-current fill-none stroke-[1.2] opacity-[0.05] filter drop-shadow-[0_0_8px_rgba(212,175,55,0.3)]" viewBox="0 0 100 150" preserveAspectRatio="none">
+          <path d="M 5,150 L 5,60 C 5,30 25,10 50,10 C 75,10 95,30 95,60 L 95,150" />
+          <path d="M 10,150 L 10,63 C 10,35 27,16 50,16 C 73,16 90,35 90,63 L 90,150" strokeDasharray="3,3" />
+        </svg>
+      </div>
+
       {/* Ambient dynamic diagonal light sweep */}
       <div className="ambient-light-sweep" />
-
-      {/* Oversized blurred gradient shapes for cinematic color depth */}
-      <div className="absolute top-[-10%] left-[-20%] w-[80%] h-[60%] bg-[#7A1230]/20 rounded-full blur-[120px] pointer-events-none z-0" />
-      <div className="absolute bottom-[-15%] right-[-15%] w-[70%] h-[50%] bg-[#5B001D]/25 rounded-full blur-[140px] pointer-events-none z-0" />
-
-      {/* Soft radial golden glow spotlight behind cards */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[380px] md:w-[600px] md:h-[600px] bg-gradient-to-tr from-brand-gold/5 via-[#FFF8ED]/10 to-brand-gold/5 rounded-full blur-[80px] pointer-events-none z-0" />
 
       {/* Slow ambient light sweep across background */}
       <motion.div
@@ -215,30 +225,29 @@ function Dua() {
         className="absolute w-[500px] h-[300px] bg-[#7A1230]/30 rounded-full blur-[90px] pointer-events-none z-0"
       />
 
-      {/* Floating Gold Stars */}
+      {/* Layer 4: Subtle Floating Gold Dust */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-[1]">
         {stars.map((s) => (
           <motion.div
             key={s.id}
-            initial={{ y: "100%", opacity: 0 }}
+            initial={{ y: "110%", opacity: 0 }}
             animate={{
-              y: "-150%",
-              opacity: [0, 0.7, 0.7, 0],
-              x: [0, Math.random() * 30 - 15],
+              y: "-10%",
+              opacity: [0, 0.65, 0.65, 0],
+              x: [0, Math.random() * 20 - 10],
             }}
             transition={{
               duration: s.duration,
               repeat: Infinity,
               delay: s.delay,
-              ease: "easeInOut",
+              ease: "linear",
             }}
             className="absolute rounded-full bg-[#E8C76A]"
             style={{
               width: s.size,
               height: s.size,
               left: s.left,
-              top: s.top,
-              boxShadow: "0 0 8px rgba(232, 199, 106, 0.65)",
+              boxShadow: "0 0 6px rgba(232, 199, 106, 0.5)",
             }}
           />
         ))}
@@ -268,9 +277,9 @@ function Dua() {
                 animate={{
                   y: [0, -6, 0],
                   boxShadow: [
-                    "0 12px 40px rgba(0,0,0,0.35), 0 0 15px rgba(212,175,55,0.08)",
-                    "0 12px 40px rgba(0,0,0,0.35), 0 0 25px rgba(212,175,55,0.22)",
-                    "0 12px 40px rgba(0,0,0,0.35), 0 0 15px rgba(212,175,55,0.08)"
+                    "0 24px 50px rgba(0,0,0,0.5), 0 0 15px rgba(122,18,55,0.08)",
+                    "0 24px 50px rgba(0,0,0,0.5), 0 0 25px rgba(122,18,55,0.22)",
+                    "0 24px 50px rgba(0,0,0,0.5), 0 0 15px rgba(122,18,55,0.08)"
                   ]
                 }}
                 transition={{
@@ -278,7 +287,7 @@ function Dua() {
                   boxShadow: { repeat: Infinity, duration: 4.8, ease: "easeInOut" }
                 }}
                 exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
-                className="w-full max-w-xl bg-gradient-to-br from-[#4A081B]/45 via-[#1E020A]/70 to-[#4A081B]/45 p-8 md:p-12 rounded-[28px] border border-[#D4AF37]/25 shadow-2xl backdrop-blur-md relative overflow-hidden"
+                className="w-full max-w-xl bg-gradient-to-br from-[#5A001E]/75 via-[#2A000C]/80 to-[#1A0008]/85 p-8 md:p-12 rounded-[28px] border border-[#D4AF37]/35 shadow-[0_24px_50px_rgba(0,0,0,0.5),0_0_30px_rgba(122,18,55,0.25),inset_0_1px_3px_rgba(255,255,255,0.15)] backdrop-blur-xl relative overflow-hidden"
               >
                 {/* Heading with sparkle pulse + rotation */}
                 <h2 className="font-cormorant text-3xl md:text-4xl text-[#FFF8ED] tracking-wide mb-3 font-light flex items-center justify-center gap-2">
@@ -310,7 +319,7 @@ function Dua() {
                     InshaAllah, I’ll Attend
                   </motion.button>
 
-                  {/* Sending Duas Button - Outlined burgundy/gold */}
+                  {/* Sending My Duas Button - Outlined gold */}
                   <motion.button
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.95 }}
@@ -327,9 +336,9 @@ function Dua() {
                 animate={{
                   y: [0, -6, 0],
                   boxShadow: [
-                    "0 12px 40px rgba(0,0,0,0.35), 0 0 15px rgba(212,175,55,0.08)",
-                    "0 12px 40px rgba(0,0,0,0.35), 0 0 25px rgba(212,175,55,0.22)",
-                    "0 12px 40px rgba(0,0,0,0.35), 0 0 15px rgba(212,175,55,0.08)"
+                    "0 24px 50px rgba(0,0,0,0.5), 0 0 15px rgba(122,18,55,0.08)",
+                    "0 24px 50px rgba(0,0,0,0.5), 0 0 25px rgba(122,18,55,0.22)",
+                    "0 24px 50px rgba(0,0,0,0.5), 0 0 15px rgba(122,18,55,0.08)"
                   ]
                 }}
                 transition={{
@@ -337,7 +346,7 @@ function Dua() {
                   boxShadow: { repeat: Infinity, duration: 4.8, ease: "easeInOut" }
                 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="w-full max-w-xl bg-gradient-to-br from-[#4A081B]/45 via-[#1E020A]/70 to-[#4A081B]/45 p-8 md:p-12 rounded-[28px] border border-[#D4AF37]/25 shadow-2xl backdrop-blur-md text-center"
+                className="w-full max-w-xl bg-gradient-to-br from-[#5A001E]/75 via-[#2A000C]/80 to-[#1A0008]/85 p-8 md:p-12 rounded-[28px] border border-[#D4AF37]/35 shadow-[0_24px_50px_rgba(0,0,0,0.5),0_0_30px_rgba(122,18,55,0.25),inset_0_1px_3px_rgba(255,255,255,0.15)] backdrop-blur-xl text-center"
               >
                 <div className="w-12 h-12 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/45 flex items-center justify-center mx-auto mb-6 text-[#E8C76A] shadow-[0_0_12px_rgba(212,175,55,0.2)]">
                   <svg className="w-5.5 h-5.5 text-[#E8C76A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -408,7 +417,7 @@ function Dua() {
                 exit={{ scale: 0.9, y: 15 }}
                 transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-md bg-gradient-to-br from-[#4A081B]/95 via-[#1E020A]/95 to-[#4A081B]/95 p-8 rounded-[28px] border border-[#D4AF37]/35 shadow-2xl relative overflow-hidden cursor-default backdrop-blur-md"
+                className="w-full max-w-md bg-gradient-to-br from-[#5A001E]/95 via-[#2A000C]/95 to-[#1A0008]/95 p-8 rounded-[28px] border border-[#D4AF37]/35 shadow-[0_24px_50px_rgba(0,0,0,0.5),0_0_30px_rgba(122,18,55,0.25),inset_0_1px_3px_rgba(255,255,255,0.15)] relative overflow-hidden cursor-default backdrop-blur-xl"
               >
                 {/* Close button X */}
                 <button
@@ -589,7 +598,7 @@ function Dua() {
                 exit={{ opacity: 0, scale: 0.93, y: 15 }}
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-md bg-gradient-to-br from-[#4A081B]/95 via-[#1E020A]/95 to-[#4A081B]/95 p-8 rounded-[28px] border border-[#D4AF37]/35 shadow-2xl relative overflow-hidden cursor-default text-center backdrop-blur-md"
+                className="w-full max-w-md bg-gradient-to-br from-[#5A001E]/95 via-[#2A000C]/95 to-[#1A0008]/95 p-8 rounded-[28px] border border-[#D4AF37]/35 shadow-2xl relative overflow-hidden cursor-default text-center backdrop-blur-xl"
               >
                 {/* Close button X */}
                 <button

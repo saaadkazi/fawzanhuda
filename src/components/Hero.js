@@ -201,7 +201,7 @@ export default function Hero() {
     <section className="relative min-h-screen flex items-center justify-center px-6 py-24 overflow-hidden velvet-silk-bg z-10">
       
       {/* Low-opacity repeating Islamic geometric pattern watermark (matches light theme) */}
-      <div className="absolute inset-0 opacity-[0.035] pointer-events-none z-0" 
+      <div className="absolute inset-0 opacity-[0.025] pointer-events-none z-0" 
            style={{ 
              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
              backgroundSize: "60px 60px" 
