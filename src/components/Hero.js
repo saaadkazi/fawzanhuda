@@ -1,19 +1,19 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import FloralOrnament from "./FloralOrnament";
 
 // Card corner ornament subcomponent
 const CardCornerOrnament = ({ position }) => {
   const classMap = {
-    "top-left": "top-4 left-4 rotate-0",
-    "top-right": "top-4 right-4 rotate-90",
-    "bottom-left": "bottom-4 left-4 -rotate-90",
-    "bottom-right": "bottom-4 right-4 rotate-180",
+    "top-left": "top-3 left-3 rotate-0",
+    "top-right": "top-3 right-3 rotate-90",
+    "bottom-left": "bottom-3 left-3 -rotate-90",
+    "bottom-right": "bottom-3 right-3 rotate-180",
   };
   return (
-    <div className={`absolute w-7 h-7 text-[#D4AF37]/35 pointer-events-none z-10 ${classMap[position]}`}>
+    <div className={`absolute w-5 h-5 md:w-7 md:h-7 text-[#D4AF37]/35 pointer-events-none z-10 ${classMap[position]}`}>
       <svg className="w-full h-full" viewBox="0 0 50 50" fill="none" stroke="currentColor" strokeWidth="1.2">
         <path d="M 0,0 L 40,0 M 0,0 L 0,40" />
         <path d="M 6,6 C 12,6 16,12 16,16 C 16,20 20,24 24,24" strokeDasharray="1.5,1.5" />
@@ -23,39 +23,72 @@ const CardCornerOrnament = ({ position }) => {
   );
 };
 
-// Pointed Islamic Arch Outline vector with slow breathing float
-const ArchOutline = ({ className, delay = 0, scale = 1, opacity = 0.2, entering = false }) => {
+// Royal Swaying Lanterns inside the Hero chamber background (Performance-optimized for mobile 60 FPS)
+const SwayingLantern = ({ position }) => {
+  const isLeft = position === "left";
   return (
     <motion.div
-      initial={{ scale: scale * 0.72, opacity: 0 }}
+      animate={{ rotate: isLeft ? [-1.8, 1.8, -1.8] : [1.8, -1.8, 1.8] }}
+      transition={{ duration: 9.0, repeat: Infinity, ease: "easeInOut", delay: isLeft ? 0 : 2.5 }}
+      style={{ transformOrigin: "top center" }}
+      className={`absolute top-0 ${isLeft ? "left-4 md:left-16" : "right-4 md:right-16"} w-12 md:w-20 h-[300px] z-10 pointer-events-none transform-gpu will-change-transform`}
+    >
+      {/* Hanging Chain (No expensive box shadow) */}
+      <div className="w-[1px] h-[110px] md:h-[150px] bg-gradient-to-b from-[#856124] via-[#D4AF37] to-[#FCF6BA] mx-auto opacity-75" />
+      
+      {/* Intricately detailed vectors representing palace lanterns */}
+      <div className="w-9 h-14 md:w-12 md:h-18 mx-auto relative flex flex-col items-center justify-start text-[#D4AF37]">
+        {/* Glow halo (Using radial gradient instead of expensive CSS blur filter) */}
+        <div 
+          className="absolute top-2.5 w-8 h-8 rounded-full opacity-35 animate-pulse"
+          style={{
+            background: "radial-gradient(circle, rgba(255, 209, 102, 0.45) 0%, transparent 70%)"
+          }}
+        />
+        <svg className="w-full h-full fill-current drop-shadow-[0_2px_5px_rgba(212,175,55,0.4)]" viewBox="0 0 40 60">
+          <path d="M 20 2 L 10 15 L 30 15 Z" />
+          <path d="M 10 15 L 30 15 L 35 45 L 20 55 L 5 45 Z" fill="none" stroke="currentColor" strokeWidth="1" />
+          {/* Flame core */}
+          <circle cx="20" cy="32" r="5" className="fill-[#FFEAA7] animate-pulse" />
+          <circle cx="20" cy="32" r="3.2" className="fill-[#FFD166]" />
+        </svg>
+      </div>
+    </motion.div>
+  );
+};
+
+// Illuminated Islamic Arch Frame surrounding the centerpiece card
+const PalaceArchFrame = ({ entering }) => {
+  return (
+    <motion.div
+      initial={{ scale: 0.96, opacity: 0 }}
       animate={{ 
-        scale: entering ? scale * 1.45 : scale, 
-        opacity: entering ? 0 : opacity,
+        scale: entering ? 1.15 : 1, 
+        opacity: entering ? 0 : 1,
       }}
       transition={{
-        scale: entering ? { duration: 0.85, ease: "easeOut" } : { duration: 2.8, delay, ease: [0.25, 1, 0.36, 1] },
-        opacity: entering ? { duration: 0.75, ease: "easeOut" } : { duration: 2.5, delay, ease: "easeOut" },
+        scale: entering ? { duration: 0.85, ease: "easeOut" } : { duration: 2.8, ease: "easeOut" },
+        opacity: entering ? { duration: 0.75, ease: "easeOut" } : { duration: 2.2, ease: "easeOut" },
       }}
-      className={`absolute pointer-events-none text-[#D4AF37]/15 flex items-center justify-center ${className}`}
+      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[84vw] md:w-auto md:max-w-[395px] h-[68vh] md:h-auto pointer-events-none z-0 transform-gpu will-change-transform"
     >
-      <svg className="w-full h-full stroke-current fill-none stroke-[0.35]" viewBox="0 0 100 150">
+      {/* Arch backlighting bloom */}
+      <div className="absolute inset-0 bg-[#D4AF37]/10 blur-[36px] rounded-[150px_150px_24px_24px] animate-pulse-slow" />
+      {/* Sacred arch line vectors */}
+      <svg className="w-full h-full stroke-current fill-none stroke-[1.2] text-[#D4AF37]/30 drop-shadow-[0_0_10px_rgba(212,175,55,0.45)]" viewBox="0 0 100 150">
         <path d="M 5,150 L 5,45 C 5,15 35,2 50,2 C 65,2 95,15 95,45 L 95,150" />
-        <path d="M 10,150 L 10,47 C 10,18 36,6 50,6 C 64,6 90,18 90,47 L 90,150" strokeDasharray="1.5,1.5" strokeWidth="0.15" />
+        <path d="M 9,150 L 9,47 C 9,18 36,6 50,6 C 64,6 90,18 90,47 L 90,150" strokeDasharray="1.5,1.5" strokeWidth="0.5" />
+        
+        {/* Rosette at Peak */}
+        <path d="M 47,4 L 50,1 L 53,4 L 50,7 Z" fill="#D4AF37" opacity="0.8" />
+        <circle cx="50" cy="4" r="1.5" fill="#FFFDF9" />
       </svg>
     </motion.div>
   );
 };
 
-// Palace silhouette back layer vector
-const PalaceSilhouette = () => {
-  return (
-    <div className="absolute inset-0 flex items-end justify-center opacity-[0.015] pointer-events-none z-0 pb-16">
-      <svg className="w-5/6 max-w-[850px] h-auto text-[#D4AF37] fill-current" viewBox="0 0 100 65" preserveAspectRatio="none">
-        <path d="M 0 65 L 0 52 Q 10 50 15 42 Q 22 32 32 32 Q 42 32 50 18 Q 58 32 68 32 Q 78 32 85 42 Q 90 50 100 52 L 100 65 Z" />
-      </svg>
-    </div>
-  );
-};
+// Module-level global variable to track if the hero intro has already completed in this session
+let globalHeroIntroPlayed = false;
 
 export default function Hero() {
   const [particles, setParticles] = useState([]);
@@ -66,30 +99,42 @@ export default function Hero() {
   const [scrollY, setScrollY] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [isEntering, setIsEntering] = useState(false);
+  const [introPlayed, setIntroPlayed] = useState(false);
+
+  useEffect(() => {
+    if (globalHeroIntroPlayed) {
+      setIntroPlayed(true);
+    } else {
+      const timer = setTimeout(() => {
+        globalHeroIntroPlayed = true;
+        setIntroPlayed(true);
+      }, 6800);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   useEffect(() => {
     setMounted(true);
-    // Screen resize checking
     const checkMobileVal = typeof window !== "undefined" && window.innerWidth < 768;
     setIsMobile(checkMobileVal);
 
-    // Generate soft luxury particles (dots, sparks, orbs)
-    const particleCount = checkMobileVal ? 10 : 22; // Restrained count
+    // Dynamic pre-distributed gold particles
+    const particleCount = checkMobileVal ? 24 : 48;
     const generated = Array.from({ length: particleCount }).map((_, i) => {
       const types = ["dot", "spark", "orb"];
       const type = types[i % types.length];
       
       let size = 1.5;
-      let duration = Math.random() * 15 + 15; // Extremely slow (15-30 seconds)
+      let duration = Math.random() * 15 + 15;
       
       if (type === "orb") {
-        size = Math.random() * 16 + 8; // larger bokeh orbs
-        duration = Math.random() * 20 + 20; // very slow
+        size = Math.random() * 14 + 6;
+        duration = Math.random() * 20 + 20;
       } else if (type === "spark") {
-        size = Math.random() * 3 + 2;
+        size = Math.random() * 3 + 1.5;
         duration = Math.random() * 12 + 10;
       } else {
-        size = Math.random() * 1.5 + 1; // tiny dots
+        size = Math.random() * 1.5 + 1;
         duration = Math.random() * 18 + 14;
       }
 
@@ -98,7 +143,7 @@ export default function Hero() {
         left: `${Math.random() * 100}%`,
         size,
         type,
-        delay: Math.random() * -10, // pre-distributed
+        delay: Math.random() * -10,
         duration,
       };
     });
@@ -107,7 +152,6 @@ export default function Hero() {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
 
-    // Pointer move listener for 3D parallax (mouse on desktop, drag/touch on mobile)
     const handlePointerMove = (e) => {
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -121,7 +165,6 @@ export default function Hero() {
     window.addEventListener("mousemove", handlePointerMove);
     window.addEventListener("touchmove", handlePointerMove, { passive: true });
 
-    // Scroll listener for hero exit transition
     const handleScroll = () => {
       setScrollY(window.scrollY);
     };
@@ -135,7 +178,6 @@ export default function Hero() {
     };
   }, []);
 
-  // Looping wave timeline on mobile every 3.8 seconds
   useEffect(() => {
     if (!isMobile) return;
     const interval = setInterval(() => {
@@ -165,10 +207,8 @@ export default function Hero() {
     }, 850);
   };
 
-  // Scroll ratio for smooth scroll triggers (lifts card, expands glow)
   const scrollRatio = typeof window !== "undefined" ? Math.min(scrollY / 300, 1) : 0;
 
-  // Characters split helper for letter-by-letter reveal & spring hover waves
   const splitName = (name, parentVariant, isBride = false) => {
     return (
       <motion.span variants={parentVariant} className="inline-flex justify-center flex-wrap gap-x-1 select-none">
@@ -219,7 +259,7 @@ export default function Hero() {
                     }
                   : {}
               }
-              className="inline-block cursor-default font-semibold drop-shadow-[0_0_8px_rgba(212,175,55,0.25)] tracking-wide transition-all duration-300"
+              className="inline-block cursor-default font-bold drop-shadow-[0_0_8px_rgba(212,175,55,0.25)] tracking-tighter transition-all duration-300"
             >
               {char === " " ? "\u00A0" : char}
             </motion.span>
@@ -229,30 +269,29 @@ export default function Hero() {
     );
   };
 
-  // Text Stagger Timelines aligned to trigger AFTER card intro (delays adjusted to 5.2s and 6.5s)
   const groomStagger = {
     hidden: {},
     visible: {
-      transition: { staggerChildren: 0.08, delayChildren: 5.2 }
+      transition: { staggerChildren: 0.08, delayChildren: introPlayed ? 0 : 5.2 }
     }
   };
 
   const brideStagger = {
     hidden: {},
     visible: {
-      transition: { staggerChildren: 0.08, delayChildren: 6.3 }
+      transition: { staggerChildren: 0.08, delayChildren: introPlayed ? 0 : 6.3 }
     }
   };
 
   return (
     <section 
       style={{
-        background: "radial-gradient(circle at center, #7a1738 0%, #5d001f 55%, #3b0014 100%)"
+        background: "radial-gradient(circle at center, #7A1237 0%, #5A001E 50%, #2A000C 100%)"
       }}
-      className="relative min-h-screen flex items-center justify-center px-4 py-16 md:py-24 overflow-hidden z-10"
+      className="relative h-[100svh] md:min-h-screen flex flex-col items-center justify-center px-4 py-4 md:pt-24 md:pb-12 overflow-hidden z-10"
     >
       
-      {/* Custom Styles for GPU floating animations, silk haze, and shadows */}
+      {/* Custom Styles for GPU animations, paper textures, and backlights */}
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes silk-haze {
           0% { transform: translate(-10%, -10%) scale(1); }
@@ -264,16 +303,16 @@ export default function Hero() {
         }
 
         @keyframes card-float-breathing {
-          0% { transform: translateY(0px) rotateX(0deg) rotateY(0deg); }
-          50% { transform: translateY(-8px) rotateX(0.4deg) rotateY(-0.4deg); }
-          100% { transform: translateY(0px) rotateX(0deg) rotateY(0deg); }
+          0% { transform: translateY(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+          50% { transform: translateY(-3px) rotateX(0.5deg) rotateY(-0.5deg) rotateZ(0.12deg); }
+          100% { transform: translateY(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
         }
         .animate-card-float {
-          animation: card-float-breathing 7.5s infinite ease-in-out;
+          animation: card-float-breathing 4.0s infinite ease-in-out;
         }
 
         .hero-vignette {
-          background: radial-gradient(circle, rgba(0,0,0,0) 45%, rgba(15,0,5,0.85) 100%);
+          background: radial-gradient(circle, rgba(0,0,0,0) 35%, rgba(42,0,12,0.95) 100%);
         }
 
         @keyframes card-gold-sweep {
@@ -306,24 +345,88 @@ export default function Hero() {
           transform: rotate(35deg);
           animation: card-gold-sweep 6.5s infinite ease-in-out;
         }
+
+        @keyframes border-shimmer {
+          0% { opacity: 0.45; }
+          50% { opacity: 0.95; }
+          100% { opacity: 0.45; }
+        }
+        .animate-border-shimmer {
+          animation: border-shimmer 6.0s infinite ease-in-out;
+        }
+
+        @keyframes fog-drift {
+          0% { transform: translateX(-50%) translateY(0px) scale(1); opacity: 0.22; }
+          50% { transform: translateX(-25%) translateY(-8px) scale(1.08); opacity: 0.42; }
+          100% { transform: translateX(-50%) translateY(0px) scale(1); opacity: 0.22; }
+        }
+        .animate-fog-drift-1 {
+          animation: fog-drift 18s infinite ease-in-out;
+        }
+        .animate-fog-drift-2 {
+          animation: fog-drift 24s infinite ease-in-out;
+        }
+
+        @keyframes noor-breathe-1 {
+          0% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
+          50% { opacity: 0.75; transform: translate(-50%, -50%) scale(1.06); }
+          100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
+        }
+        @keyframes noor-breathe-2 {
+          0% { opacity: 0.75; transform: translate(-50%, -50%) scale(1); }
+          50% { opacity: 0.95; transform: translate(-50%, -50%) scale(1.04); }
+          100% { opacity: 0.75; transform: translate(-50%, -50%) scale(1); }
+        }
+        .animate-noor-1 {
+          animation: noor-breathe-1 8.0s infinite ease-in-out;
+        }
+        .animate-noor-2 {
+          animation: noor-breathe-2 6.0s infinite ease-in-out;
+        }
       `}} />
 
-      {/* Layer 1: Vignette Edge Overlay */}
+      {/* Layer 1: Dark Vignette Edge Overlay */}
       <div className="absolute inset-0 pointer-events-none z-[5] hero-vignette" />
 
-      {/* Layer 2: Silk Haze Ambient Atmospheric layer (3% opacity) */}
+      {/* Velvet fabric grain overlay (2.5% opacity) */}
+      <div 
+        className="absolute inset-0 opacity-[0.025] pointer-events-none mix-blend-overlay z-[2]" 
+        style={{ 
+          backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.12) 0.5px, transparent 0.5px)`, 
+          backgroundSize: "2px 2px" 
+        }} 
+      />
+
+      {/* Layer 2: Silk Haze Ambient Atmospheric layer */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.035] z-[1]">
         <div className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-[radial-gradient(circle_at_30%_30%,#7a1738_0%,transparent_50%),radial-gradient(circle_at_70%_70%,#D4AF37_0%,transparent_50%)] animate-silk-haze" />
       </div>
 
-      {/* Layer 3: Watermark Geometric Pattern (2.5% opacity) */}
+      {/* Volumetric Palace Light Rays */}
+      <div className="hidden md:block absolute inset-0 pointer-events-none overflow-hidden opacity-[0.03] z-[1]">
+        <div className="absolute top-0 left-1/4 w-[1px] h-full bg-gradient-to-b from-[#FFFDF9] via-[#D4AF37] to-transparent blur-[12px] rotate-[15deg] transform-gpu" />
+        <div className="absolute top-0 left-1/2 w-[2px] h-full bg-gradient-to-b from-[#FFFDF9] via-[#D4AF37] to-transparent blur-[20px] rotate-[15deg] transform-gpu" />
+        <div className="absolute top-0 left-3/4 w-[1px] h-full bg-gradient-to-b from-[#FFFDF9] via-[#D4AF37] to-transparent blur-[16px] rotate-[15deg] transform-gpu" />
+      </div>
+
+      {/* Layer 3: Islamic Geometric watermark */}
       <div 
-        className="absolute inset-0 opacity-[0.025] pointer-events-none z-[1]" 
+        className="absolute inset-0 opacity-[0.04] pointer-events-none z-[1]" 
         style={{ 
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
           backgroundSize: "60px 60px" 
         }} 
       />
+
+      {/* Cinematic Mystical Drifting Fog Layers at bottom */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[150%] h-[200px] pointer-events-none overflow-hidden z-[4] opacity-[0.3]">
+        <div className="absolute bottom-[-50px] left-0 w-full h-[150px] bg-gradient-to-t from-[#8a1538] via-[#4a0218]/45 to-transparent blur-[40px] animate-fog-drift-1" />
+        <div className="absolute bottom-[-80px] left-[-20%] w-full h-[180px] bg-gradient-to-t from-[#D4AF37]/25 via-[#4a0218]/30 to-transparent blur-[50px] animate-fog-drift-2" style={{ animationDelay: "-6s" }} />
+      </div>
+
+      {/* Swaying Golden lanterns */}
+      <SwayingLantern position="left" />
+      <SwayingLantern position="right" />
 
       {/* Corner floral frame ornaments */}
       <FloralOrnament position="top-left" opacity={0.65} />
@@ -342,44 +445,43 @@ export default function Hero() {
         transition={{ type: "spring", stiffness: 85, damping: 26 }}
         className="absolute inset-0 z-[2] pointer-events-none"
       >
-        <PalaceSilhouette />
         <div className="absolute inset-0 bg-gradient-to-t from-[#2D040F]/90 via-transparent to-transparent pointer-events-none" />
         
-        {/* Layer 4: Soft-Drawing Islamic Arch Outlines */}
-        <ArchOutline className="w-[280px] h-[420px] md:w-[480px] md:h-[720px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" scale={0.72} opacity={0.12} delay={2.0} entering={isEntering} />
-        <ArchOutline className="w-[360px] h-[540px] md:w-[620px] md:h-[930px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" scale={1.0} opacity={0.2} delay={2.3} entering={isEntering} />
-        <ArchOutline className="w-[450px] h-[675px] md:w-[800px] md:h-[1200px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" scale={1.35} opacity={0.08} delay={2.6} entering={isEntering} />
+        {/* Core Illuminated Palace Archway */}
+        <PalaceArchFrame entering={isEntering} />
       </motion.div>
 
       {/* ==================================================
-          NOOR LIGHT GLOW (Layered Divine Backlighting)
+          NOOR LIGHT GLOW (Layered Backlighting Spotlights)
           ================================================== */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[3] w-[450px] h-[650px] flex items-center justify-center">
-        {/* Outer Soft Gold Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[3] w-[450px] h-[650px] flex items-center justify-center transform-gpu will-change-transform">
         <motion.div 
-          initial={{ opacity: 0, scale: 0.85 }}
+          initial={{ opacity: 0 }}
           animate={{
-            scale: isEntering ? 1.35 : (1 + (scrollRatio * 0.18)),
-            opacity: isEntering ? 0.9 : ((0.35 + (scrollRatio * 0.12)) * (mounted ? 1 : 0)),
+            scale: isEntering ? 1.35 : 1,
+            opacity: isEntering ? 0.95 : (mounted ? 1 : 0),
           }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="absolute w-[360px] h-[520px] rounded-[180px_180px_60px_60px] bg-gradient-to-b from-[#D4AF37] to-transparent blur-[80px]"
-          style={{
-            transform: "translate(-50%, -50%)"
-          }}
+          className="absolute w-[260px] h-[360px] md:w-[390px] md:h-[550px] rounded-[180px_180px_60px_60px] bg-gradient-to-b from-[#D4AF37] to-transparent blur-[50px] md:blur-[90px] animate-noor-1"
         />
-        {/* Inner Warm Ivory Glow */}
         <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0 }}
           animate={{
-            scale: isEntering ? 1.25 : (1 + (scrollRatio * 0.15)),
-            opacity: isEntering ? 0.95 : ((0.55 + (scrollRatio * 0.15)) * (mounted ? 1 : 0)),
+            scale: isEntering ? 1.25 : 1,
+            opacity: isEntering ? 0.98 : (mounted ? 1 : 0),
           }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="absolute w-[270px] h-[390px] rounded-[135px_135px_40px_40px] bg-gradient-to-b from-[#FFFDF9] to-transparent blur-[48px]"
-          style={{
-            transform: "translate(-50%, -50%)"
+          className="absolute w-[200px] h-[280px] md:w-[300px] md:h-[420px] rounded-[135px_135px_40px_40px] bg-gradient-to-b from-[#FFFDF9] to-transparent blur-[35px] md:blur-[60px] animate-noor-2"
+        />
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{
+            scale: isEntering ? 1.15 : 1,
+            opacity: isEntering ? 0.99 : (mounted ? 1 : 0),
           }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="absolute w-[130px] h-[180px] md:w-[180px] md:h-[250px] rounded-full bg-[#FFFDF9] blur-[15px] md:blur-[24px] opacity-80"
+          style={{ transform: "translate(-50%, -50%)" }}
         />
       </div>
 
@@ -398,12 +500,11 @@ export default function Hero() {
           x: { type: "spring", stiffness: 85, damping: 26 },
           y: { type: "spring", stiffness: 85, damping: 26 }
         }}
-        className="absolute inset-0 pointer-events-none overflow-hidden z-[4]"
+        className="absolute inset-0 pointer-events-none overflow-hidden z-[4] transform-gpu will-change-transform"
       >
         {particles.map((p) => {
           let particleEl;
           if (p.type === "orb") {
-            // Soft bokeh orb
             particleEl = (
               <div 
                 className="rounded-full bg-gradient-to-br from-[#E8C76A]/10 to-transparent blur-[2.5px]"
@@ -411,14 +512,12 @@ export default function Hero() {
               />
             );
           } else if (p.type === "spark") {
-            // Diamond glowing star spark
             particleEl = (
               <svg width={p.size} height={p.size} viewBox="0 0 24 24" className="text-[#D4AF37]/50 drop-shadow-[0_0_4px_rgba(212,175,55,0.4)]">
                 <path d="M 12 2 C 12 2 12 12 2 12 C 12 12 12 22 12 22 C 12 22 12 12 22 12 C 12 12 12 2 12 2 Z" fill="currentColor" />
               </svg>
             );
           } else {
-            // Glowing micro dot
             particleEl = (
               <div 
                 className="rounded-full bg-[#FFF8ED]/40"
@@ -436,8 +535,9 @@ export default function Hero() {
               initial={{ y: "105vh", opacity: 0 }}
               animate={{
                 y: "-15vh",
-                opacity: [0, 0.75, 0.75, 0],
-                x: ["0px", `${Math.random() * 80 - 40}px`]
+                opacity: [0, 0.85, 0.85, 0],
+                x: ["0px", `${Math.random() * 100 - 50}px`],
+                rotate: ["0deg", `${Math.random() * 360}deg`]
               }}
               transition={{
                 duration: p.duration,
@@ -457,61 +557,77 @@ export default function Hero() {
       {/* ==================================================
           PARALLAX LAYER 3 (1.0x): CARD CENTERPIECE WITH INTRO
           ================================================== */}
-      <div className="relative z-10 flex flex-col items-center max-w-lg w-full text-center select-none pt-2">
+      <div className="relative z-10 flex flex-col items-center max-w-lg w-full text-center select-none pt-0">
         
-        {/* Ivory textured card body with 3D bevel gold lining */}
+        {/* Large layered glowing Islamic arch frame around card */}
         <motion.div
-          initial={{ opacity: 0, y: 35, scale: 0.96 }}
+          initial={{ opacity: 0, scale: 0.92, y: 30 }}
           animate={{ 
-            opacity: 1, 
-            y: (pointer.y * 14) + (-scrollRatio * 25) + (isEntering ? -20 : 0), // Scroll + Tap lifts card
+            opacity: isEntering ? 0 : 1, 
+            y: (pointer.y * 14) + (-scrollRatio * 25) + (isEntering ? -30 : 0), 
             x: pointer.x * 14,
-            scale: isEntering ? 1.06 : 1.01,
-            rotateX: (-pointer.y * 3.5) + (isEntering ? -2 : 0),
-            rotateY: (pointer.x * 3.5) + (isEntering ? 2 : 0)
+            scale: isEntering ? 1.04 : 1,
+            rotateX: isMobile ? 0 : (-pointer.y * 3.5) + (isEntering ? -2 : 0),
+            rotateY: isMobile ? 0 : (pointer.x * 3.5) + (isEntering ? 2 : 0),
+            filter: isEntering ? "blur(4px)" : "blur(0px)"
           }}
           transition={{ 
-            opacity: { duration: 1.4, delay: 4.0, ease: "easeOut" },
+            opacity: isEntering ? { duration: 0.65, ease: "easeOut" } : { duration: 1.2, delay: introPlayed ? 0 : 4.0, ease: [0.215, 0.61, 0.355, 1] },
+            scale: { duration: 1.2, delay: introPlayed ? 0 : 4.0, ease: [0.215, 0.61, 0.355, 1] },
+            filter: { duration: 0.6, ease: "easeOut" },
             y: { type: "spring", stiffness: 85, damping: 26 },
             x: { type: "spring", stiffness: 85, damping: 26 },
-            scale: { duration: 0.8, ease: "easeOut" },
             rotateX: { type: "spring", stiffness: 85, damping: 26 },
             rotateY: { type: "spring", stiffness: 85, damping: 26 }
           }}
           onClick={handleCardTap}
-          whileTap={{ scale: 0.995 }}
-          className={`relative w-full max-w-[345px] md:max-w-[410px] bg-gradient-to-br from-[#FFFFFF] via-[#FFFDF9] to-[#F7F2E8] px-6 md:px-8 pt-12 md:pt-16 pb-8 md:pb-12 rounded-[180px_180px_24px_24px] border-[2px] border-t-[#FCF6BA] border-l-[#DFCA98] border-r-[#B38728] border-b-[#856124] shadow-[0_25px_60px_-15px_rgba(32,3,10,0.65),0_0_40px_rgba(212,175,55,0.06),inset_0_1px_3px_rgba(255,255,255,0.9),inset_0_0_20px_rgba(212,175,55,0.05)] flex flex-col items-center overflow-hidden cursor-pointer animate-card-float`}
+          whileTap={{ scale: 0.992 }}
+          className="relative w-[80vw] h-[64svh] md:w-auto md:max-w-[365px] md:h-auto p-[2px] md:p-[4px] bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#B38728] rounded-[126px_126px_18px_18px] md:rounded-[162px_162px_22px_22px] shadow-[0_25px_60px_-15px_rgba(32,3,10,0.65),0_0_35px_rgba(212,175,55,0.25)] flex flex-col items-center justify-center overflow-hidden cursor-pointer animate-card-float transform-gpu will-change-transform"
           style={{ transformStyle: "preserve-3d" }}
         >
-          {/* Elegant Islamic card corner frame ornaments for depth */}
-          <CardCornerOrnament position="top-left" />
-          <CardCornerOrnament position="top-right" />
-          <CardCornerOrnament position="bottom-left" />
-          <CardCornerOrnament position="bottom-right" />
+          {/* Inner illuminated glow halo */}
+          <div className="absolute inset-[0.5px] border border-[#FFFDF9]/45 rounded-[125.5px_125.5px_17.5px_17.5px] md:rounded-[161.5px_161.5px_21.5px_21.5px] pointer-events-none z-10 animate-border-shimmer" />
 
-          {/* Paper Grain Texture (Mix-blend multiplier layer for tactile feel) */}
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay z-0" 
-               style={{ 
-                 backgroundImage: `radial-gradient(rgba(0, 0, 0, 0.15) 0.5px, transparent 0.5px)`, 
-                 backgroundSize: "3px 3px" 
-               }} />
-          <div className="absolute inset-0 opacity-[0.015] pointer-events-none mix-blend-multiply z-0"
-               style={{
-                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)'/%3E%3C/svg%3E")`
-               }} />
+          {/* Inner Ivory Textured Invitation Card */}
+          <div className="relative w-full h-full bg-gradient-to-br from-[#FFFFFF] via-[#FFFDF9] to-[#F7F2E8] px-5 md:px-8 pt-9 md:pt-12 pb-5 md:pb-8 rounded-[124px_124px_16px_16px] md:rounded-[158px_158px_18px_18px] border border-[#856124]/30 shadow-[inset_0_1.5px_4px_rgba(255,255,255,0.95)] flex flex-col items-center justify-between overflow-hidden">
+            {/* Elegant Islamic card corner frame ornaments for depth */}
+            <CardCornerOrnament position="top-left" />
+            <CardCornerOrnament position="top-right" />
+            <CardCornerOrnament position="bottom-left" />
+            <CardCornerOrnament position="bottom-right" />
 
-          {/* Gold sweep dynamic foil light overlay */}
+            {/* Paper Grain Texture overlay */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay z-0" 
+                 style={{ 
+                   backgroundImage: `radial-gradient(rgba(0, 0, 0, 0.15) 0.5px, transparent 0.5px)`, 
+                   backgroundSize: "3px 3px" 
+                 }} />
+            <div className="absolute inset-0 opacity-[0.015] pointer-events-none mix-blend-multiply z-0"
+                 style={{
+                   backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)'/%3E%3C/svg%3E")`
+                 }} />
+
+            {/* Card Center Rosette Watermark */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-[0.035] pointer-events-none z-0">
+              <svg className="w-48 h-48 text-[#D4AF37]" viewBox="0 0 100 100" fill="currentColor">
+                <path d="M 50,0 C 77.6,0 100,22.4 100,50 C 100,77.6 77.6,100 50,100 C 22.4,100 0,77.6 0,50 C 0,22.4 22.4,0 50,0 Z" fill="none" stroke="currentColor" strokeWidth="0.5" />
+                <path d="M 50,10 L 61,39 L 90,50 L 61,61 L 50,90 L 39,61 L 10,50 L 39,39 Z" />
+                <path d="M 50,20 L 59,41 L 80,50 L 59,59 L 50,80 L 41,59 L 20,50 L 41,41 Z" opacity="0.7" />
+              </svg>
+            </div>
+
+          {/* Gold sweep dynamic foil reflection light */}
           <div className="gold-sweep-overlay" />
 
-          {/* Floral Corner Ornaments inside bottom edges of the card */}
+          {/* Floral Corner Ornaments inside card bottom */}
           <FloralOrnament position="bottom-left" opacity={0.35} />
           <FloralOrnament position="bottom-right" opacity={0.35} />
 
-          {/* Golden inner arch border lining */}
-          <div className="absolute inset-[10px] border border-[#D4AF37]/25 rounded-[170px_170px_16px_16px] pointer-events-none z-10" />
-          <div className="absolute inset-[13px] border border-dashed border-[#D4AF37]/15 rounded-[167px_167px_13px_13px] pointer-events-none z-10" />
+          {/* Golden inner arch border lining with border shimmer */}
+          <div className="absolute inset-[10px] border border-[#D4AF37]/25 rounded-[170px_170px_16px_16px] pointer-events-none z-10 animate-border-shimmer" />
+          <div className="absolute inset-[13px] border border-dashed border-[#D4AF37]/15 rounded-[167px_167px_13px_13px] pointer-events-none z-10 animate-border-shimmer" style={{ animationDelay: "1.5s" }} />
 
-          {/* Soft wave of gold glow pulse that washes card face on card tap */}
+          {/* Tap gold glow bloom pulse */}
           <motion.div
             animate={
               isCardTapped
@@ -526,16 +642,16 @@ export default function Hero() {
             className="absolute inset-0 bg-[#D4AF37]/5 rounded-[170px_170px_16px_16px] pointer-events-none z-0 blur-xl"
           />
 
-          {/* Sequential stagger reveals for content (Sharpens text and fades in at 5s) */}
+          {/* Sequential text stagger reveals */}
           <motion.div 
             initial={{ opacity: 0, filter: "blur(4px)" }}
             animate={{ opacity: 1, filter: "blur(0px)" }}
-            transition={{ duration: 0.95, delay: 5.0, ease: "easeOut" }}
-            className="w-full flex flex-col items-center z-10"
+            transition={{ duration: 0.95, delay: introPlayed ? 0 : 5.0, ease: "easeOut" }}
+            className="w-full flex-1 flex flex-col items-center justify-between z-10"
           >
             
-            {/* Top Islamic Icon ornament */}
-            <div className="w-8 h-8 md:w-10 md:h-10 text-brand-gold mb-4 md:mb-6 relative">
+            {/* Top Islamic star rosette */}
+            <div className="w-6.5 h-6.5 md:w-10 md:h-10 text-brand-gold mb-2.5 md:mb-6 relative">
               <svg className="w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.2">
                 <path d="M 50 15 L 85 50 L 50 85 L 15 50 Z" />
                 <path d="M 50 25 L 75 50 L 50 75 L 25 50 Z" />
@@ -544,27 +660,27 @@ export default function Hero() {
             </div>
 
             {/* Families Line */}
-            <p className="font-cormorant italic text-xs md:text-sm text-brand-body tracking-[0.25em] uppercase mb-4 md:mb-5">
+            <p className="font-cormorant italic text-[10px] md:text-sm text-brand-body tracking-[0.25em] uppercase mb-1.5 md:mb-5">
               Together with their families
             </p>
 
             {/* Groom Label */}
-            <p className="font-inter text-[8px] md:text-[9px] uppercase tracking-[0.25em] text-[#D4AF37] font-bold mb-1 select-none">
+            <p className="font-inter text-[8px] md:text-[9px] uppercase tracking-[0.25em] text-[#D4AF37] font-bold mb-0.5 select-none">
               THE GROOM
             </p>
 
-            {/* Groom Name (starts at 5.2s) */}
+            {/* Groom Name */}
             <motion.h1
               initial="hidden"
               animate="visible"
               variants={groomStagger}
-              className="font-cormorant text-3.5xl md:text-5xl font-semibold text-[#4A081B] tracking-wide"
+              className="font-cormorant text-[42px] md:text-[80px] font-bold text-[#4A081B] tracking-tighter leading-none"
             >
               {splitName("Fauzan", groomStagger, false)}
             </motion.h1>
 
-            {/* Premium Gold Star Rosette Divider */}
-            <div className="my-4 md:my-5 w-full flex items-center justify-center gap-4 relative pointer-events-none">
+            {/* Star Rosette Divider */}
+            <div className="my-2.5 md:my-5 w-full flex items-center justify-center gap-4 relative pointer-events-none">
               <motion.span 
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
@@ -573,7 +689,6 @@ export default function Hero() {
                 className="h-[0.5px] w-12 bg-gradient-to-r from-transparent to-[#D4AF37]/50" 
               />
               <div className="relative flex items-center justify-center">
-                {/* Tap Sparkle ring expanding */}
                 <motion.div
                   animate={
                     isCardTapped
@@ -600,55 +715,92 @@ export default function Hero() {
             </div>
 
             {/* Bride Label */}
-            <p className="font-inter text-[8px] md:text-[9px] uppercase tracking-[0.25em] text-[#D4AF37] font-bold mb-1 select-none">
+            <p className="font-inter text-[8px] md:text-[9px] uppercase tracking-[0.25em] text-[#D4AF37] font-bold mb-0.5 select-none">
               THE BRIDE
             </p>
 
-            {/* Bride Name (starts at 6.3s) */}
+            {/* Bride Name */}
             <motion.h1
               initial="hidden"
               animate="visible"
               variants={brideStagger}
-              className="font-cormorant text-3.5xl md:text-5xl font-semibold text-[#4A081B] tracking-wide mb-4 md:mb-6"
+              className="font-cormorant text-[42px] md:text-[80px] font-bold text-[#4A081B] tracking-tighter leading-none mb-1 md:mb-6"
             >
               {splitName("Huda", brideStagger, true)}
             </motion.h1>
 
             {/* Honor request line */}
-            <p className="font-inter text-[8px] md:text-[10px] text-brand-gold font-bold uppercase tracking-[0.25em] mb-3 md:mb-4">
+            <p className="font-inter text-[8px] md:text-[10px] text-brand-gold font-bold uppercase tracking-[0.25em] mb-1.5 md:mb-4">
               Request the honor of your presence
             </p>
 
-            {/* Nikah ceremony */}
-            <p className="font-cormorant italic text-base md:text-xl text-brand-body max-w-[240px] md:max-w-[280px] leading-relaxed">
+            {/* Nikah ceremony description */}
+            <p className="font-cormorant italic text-xs md:text-xl text-brand-body max-w-[240px] md:max-w-[280px] leading-relaxed">
               at their blessed Nikah ceremony
             </p>
-          </motion.div>
+
+            {/* Subtle gold line divider */}
+            <div className="w-12 h-[0.5px] bg-[#D4AF37]/50 mt-4.5 mb-2.5 md:mt-6 md:mb-4 pointer-events-none" />
+
+            {/* Sacred Date Micro-Detail */}
+            <p className="font-cinzel text-[8px] md:text-[9.5px] tracking-[0.25em] text-[#856124] font-bold">
+              09 • 12 • 2026
+            </p>
+            </motion.div>
+          </div>
+        </motion.div>
+
+        {/* Glowing visual connector linking card and medallion CTA on mobile */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.6 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.0, delay: introPlayed ? 0 : 4.3 }}
+          className="relative w-8 h-6 flex items-center justify-center pointer-events-none z-10 my-0.5 md:hidden"
+        >
+          {/* Glowing vertical line */}
+          <motion.div
+            animate={{
+              opacity: [0.4, 0.9, 0.4],
+              height: ["12px", "20px", "12px"],
+              boxShadow: [
+                "0 0 4px rgba(212, 175, 55, 0.35)",
+                "0 0 10px rgba(212, 175, 55, 0.75)",
+                "0 0 4px rgba(212, 175, 55, 0.35)"
+              ]
+            }}
+            transition={{ duration: 3.0, repeat: Infinity, ease: "easeInOut" }}
+            className="w-[1.2px] bg-gradient-to-b from-[#D4AF37] via-[#FFFDF9] to-[#B38728]"
+          />
+          <div className="absolute top-0 w-1.5 h-1.5 rounded-full bg-[#FFFDF9] border border-[#D4AF37] shadow-[0_0_6px_rgba(212,175,55,0.7)]" />
+          <div className="absolute bottom-0 w-1 h-1 rounded-full bg-[#FFFDF9] border border-[#D4AF37] shadow-[0_0_4px_rgba(212,175,55,0.6)]" />
         </motion.div>
 
         {/* Premium Medallion CTA Button ("TAP TO ENTER") */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
+          initial={{ opacity: 0, scale: 0.7 }}
           animate={{ 
             opacity: 1, 
-            scale: 1,
-            y: scrollRatio * 15 // smooth lift shift on scroll
+            scale: isEntering ? 0.96 : [1, 1.03, 1],
+            y: scrollRatio * 15
           }}
-          transition={{ duration: 1.0, delay: 6.8, ease: "easeOut" }}
-          className="mt-8 md:mt-12 flex flex-col items-center justify-center pointer-events-auto z-20"
+          transition={{ 
+            opacity: { duration: 1.0, delay: introPlayed ? 0 : 4.3, ease: "easeOut" },
+            scale: { repeat: Infinity, duration: 3.0, ease: "easeInOut" }
+          }}
+          className="mt-1 z-20 md:mt-10 flex flex-col items-center justify-center pointer-events-auto"
         >
           <motion.button
             onClick={handleEnterClick}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.92 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.96 }}
             transition={{ type: "spring", stiffness: 450, damping: 15 }}
-            className="w-20 h-20 md:w-[90px] md:h-[90px] rounded-full p-[2.2px] bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#B38728] shadow-[0_8px_25px_rgba(212,175,55,0.4),0_0_15px_rgba(212,175,55,0.15),inset_0_1.5px_2px_rgba(255,255,255,0.85)] hover:shadow-[0_12px_35px_rgba(232,199,106,0.6)] transition-shadow duration-300 relative group flex items-center justify-center cursor-pointer select-none focus:outline-none"
-            style={{
-              animation: "card-float-breathing 4.5s infinite ease-in-out"
-            }}
+            className="w-20 h-20 md:w-[90px] md:h-[90px] rounded-full p-[2.2px] bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#B38728] shadow-[0_8px_25px_rgba(212,175,55,0.45),0_0_15px_rgba(212,175,55,0.15),inset_0_1.5px_2px_rgba(255,255,255,0.85)] hover:shadow-[0_12px_35px_rgba(232,199,106,0.6)] transition-shadow duration-300 relative group flex items-center justify-center cursor-pointer select-none focus:outline-none"
           >
             {/* Center burgundy core */}
             <div className="w-full h-full rounded-full bg-gradient-to-b from-[#4A081B] via-[#310411] to-[#1F000A] shadow-[inset_0_2px_5px_rgba(0,0,0,0.65)] flex flex-col items-center justify-center p-2 relative overflow-hidden">
+              
+              {/* Inner gold bead trim ring */}
+              <div className="absolute inset-[3.5px] border border-dashed border-[#FCF6BA]/35 rounded-full pointer-events-none z-10" />
               
               {/* Gold light sweep across medallion */}
               <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">

@@ -1179,86 +1179,89 @@ function ScratchDate() {
         <CountdownCard value={timeLeft.seconds} label="Seconds" format={formatNumber} />
       </motion.div>
 
-      {/* Glassmorphic Success Celebration Modal (Using React Portal) */}
+      {/* Glassmorphic Success Celebration Modal (Using React Portal for clean layout hierarchy, pre-rendered to prevent load flash) */}
       {mounted && createPortal(
-        <AnimatePresence>
-          {showCelebrationPopup && (
-            <motion.div
-              key="celebration-backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+        <div 
+          style={{ pointerEvents: showCelebrationPopup ? "auto" : "none" }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+        >
+          {/* Backdrop layer */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: showCelebrationPopup ? 1 : 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            onClick={() => setShowCelebrationPopup(false)}
+            className="absolute inset-0 bg-black/75 cursor-pointer transform-gpu"
+          />
+
+          {/* Modal Container */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ 
+              opacity: showCelebrationPopup ? 1 : 0, 
+              scale: showCelebrationPopup ? 1 : 0.96
+            }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md bg-gradient-to-b from-[#FFFDF9] via-[#FFFDF9] to-[#F6EBDD] border border-[#D4AF37]/50 rounded-[28px] p-8 md:p-10 shadow-[0_15px_40px_rgba(74,8,27,0.14)] relative overflow-hidden cursor-default text-center transform-gpu will-change-transform"
+          >
+            {/* Close Button X */}
+            <button
+              type="button"
               onClick={() => setShowCelebrationPopup(false)}
-              className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md cursor-pointer"
+              className="absolute top-4 right-4 text-[#4A081B]/50 hover:text-[#4A081B] transition-colors cursor-pointer focus:outline-none z-10"
             >
-              <motion.div
-                key="celebration-card"
-                initial={{ opacity: 0, scale: 0.9, y: 15 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 15 }}
-                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-md bg-gradient-to-b from-[#FFFDF9]/95 to-[#F6EBDD]/95 border border-[#D4AF37]/50 rounded-[28px] p-8 md:p-10 shadow-[0_24px_60px_rgba(74,8,27,0.18),inset_0_1.5px_3px_rgba(255,255,255,0.7)] relative overflow-hidden cursor-default text-center backdrop-blur-xl"
-              >
-                {/* Close Button X */}
-                <button
-                  type="button"
-                  onClick={() => setShowCelebrationPopup(false)}
-                  className="absolute top-4 right-4 text-[#4A081B]/50 hover:text-[#4A081B] transition-colors cursor-pointer focus:outline-none z-10"
-                >
-                  <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+              <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
 
-                {/* Elegant gold corner ornaments */}
-                <div className="absolute top-3 left-3 w-6 h-6 border-t border-l border-[#D4AF37]/40 rounded-tl-sm pointer-events-none" />
-                <div className="absolute top-3 right-3 w-6 h-6 border-t border-r border-[#D4AF37]/40 rounded-tr-sm pointer-events-none" />
-                <div className="absolute bottom-3 left-3 w-6 h-6 border-b border-l border-[#D4AF37]/40 rounded-bl-sm pointer-events-none" />
-                <div className="absolute bottom-3 right-3 w-6 h-6 border-b border-r border-[#D4AF37]/40 rounded-br-sm pointer-events-none" />
+            {/* Elegant gold corner ornaments */}
+            <div className="absolute top-3 left-3 w-6 h-6 border-t border-l border-[#D4AF37]/40 rounded-tl-sm pointer-events-none" />
+            <div className="absolute top-3 right-3 w-6 h-6 border-t border-r border-[#D4AF37]/40 rounded-tr-sm pointer-events-none" />
+            <div className="absolute bottom-3 left-3 w-6 h-6 border-b border-l border-[#D4AF37]/40 rounded-bl-sm pointer-events-none" />
+            <div className="absolute bottom-3 right-3 w-6 h-6 border-b border-r border-[#D4AF37]/40 rounded-br-sm pointer-events-none" />
 
-                {/* Medallion Gold Icon */}
-                <div className="w-14 h-14 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/45 flex items-center justify-center mx-auto mb-6 text-[#E8C76A] shadow-[0_0_15px_rgba(212,175,55,0.2)]">
-                  <svg className="w-6.5 h-6.5 text-[#E8C76A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499c-.105-.347-.492-.546-.861-.485a9.001 9.001 0 1 0 7.824 7.824c.06-.369-.138-.756-.485-.861l-6.478-1.478-1.478-6.478Z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15h.008v.008H12V15Z" />
-                  </svg>
-                </div>
+            {/* Medallion Gold Icon */}
+            <div className="w-14 h-14 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/45 flex items-center justify-center mx-auto mb-6 text-[#E8C76A]">
+              <svg className="w-6.5 h-6.5 text-[#E8C76A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499c-.105-.347-.492-.546-.861-.485a9.001 9.001 0 1 0 7.824 7.824c.06-.369-.138-.756-.485-.861l-6.478-1.478-1.478-6.478Z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15h.008v.008H12V15Z" />
+              </svg>
+            </div>
 
-                <span className="font-cinzel text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#856124] font-semibold mb-4 block">
-                  The Sacred Date Unlocked
-                </span>
+            <span className="font-cinzel text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#856124] font-semibold mb-4 block">
+              The Sacred Date Unlocked
+            </span>
 
-                {/* Sacred Arabic Calligraphy */}
-                <p className="font-amiri text-[1.8rem] md:text-[2.2rem] leading-none tracking-wide text-center text-[#4A081B] font-bold mb-4 drop-shadow-[0_1px_1.5px_rgba(212,175,55,0.4)]">
-                  بَارَكَ ٱللَّٰهُ لَكُمَا وَبَارَكَ عَلَيْكُمَا
-                </p>
+            {/* Sacred Arabic Calligraphy */}
+            <p className="font-amiri text-[1.8rem] md:text-[2.2rem] leading-none tracking-wide text-center text-[#4A081B] font-bold mb-4">
+              بَارَكَ ٱللَّٰهُ لَكُمَا وَبَارَكَ عَلَيْكُمَا
+            </p>
 
-                {/* Revealed Date text */}
-                <h2 className="font-cormorant text-4xl md:text-5xl font-bold text-[#4A081B] tracking-normal mb-1 drop-shadow-[0_1px_1px_rgba(212,175,55,0.25)]">
-                  09 DEC 2026
-                </h2>
-                
-                <p className="font-cormorant italic text-base text-[#4A081B]/85 tracking-wider mb-2 font-medium">
-                  Wednesday
-                </p>
+            {/* Revealed Date text */}
+            <h2 className="font-cormorant text-4xl md:text-5xl font-bold text-[#4A081B] tracking-normal mb-1">
+              09 DEC 2026
+            </h2>
+            
+            <p className="font-cormorant italic text-base text-[#4A081B]/85 tracking-wider mb-2 font-medium">
+              Wednesday
+            </p>
 
-                <p className="font-cormorant text-[#4A081B]/70 text-sm md:text-base leading-relaxed max-w-xs mx-auto mb-8">
-                  We look forward to welcoming you to celebrate our union.
-                </p>
+            <p className="font-cormorant text-[#4A081B]/70 text-sm md:text-base leading-relaxed max-w-xs mx-auto mb-8">
+              We look forward to welcoming you to celebrate our union.
+            </p>
 
-                {/* Save the Date Action Button */}
-                <button
-                  type="button"
-                  onClick={() => setShowCelebrationPopup(false)}
-                  className="px-10 py-3.5 rounded-full border border-[#856124]/60 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] text-[#2D040F] font-cinzel text-xs font-bold tracking-[0.25em] shadow-[inset_0_2px_3px_rgba(255,255,255,0.85),0_4px_18px_rgba(212,175,55,0.35)] cursor-pointer hover:scale-105 transition-transform"
-                >
-                  SAVE THE DATE
-                </button>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>,
+            {/* Save the Date Action Button */}
+            <button
+              type="button"
+              onClick={() => setShowCelebrationPopup(false)}
+              className="px-10 py-3.5 rounded-full border border-[#856124]/60 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] text-[#2D040F] font-cinzel text-xs font-bold tracking-[0.25em] shadow-[inset_0_2px_3px_rgba(255,255,255,0.85),0_4px_18px_rgba(212,175,55,0.35)] cursor-pointer hover:scale-105 transition-transform"
+            >
+              SAVE THE DATE
+            </button>
+          </motion.div>
+        </div>,
         document.body
       )}
     </section>
