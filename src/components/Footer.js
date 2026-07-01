@@ -149,13 +149,15 @@ const RoyalSeal = ({ setGlobalStage }) => {
     
     holdIntervalRef.current = setInterval(() => {
       setProgress((prev) => {
-        if (prev <= 0) {
+        const nextVal = Math.max(prev - 4, 0);
+        if (nextVal <= 0) {
           clearInterval(holdIntervalRef.current);
-          setStage("locked");
-          setGlobalStage("locked");
-          return 0;
+          setTimeout(() => {
+            setStage("locked");
+            setGlobalStage("locked");
+          }, 0);
         }
-        return Math.max(prev - 4, 0);
+        return nextVal;
       });
     }, 15);
   };
@@ -311,10 +313,13 @@ const RoyalSeal = ({ setGlobalStage }) => {
             className="flex flex-col items-center justify-center py-6 select-none"
           >
             {/* Section Headings - Antique gold and burgundy */}
-            <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-[#856124] font-semibold mb-3">
+            <span 
+              className="font-cormorant text-xs md:text-sm uppercase tracking-[0.34em] text-[#856124] font-bold mb-3"
+              style={{ textShadow: "0 1px 1px rgba(255, 255, 255, 0.75), 0 1px 3px rgba(133, 97, 36, 0.12)" }}
+            >
               Break the Sacred Seal ✨
             </span>
-            <p className="font-cormorant italic text-sm text-[#4A081B]/75 tracking-wider mb-10 max-w-xs text-center">
+            <p className="font-cormorant italic text-sm text-[#4A081B] tracking-wider mb-10 max-w-xs text-center font-semibold opacity-90">
               Touch and hold to unlock a hidden blessing.
             </p>
 
@@ -718,8 +723,13 @@ function Footer() {
 
         {/* Animated Premium Signature Plate for Saad Kazi */}
         <div className="flex flex-col items-center gap-3 mt-8 z-10">
-          <span className="font-cormorant text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#4A081B]/60 font-semibold">
-            Handcrafted with love by
+          <span 
+            className="font-cormorant text-[11px] md:text-[12.5px] uppercase tracking-[0.35em] text-[#856124] font-bold"
+            style={{ 
+              textShadow: "0 1px 1px rgba(255, 255, 255, 0.75), 0 1px 3px rgba(74, 8, 27, 0.08)"
+            }}
+          >
+            A Signature Creation by
           </span>
           
           <motion.div

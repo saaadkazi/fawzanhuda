@@ -9,7 +9,6 @@ import MusicToggle from "@/components/MusicToggle";
 import Hero from "@/components/Hero";
 import Parents from "@/components/Parents";
 import ScratchDate from "@/components/ScratchDate";
-import Countdown from "@/components/Countdown";
 import Venue from "@/components/Venue";
 import Dua from "@/components/Dua";
 import Footer from "@/components/Footer";
@@ -77,7 +76,7 @@ export default function Home() {
         >
           {(status === "transitioning" || status === "opened") && (
             <main className="w-full relative flex flex-col min-h-screen">
-              {/* Critical Hero preloaded instantly in background during transition */}
+               {/* Critical Hero preloaded instantly in background during transition */}
               <Hero />
               
               {/* Lazy-load other heavy sections ONLY after doors fully resolve */}
@@ -85,7 +84,6 @@ export default function Home() {
                 <>
                   <Parents />
                   <ScratchDate />
-                  <Countdown />
                   <Venue />
                   <Dua />
                   <Footer />

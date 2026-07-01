@@ -17,6 +17,12 @@ function Dua() {
   const [mounted, setMounted] = useState(false);
   const [ripples, setRipples] = useState([]);
 
+  const isValidRsvp = savedRsvp && 
+                      typeof savedRsvp === "object" && 
+                      (savedRsvp.rsvp === "attend" || savedRsvp.rsvp === "dua") && 
+                      typeof savedRsvp.name === "string" && 
+                      savedRsvp.name.trim().length > 0;
+
   useEffect(() => {
     setMounted(true);
 
@@ -34,6 +40,7 @@ function Dua() {
       };
     });
     setStars(generated);
+
   }, []);
 
   // Prevent scroll when modal is active
@@ -88,8 +95,6 @@ function Dua() {
         timestamp: Date.now(),
       };
       
-      // Save details to in-memory state and localStorage (not loaded on mount)
-      localStorage.setItem("wedding_rsvp", JSON.stringify(submission));
       setSavedRsvp(submission);
       setIsSubmitting(false);
       setShowModal(false);
@@ -106,7 +111,6 @@ function Dua() {
   };
 
   const handleReset = () => {
-    localStorage.removeItem("wedding_rsvp");
     setSavedRsvp(null);
     setName("");
     setMessage("");
@@ -165,6 +169,23 @@ function Dua() {
         }
         .animate-ripple {
           animation: ripple 0.85s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+        @keyframes float-glow-card {
+          0% {
+            transform: translateY(0px);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.55), 0 0 10px rgba(212,175,55,0.08);
+          }
+          50% {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.55), 0 0 20px rgba(212,175,55,0.22);
+          }
+          100% {
+            transform: translateY(0px);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.55), 0 0 10px rgba(212,175,55,0.08);
+          }
+        }
+        .animate-float-glow-card {
+          animation: float-glow-card 5.5s infinite ease-in-out;
         }
       `}} />
 
@@ -271,127 +292,173 @@ function Dua() {
           </div>
 
           <AnimatePresence mode="wait">
-            {!savedRsvp ? (
+            {!mounted ? (
+              // Premium Skeleton Loading Card with matched layout height to avoid cumulative layout shift (CLS)
+              <div 
+                key="rsvp-loading-skeleton"
+                className="w-full max-w-xl h-[320px] md:h-[350px] bg-gradient-to-br from-[#5A001E]/40 via-[#2A000C]/40 to-[#1A0008]/40 border border-[#D4AF37]/15 rounded-[30px] flex items-center justify-center relative overflow-hidden shadow-lg animate-pulse"
+              >
+                <div className="flex flex-col items-center">
+                  <svg className="animate-spin h-7 w-7 text-[#E8C76A] opacity-75" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span className="font-cormorant text-[#FFF8ED]/60 text-sm tracking-widest mt-4">Preparing Presence Casing...</span>
+                </div>
+              </div>
+            ) : !isValidRsvp ? (
               <motion.div
                 key="rsvp-form"
-                animate={{
-                  y: [0, -6, 0],
-                  boxShadow: [
-                    "0 24px 50px rgba(0,0,0,0.5), 0 0 15px rgba(122,18,55,0.08)",
-                    "0 24px 50px rgba(0,0,0,0.5), 0 0 25px rgba(122,18,55,0.22)",
-                    "0 24px 50px rgba(0,0,0,0.5), 0 0 15px rgba(122,18,55,0.08)"
-                  ]
-                }}
-                transition={{
-                  y: { repeat: Infinity, duration: 4.8, ease: "easeInOut" },
-                  boxShadow: { repeat: Infinity, duration: 4.8, ease: "easeInOut" }
-                }}
-                exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
-                className="w-full max-w-xl bg-gradient-to-br from-[#5A001E]/75 via-[#2A000C]/80 to-[#1A0008]/85 p-8 md:p-12 rounded-[28px] border border-[#D4AF37]/35 shadow-[0_24px_50px_rgba(0,0,0,0.5),0_0_30px_rgba(122,18,55,0.25),inset_0_1px_3px_rgba(255,255,255,0.15)] backdrop-blur-xl relative overflow-hidden"
+                initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -15, filter: "blur(8px)" }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="w-full max-w-xl bg-gradient-to-br from-[#BF953F] via-[#DFCA98] to-[#B38728] p-[1.5px] rounded-[30px] shadow-[0_24px_50px_rgba(0,0,0,0.5)] relative overflow-hidden animate-float-glow-card"
               >
-                {/* Heading with sparkle pulse + rotation */}
-                <h2 className="font-cormorant text-3xl md:text-4xl text-[#FFF8ED] tracking-wide mb-3 font-light flex items-center justify-center gap-2">
-                  Confirm Your Presence
-                  <motion.span 
-                    className="inline-block text-[#E8C76A]"
-                    animate={{ 
-                      rotate: [0, 15, -15, 0],
-                      filter: ["drop-shadow(0 0 2px #E8C76A)", "drop-shadow(0 0 8px #E8C76A)", "drop-shadow(0 0 2px #E8C76A)"]
-                    }}
-                    transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
-                  >
-                    ✨
-                  </motion.span>
-                </h2>
-                
-                <p className="font-cormorant italic text-base md:text-lg text-[#FFF8ED]/85 leading-relaxed max-w-md mx-auto mb-8">
-                  Your presence, blessings, and duas would mean the world to us.
-                </p>
+                {/* Inner core panel matching ScratchDate casing */}
+                <div className="w-full h-full bg-gradient-to-br from-[#4a0018] via-[#2A000C] to-[#1F000A] p-8 md:p-12 rounded-[29px] relative overflow-hidden flex flex-col items-center justify-center shadow-[inset_0_1px_3px_rgba(255,255,255,0.15)] z-10 text-center">
+                  
+                  {/* Subtle paper grain texture */}
+                  <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay z-0" 
+                       style={{ 
+                         backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.12) 0.5px, transparent 0.5px)`, 
+                         backgroundSize: "2px 2px" 
+                       }} />
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
-                  {/* Attending Button - Gold gradient primary */}
-                  <motion.button
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleSelectRSVP("attend")}
-                    className="w-full sm:w-auto min-w-[200px] px-8 py-4 rounded-full border border-[#856124]/60 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] text-[#2D040F] font-cinzel text-xs font-bold tracking-[0.2em] shadow-[inset_0_2px_3px_rgba(255,255,255,0.85),inset_0_-1.5px_2px_rgba(0,0,0,0.25),0_4px_18px_rgba(212,175,55,0.35)] hover:shadow-[0_6px_25px_rgba(232,199,106,0.6)] cursor-pointer transition-all duration-300 shine-btn-sweep"
-                  >
-                    InshaAllah, I’ll Attend
-                  </motion.button>
+                  {/* Faint Islamic pattern watermark */}
+                  <div className="absolute inset-0 opacity-[0.02] pointer-events-none z-0" 
+                       style={{ 
+                         backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
+                         backgroundSize: "40px 40px" 
+                       }} />
 
-                  {/* Sending My Duas Button - Outlined gold */}
-                  <motion.button
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleSelectRSVP("dua")}
-                    className="w-full sm:w-auto min-w-[200px] border border-[#D4AF37]/65 hover:bg-[#D4AF37]/15 hover:border-[#FCF6BA] text-[#FFFDF9] font-cinzel text-xs font-bold tracking-widest py-4 px-8 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] cursor-pointer focus:outline-none"
-                  >
-                    Sending My Duas
-                  </motion.button>
+                  {/* Elegant gold corner ornaments */}
+                  <div className="absolute top-4 left-4 w-6 h-6 border-t border-l border-[#D4AF37]/35 rounded-tl-md pointer-events-none z-10" />
+                  <div className="absolute top-4 right-4 w-6 h-6 border-t border-r border-[#D4AF37]/35 rounded-tr-md pointer-events-none z-10" />
+                  <div className="absolute bottom-4 left-4 w-6 h-6 border-b border-l border-[#D4AF37]/35 rounded-bl-md pointer-events-none z-10" />
+                  <div className="absolute bottom-4 right-4 w-6 h-6 border-b border-r border-[#D4AF37]/35 rounded-br-md pointer-events-none z-10" />
+
+                  {/* Heading with sparkle pulse + rotation */}
+                  <h2 className="font-cormorant text-3xl md:text-4xl text-[#FFF8ED] tracking-wide mb-3 font-light flex items-center justify-center gap-2 relative z-10">
+                    Confirm Your Presence
+                    <motion.span 
+                      className="inline-block text-[#E8C76A]"
+                      animate={{ 
+                        rotate: [0, 15, -15, 0],
+                        filter: ["drop-shadow(0 0 2px #E8C76A)", "drop-shadow(0 0 8px #E8C76A)", "drop-shadow(0 0 2px #E8C76A)"]
+                      }}
+                      transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
+                    >
+                      ✨
+                    </motion.span>
+                  </h2>
+                  
+                  <p className="font-cormorant italic text-base md:text-lg text-[#FFF8ED]/85 leading-relaxed max-w-md mx-auto mb-8 relative z-10">
+                    Your presence, blessings, and duas would mean the world to us.
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full relative z-10">
+                    {/* Attending Button - Gold gradient primary */}
+                    <motion.button
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.96 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                      onClick={(e) => { handleButtonClick(e); handleSelectRSVP("attend"); }}
+                      className="w-full sm:w-auto min-w-[200px] px-8 py-4 rounded-full border border-[#856124]/60 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] text-[#2D040F] font-cinzel text-xs font-bold tracking-[0.2em] shadow-[inset_0_2px_3px_rgba(255,255,255,0.85),inset_0_-1.5px_2px_rgba(0,0,0,0.25),0_4px_18px_rgba(212,175,55,0.35)] hover:shadow-[0_6px_25px_rgba(232,199,106,0.6)] cursor-pointer transition-all duration-300 shine-btn-sweep relative overflow-hidden focus:outline-none"
+                    >
+                      InshaAllah, I’ll Attend
+                    </motion.button>
+
+                    {/* Sending My Duas Button - Outlined gold */}
+                    <motion.button
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.96 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                      onClick={(e) => { handleButtonClick(e); handleSelectRSVP("dua"); }}
+                      className="w-full sm:w-auto min-w-[200px] border border-[#D4AF37]/65 bg-[#20030B]/35 hover:bg-[#D4AF37]/15 hover:border-[#FCF6BA] text-[#FFFDF9] font-cinzel text-xs font-bold tracking-widest py-4 px-8 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] cursor-pointer focus:outline-none relative overflow-hidden shine-btn-sweep"
+                    >
+                      Sending My Duas
+                    </motion.button>
+                  </div>
                 </div>
               </motion.div>
             ) : (
               <motion.div
                 key="rsvp-saved"
-                animate={{
-                  y: [0, -6, 0],
-                  boxShadow: [
-                    "0 24px 50px rgba(0,0,0,0.5), 0 0 15px rgba(122,18,55,0.08)",
-                    "0 24px 50px rgba(0,0,0,0.5), 0 0 25px rgba(122,18,55,0.22)",
-                    "0 24px 50px rgba(0,0,0,0.5), 0 0 15px rgba(122,18,55,0.08)"
-                  ]
-                }}
-                transition={{
-                  y: { repeat: Infinity, duration: 4.8, ease: "easeInOut" },
-                  boxShadow: { repeat: Infinity, duration: 4.8, ease: "easeInOut" }
-                }}
-                exit={{ opacity: 0, y: -20 }}
-                className="w-full max-w-xl bg-gradient-to-br from-[#5A001E]/75 via-[#2A000C]/80 to-[#1A0008]/85 p-8 md:p-12 rounded-[28px] border border-[#D4AF37]/35 shadow-[0_24px_50px_rgba(0,0,0,0.5),0_0_30px_rgba(122,18,55,0.25),inset_0_1px_3px_rgba(255,255,255,0.15)] backdrop-blur-xl text-center"
+                initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -15 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="w-full max-w-xl bg-gradient-to-br from-[#BF953F] via-[#DFCA98] to-[#B38728] p-[1.5px] rounded-[30px] shadow-[0_24px_50px_rgba(0,0,0,0.5)] relative overflow-hidden animate-float-glow-card"
               >
-                <div className="w-12 h-12 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/45 flex items-center justify-center mx-auto mb-6 text-[#E8C76A] shadow-[0_0_12px_rgba(212,175,55,0.2)]">
-                  <svg className="w-5.5 h-5.5 text-[#E8C76A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.746 3.746 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
-                  </svg>
-                </div>
+                {/* Inner core panel matching ScratchDate casing */}
+                <div className="w-full h-full bg-gradient-to-br from-[#4a0018] via-[#2A000C] to-[#1F000A] p-8 md:p-12 rounded-[29px] relative overflow-hidden flex flex-col items-center justify-center shadow-[inset_0_1px_3px_rgba(255,255,255,0.15)] z-10 text-center">
+                  
+                  {/* Subtle paper grain texture */}
+                  <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay z-0" 
+                       style={{ 
+                         backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.12) 0.5px, transparent 0.5px)`, 
+                         backgroundSize: "2px 2px" 
+                       }} />
 
-                <h2 className="font-cormorant text-2xl md:text-3.5xl text-[#FFF8ED] tracking-wide mb-2">
-                  JazakAllah Khair!
-                </h2>
+                  {/* Faint Islamic pattern watermark */}
+                  <div className="absolute inset-0 opacity-[0.02] pointer-events-none z-0" 
+                       style={{ 
+                         backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
+                         backgroundSize: "40px 40px" 
+                       }} />
 
-                <p className="font-cormorant italic text-base md:text-lg text-[#FFF8ED]/85 leading-relaxed max-w-md mx-auto mb-6">
-                  {savedRsvp.rsvp === "attend" 
-                    ? "Thank you! We are delighted to hear you will be joining us to celebrate this blessed union."
-                    : "Thank you for sending your warm prayers and blessings to the couple."}
-                </p>
+                  {/* Elegant gold corner ornaments */}
+                  <div className="absolute top-4 left-4 w-6 h-6 border-t border-l border-[#D4AF37]/35 rounded-tl-md pointer-events-none z-10" />
+                  <div className="absolute top-4 right-4 w-6 h-6 border-t border-r border-[#D4AF37]/35 rounded-tr-md pointer-events-none z-10" />
+                  <div className="absolute bottom-4 left-4 w-6 h-6 border-b border-l border-[#D4AF37]/35 rounded-bl-md pointer-events-none z-10" />
+                  <div className="absolute bottom-4 right-4 w-6 h-6 border-b border-r border-[#D4AF37]/35 rounded-br-md pointer-events-none z-10" />
 
-                {savedRsvp.name && (
-                  <div className="bg-[#20030B]/40 rounded-2xl p-5 border border-[#D4AF37]/15 max-w-md mx-auto mb-8 text-left shadow-lg">
-                    <div className="font-inter text-[9px] uppercase tracking-wider text-[#D4AF37] font-semibold mb-1">
-                      Guest Name
-                    </div>
-                    <div className="font-cormorant text-lg text-[#FFF8ED] font-bold mb-3">
-                      {savedRsvp.name}
-                    </div>
-
-                    {savedRsvp.message && (
-                      <>
-                        <div className="font-inter text-[9px] uppercase tracking-wider text-[#D4AF37] font-semibold mb-1">
-                          Your Blessings & Duas
-                        </div>
-                        <p className="font-cormorant italic text-base text-[#FFF8ED]/90 leading-relaxed">
-                          "{savedRsvp.message}"
-                        </p>
-                      </>
-                    )}
+                  <div className="w-12 h-12 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/45 flex items-center justify-center mx-auto mb-6 text-[#E8C76A] shadow-[0_0_12px_rgba(212,175,55,0.2)] z-10">
+                    <svg className="w-5.5 h-5.5 text-[#E8C76A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.746 3.746 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+                    </svg>
                   </div>
-                )}
 
-                <button
-                  onClick={handleReset}
-                  className="font-cinzel text-[10px] uppercase tracking-widest text-[#D4AF37]/80 hover:text-[#FFF8ED] transition-colors focus:outline-none cursor-pointer hover:drop-shadow-[0_0_8px_rgba(232,199,106,0.5)]"
-                >
-                  Update Confirmation
-                </button>
+                  <h2 className="font-cormorant text-2xl md:text-3.5xl text-[#FFF8ED] tracking-wide mb-2 z-10">
+                    JazakAllah Khair!
+                  </h2>
+
+                  <p className="font-cormorant italic text-base md:text-lg text-[#FFF8ED]/85 leading-relaxed max-w-md mx-auto mb-6 z-10">
+                    {savedRsvp.rsvp === "attend" 
+                      ? "Thank you! We are delighted to hear you will be joining us to celebrate this blessed union."
+                      : "Thank you for sending your warm prayers and blessings to the couple."}
+                  </p>
+
+                  {savedRsvp.name && (
+                    <div className="bg-[#20030B]/40 rounded-2xl p-5 border border-[#D4AF37]/15 max-w-md w-full mx-auto mb-8 text-left shadow-lg z-10">
+                      <div className="font-inter text-[9px] uppercase tracking-wider text-[#D4AF37] font-semibold mb-1">
+                        Guest Name
+                      </div>
+                      <div className="font-cormorant text-lg text-[#FFF8ED] font-bold mb-3">
+                        {savedRsvp.name}
+                      </div>
+
+                      {savedRsvp.message && (
+                        <>
+                          <div className="font-inter text-[9px] uppercase tracking-wider text-[#D4AF37] font-semibold mb-1">
+                            Your Blessings & Duas
+                          </div>
+                          <p className="font-cormorant italic text-base text-[#FFF8ED]/90 leading-relaxed">
+                            "{savedRsvp.message}"
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={handleReset}
+                    className="font-cinzel text-[10px] uppercase tracking-widest text-[#D4AF37]/80 hover:text-[#FFF8ED] transition-colors focus:outline-none cursor-pointer hover:drop-shadow-[0_0_8px_rgba(232,199,106,0.5)] z-10"
+                  >
+                    Update Confirmation
+                  </button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -472,6 +539,7 @@ function Dua() {
                     <motion.button
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
                       type="submit"
                       disabled={isSubmitting}
                       onClick={handleButtonClick}
@@ -540,6 +608,7 @@ function Dua() {
                     <motion.button
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
                       type="submit"
                       disabled={isSubmitting}
                       onClick={handleButtonClick}

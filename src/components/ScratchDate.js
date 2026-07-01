@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { createPortal } from "react-dom";
+import confetti from "canvas-confetti";
 
 // Web Audio API Synthesizer for high-fidelity luxury chime sound
 const playChimeSound = () => {
@@ -44,39 +46,109 @@ const playChimeSound = () => {
   }
 };
 
-// Luxury Ceremonial Medallion Sub-component (Brushed Gold Casing & Burgundy Enamel Foil)
+// Section curved transition divider (Countdown to Venue)
+const SectionDivider = () => {
+  return (
+    <div className="absolute left-0 right-0 w-full h-10 pointer-events-none z-10 bottom-0">
+      <svg className="w-full h-full text-[#FFFDF9] fill-current" viewBox="0 0 1000 100" preserveAspectRatio="none">
+        <path d="M 0 100 C 300 0 700 0 1000 100 L 1000 100 Z" />
+      </svg>
+      <svg className="absolute inset-0 w-full h-full text-[#D4AF37]/50 fill-none pointer-events-none stroke-current" viewBox="0 0 1000 100" preserveAspectRatio="none">
+        <path d="M 0 100 C 300 0 700 0 1000 100" strokeWidth="2" />
+      </svg>
+    </div>
+  );
+};
+
+// Luxury Ceremonial Medallion Sub-component (Burgundy Foil + Gold Casing)
 function CeremonialMedallion({ value, label, onReveal, index, isAllRevealed }) {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
+  const particleCanvasRef = useRef(null);
+  
   const lastCoordsRef = useRef(null);
+  const lastCheckTimeRef = useRef(0);
+  const particlesRef = useRef([]);
+  const animationFrameIdRef = useRef(null);
+  const scratchPointsRef = useRef([]);
+  const isScratchFrameScheduledRef = useRef(false);
+
   const [isScratching, setIsScratching] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
   const [sparkles, setSparkles] = useState([]);
-  const [dragParticles, setDragParticles] = useState([]);
 
-  // Glass dust & gold spark updates using requestAnimationFrame
+  // Clean up canvas animation loop on unmount
   useEffect(() => {
-    if (dragParticles.length === 0) return;
-    let frameId;
-    const update = () => {
-      setDragParticles((prev) => {
-        if (prev.length === 0) return [];
-        return prev
-          .map((p) => ({
-            ...p,
-            x: p.x + p.vx,
-            y: p.y + p.vy,
-            vy: p.vy + p.gravity,
-            opacity: p.opacity - p.fadeSpeed,
-            scale: Math.max(0, p.scale - 0.005),
-          }))
-          .filter((p) => p.opacity > 0 && p.scale > 0);
-      });
-      frameId = requestAnimationFrame(update);
+    return () => {
+      if (animationFrameIdRef.current) {
+        cancelAnimationFrame(animationFrameIdRef.current);
+      }
     };
-    frameId = requestAnimationFrame(update);
-    return () => cancelAnimationFrame(frameId);
-  }, [dragParticles.length]);
+  }, []);
+
+  // Performance-optimized canvas particle system drawing loop (No React re-renders)
+  const startParticleLoop = () => {
+    if (animationFrameIdRef.current) return;
+    
+    const update = () => {
+      const canvas = particleCanvasRef.current;
+      if (!canvas) {
+        animationFrameIdRef.current = null;
+        return;
+      }
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        animationFrameIdRef.current = null;
+        return;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const particles = particlesRef.current;
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        
+        // Physics update
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.opacity -= p.fadeSpeed;
+        p.scale = Math.max(0, p.scale - 0.005);
+
+        // Delete dead particle
+        if (p.opacity <= 0 || p.scale <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = p.opacity;
+        ctx.fillStyle = p.color;
+
+        if (p.type === "gold") {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.scale * 3.5, 0, Math.PI * 2);
+          ctx.shadowBlur = 4;
+          ctx.shadowColor = p.color;
+          ctx.fill();
+        } else {
+          ctx.translate(p.x, p.y);
+          ctx.rotate(Math.PI / 4);
+          const size = p.scale * 6;
+          ctx.fillRect(-size / 2, -size / 2, size, size);
+        }
+        ctx.restore();
+      }
+
+      if (particles.length > 0) {
+        animationFrameIdRef.current = requestAnimationFrame(update);
+      } else {
+        animationFrameIdRef.current = null;
+      }
+    };
+    
+    animationFrameIdRef.current = requestAnimationFrame(update);
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -85,15 +157,22 @@ function CeremonialMedallion({ value, label, onReveal, index, isAllRevealed }) {
     const resizeCanvas = () => {
       const container = containerRef.current;
       if (!container) return;
-      // Get padding-adjusted dimensions for rectangular shape
-      canvas.width = container.clientWidth - 10;
-      canvas.height = container.clientHeight - 10;
+      
+      const w = container.clientWidth - 4; // Adjusted for thin border
+      const h = container.clientHeight - 4;
+      
+      canvas.width = w;
+      canvas.height = h;
       drawMedallionFoil(canvas);
+
+      if (particleCanvasRef.current) {
+        particleCanvasRef.current.width = w;
+        particleCanvasRef.current.height = h;
+      }
     };
 
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
-
     return () => window.removeEventListener("resize", resizeCanvas);
   }, []);
 
@@ -104,15 +183,14 @@ function CeremonialMedallion({ value, label, onReveal, index, isAllRevealed }) {
     const w = canvas.width;
     const h = canvas.height;
 
-    // 1. Deep Burgundy Enamel base background gradient
-    const foilGrad = ctx.createLinearGradient(0, 0, w, h);
-    foilGrad.addColorStop(0, "#5E001F"); // Deep burgundy center
-    foilGrad.addColorStop(0.7, "#3B0013"); // Rich wine midtone
-    foilGrad.addColorStop(1, "#1A0008"); // Dark wine border
+    // 1. Deep glossy burgundy foil background gradient (#3b0014 → #690024 → #4a0018)
+    const foilGrad = ctx.createLinearGradient(0, 0, 0, h);
+    foilGrad.addColorStop(0, "#3b0014"); // Deep glossy burgundy base
+    foilGrad.addColorStop(0.5, "#690024"); // Rich metallic wine midtone
+    foilGrad.addColorStop(1, "#4a0018"); // Luxury deep burgundy bottom
 
     ctx.fillStyle = foilGrad;
     ctx.beginPath();
-    // Draw rounded rect path for foil canvas
     const r = 8; // rounded corner radius
     ctx.moveTo(r, 0);
     ctx.lineTo(w - r, 0);
@@ -126,27 +204,36 @@ function CeremonialMedallion({ value, label, onReveal, index, isAllRevealed }) {
     ctx.closePath();
     ctx.fill();
 
-    // 2. Micro-grain enamel reflections
-    ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
-    for (let i = 0; i < 90; i++) {
-      const x = Math.random() * w;
-      const y = Math.random() * h;
-      const size = Math.random() * 1.2;
-      ctx.fillRect(x, y, size, size);
-    }
+    // 2. Soft inner vignette for premium depth
+    const vignette = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.25, w / 2, h / 2, Math.min(w, h) * 0.8);
+    vignette.addColorStop(0, "rgba(255, 255, 255, 0.12)"); // Central highlight
+    vignette.addColorStop(0.6, "rgba(0, 0, 0, 0.05)");
+    vignette.addColorStop(1, "rgba(0, 0, 0, 0.45)"); // Dark vignette edge
+    ctx.fillStyle = vignette;
+    ctx.fill();
 
-    // 3. Bright inner reflection gold highlight border
-    ctx.strokeStyle = "rgba(243, 218, 144, 0.35)";
-    ctx.lineWidth = 1.2;
-    ctx.strokeRect(3, 3, w - 6, h - 6);
+    // 3. Subtle gold reflections / gloss sweep
+    const reflections = ctx.createLinearGradient(0, 0, w, h);
+    reflections.addColorStop(0, "rgba(212, 175, 55, 0)");
+    reflections.addColorStop(0.3, "rgba(212, 175, 55, 0.06)");
+    reflections.addColorStop(0.5, "rgba(255, 255, 255, 0.16)"); // Soft gloss sweep
+    reflections.addColorStop(0.7, "rgba(212, 175, 55, 0.06)");
+    reflections.addColorStop(1, "rgba(212, 175, 55, 0)");
+    ctx.fillStyle = reflections;
+    ctx.fill();
 
-    // 4. Stamped Embossed Arabesque/Islamic Star Pattern (Rub el Hizb 8-pointed star)
-    const drawIslamicPattern = () => {
+    // 4. Thinner matte gold canvas border
+    ctx.strokeStyle = "rgba(212, 175, 55, 0.35)";
+    ctx.lineWidth = 0.8;
+    ctx.strokeRect(2.5, 2.5, w - 5, h - 5);
+
+    // 5. Faint Embossed Rub el Hizb 8-pointed star pattern
+    const drawEmbossedPattern = () => {
       ctx.save();
       const cx = w / 2;
       const cy = h / 2;
       const points = 8;
-      const outerR = Math.min(w, h) * 0.32;
+      const outerR = Math.min(w, h) * 0.28;
       const innerR = outerR * 0.72;
 
       const drawPath = (ox, oy) => {
@@ -162,49 +249,48 @@ function CeremonialMedallion({ value, label, onReveal, index, isAllRevealed }) {
         ctx.closePath();
         ctx.stroke();
 
-        // Inner geometric circles
         ctx.beginPath();
-        ctx.arc(cx + ox, cy + oy, outerR * 0.5, 0, Math.PI * 2);
+        ctx.arc(cx + ox, cy + oy, outerR * 0.52, 0, Math.PI * 2);
         ctx.stroke();
       };
 
-      // Stamped emboss shadow (darker deep burgundy/black)
-      ctx.strokeStyle = "rgba(10, 0, 2, 0.85)";
-      ctx.lineWidth = 0.9;
+      // Stamped shadow
+      ctx.strokeStyle = "rgba(10, 0, 2, 0.65)";
+      ctx.lineWidth = 0.7;
       drawPath(0.6, 0.6);
 
-      // Stamped emboss highlight (champagne gold)
-      ctx.strokeStyle = "rgba(243, 218, 144, 0.65)";
-      ctx.lineWidth = 0.9;
+      // Stamped highlight
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.22)";
+      ctx.lineWidth = 0.7;
       drawPath(-0.6, -0.6);
 
       ctx.restore();
     };
-    drawIslamicPattern();
+    drawEmbossedPattern();
 
-    // 5. Embossed Gold Stamped typography
+    // 6. Embossed Gold Stamped typography "SCRATCH TO REVEAL"
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.font = "bold 9px 'Cinzel', serif";
+    ctx.font = "bold 7px 'Cinzel', serif";
     ctx.letterSpacing = "1.5px";
 
     const cx = w / 2;
     const cy = h / 2;
 
-    // Embossed shadow text (dark wine/black)
+    // Shadow text
     ctx.fillStyle = "rgba(10, 0, 2, 0.85)";
-    ctx.fillText("SCRATCH", cx + 0.6, cy - 4.5);
-    ctx.fillText("TO REVEAL", cx + 0.6, cy + 5.5);
+    ctx.fillText("SCRATCH", cx + 0.6, cy - 5.5);
+    ctx.fillText("TO REVEAL", cx + 0.6, cy + 4.5);
 
-    // Embossed highlight text (champagne gold reflection)
-    ctx.fillStyle = "rgba(243, 218, 144, 0.65)";
-    ctx.fillText("SCRATCH", cx - 0.5, cy - 5.5);
-    ctx.fillText("TO REVEAL", cx - 0.5, cy + 4.5);
+    // Highlight text
+    ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
+    ctx.fillText("SCRATCH", cx - 0.5, cy - 6.5);
+    ctx.fillText("TO REVEAL", cx - 0.5, cy + 3.5);
 
     // Main text fill in luxury champagne gold
     ctx.fillStyle = "#F3DA90";
-    ctx.fillText("SCRATCH", cx, cy - 5);
-    ctx.fillText("TO REVEAL", cx, cy + 5);
+    ctx.fillText("SCRATCH", cx, cy - 6);
+    ctx.fillText("TO REVEAL", cx, cy + 4);
   };
 
   const getCoordinates = (e) => {
@@ -221,18 +307,14 @@ function CeremonialMedallion({ value, label, onReveal, index, isAllRevealed }) {
     };
   };
 
-  // Spawns burgundy enamel fragments and golden sparks on scratch
   const spawnDissolvingParticles = (x, y) => {
     const enamelCount = 2;
     const goldCount = 2;
-    const newParticles = [];
 
-    // Deep Burgundy Enamel Fragments
     for (let i = 0; i < enamelCount; i++) {
       const angle = Math.random() * Math.PI * 2;
       const speed = 0.8 + Math.random() * 1.5;
-      newParticles.push({
-        id: Math.random(),
+      particlesRef.current.push({
         type: "enamel",
         x,
         y,
@@ -242,16 +324,14 @@ function CeremonialMedallion({ value, label, onReveal, index, isAllRevealed }) {
         fadeSpeed: 0.03,
         scale: Math.random() * 0.5 + 0.2,
         opacity: 0.9,
-        color: "rgba(94, 0, 31, 0.85)", 
+        color: "rgba(94, 0, 31, 0.85)",
       });
     }
 
-    // Gold Sparkles
     for (let i = 0; i < goldCount; i++) {
       const angle = Math.random() * Math.PI * 2;
       const speed = 1.0 + Math.random() * 1.8;
-      newParticles.push({
-        id: Math.random(),
+      particlesRef.current.push({
         type: "gold",
         x,
         y,
@@ -265,10 +345,46 @@ function CeremonialMedallion({ value, label, onReveal, index, isAllRevealed }) {
       });
     }
 
-    setDragParticles((prev) => {
-      const active = prev.filter((p) => p.opacity > 0.1);
-      return [...active, ...newParticles];
-    });
+    startParticleLoop();
+  };
+
+  const getBrushSize = (canvas) => {
+    if (!canvas) return 60;
+    return canvas.width < 100 ? 60 : 75; // Mobile: 60px, Desktop: 75px (adjusted for faster scratch coverage)
+  };
+
+  const drawScratchFrame = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.globalCompositeOperation = "destination-out";
+        const brushSize = getBrushSize(canvas);
+        ctx.lineWidth = brushSize;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        const points = scratchPointsRef.current;
+        if (points.length > 0) {
+          for (const pt of points) {
+            if (pt.from.x === pt.to.x && pt.from.y === pt.to.y) {
+              ctx.beginPath();
+              ctx.arc(pt.to.x, pt.to.y, brushSize / 2, 0, Math.PI * 2);
+              ctx.fill();
+            } else {
+              ctx.beginPath();
+              ctx.moveTo(pt.from.x, pt.from.y);
+              ctx.lineTo(pt.to.x, pt.to.y);
+              ctx.stroke();
+            }
+            spawnDissolvingParticles(pt.to.x, pt.to.y);
+          }
+          scratchPointsRef.current = []; // Clear queue
+          checkRevealPercentage(canvas);
+        }
+      }
+    }
+    isScratchFrameScheduledRef.current = false;
   };
 
   const startScratching = (e) => {
@@ -276,52 +392,69 @@ function CeremonialMedallion({ value, label, onReveal, index, isAllRevealed }) {
     const coords = getCoordinates(e);
     lastCoordsRef.current = coords;
 
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.globalCompositeOperation = "destination-out";
-        ctx.beginPath();
-        ctx.arc(coords.x, coords.y, 22, 0, Math.PI * 2); // 44px brush
-        ctx.fill();
-        spawnDissolvingParticles(coords.x, coords.y);
-      }
+    scratchPointsRef.current.push({
+      from: { ...coords },
+      to: { ...coords }
+    });
+
+    if (!isScratchFrameScheduledRef.current) {
+      isScratchFrameScheduledRef.current = true;
+      requestAnimationFrame(drawScratchFrame);
     }
   };
 
   const scratch = (e) => {
     if (!isScratching) return;
     const coords = getCoordinates(e);
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.globalCompositeOperation = "destination-out";
-        ctx.lineWidth = 44;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.beginPath();
-        if (lastCoordsRef.current) {
-          ctx.moveTo(lastCoordsRef.current.x, lastCoordsRef.current.y);
-        } else {
-          ctx.moveTo(coords.x, coords.y);
-        }
-        ctx.lineTo(coords.x, coords.y);
-        ctx.stroke();
 
-        spawnDissolvingParticles(coords.x, coords.y);
-        checkRevealPercentage(canvas);
-      }
-      lastCoordsRef.current = coords;
+    scratchPointsRef.current.push({
+      from: lastCoordsRef.current ? { ...lastCoordsRef.current } : { ...coords },
+      to: { ...coords }
+    });
+
+    if (!isScratchFrameScheduledRef.current) {
+      isScratchFrameScheduledRef.current = true;
+      requestAnimationFrame(drawScratchFrame);
     }
+
+    lastCoordsRef.current = coords;
   };
 
   const stopScratching = () => {
     setIsScratching(false);
     lastCoordsRef.current = null;
+    
+    // Force final percentage check on release to ensure smooth experience
+    const canvas = canvasRef.current;
+    if (canvas && !isRevealed) {
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        try {
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          let transparentPixels = 0;
+          for (let i = 3; i < imgData.data.length; i += 4) {
+            if (imgData.data[i] === 0) {
+              transparentPixels++;
+            }
+          }
+          const percentage = (transparentPixels / (canvas.width * canvas.height)) * 100;
+          if (percentage >= 25) {
+            setIsRevealed(true);
+            triggerLocalBloom();
+            onReveal(index);
+          }
+        } catch (err) {
+          console.warn("Canvas percentage calculation failed:", err);
+        }
+      }
+    }
   };
 
   const checkRevealPercentage = (canvas) => {
+    const now = Date.now();
+    if (now - lastCheckTimeRef.current < 50) return; // Throttled check for zero visual latency
+    lastCheckTimeRef.current = now;
+
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     try {
@@ -333,27 +466,28 @@ function CeremonialMedallion({ value, label, onReveal, index, isAllRevealed }) {
         }
       }
       const percentage = (transparentPixels / (canvas.width * canvas.height)) * 100;
-      if (percentage >= 35 && !isRevealed) {
+      if (percentage >= 25 && !isRevealed) {
         setIsRevealed(true);
+        setIsScratching(false);
         triggerLocalBloom();
         onReveal(index);
       }
     } catch (err) {
-      console.warn("Canvas security error checking percentage:", err);
+      console.warn("Canvas percentage calculation failed:", err);
     }
   };
 
   const triggerLocalBloom = () => {
-    const newSparkles = Array.from({ length: 14 }).map((_, i) => {
-      const angle = (i / 14) * Math.PI * 2 + Math.random() * 0.4;
-      const distance = 45 + Math.random() * 50;
+    const newSparkles = Array.from({ length: 12 }).map((_, i) => {
+      const angle = (i / 12) * Math.PI * 2 + Math.random() * 0.4;
+      const distance = 30 + Math.random() * 35;
       return {
         id: i,
         x: Math.cos(angle) * distance,
         y: Math.sin(angle) * distance,
-        scale: Math.random() * 0.75 + 0.35,
-        duration: 0.7 + Math.random() * 0.5,
-        delay: Math.random() * 0.08,
+        scale: Math.random() * 0.5 + 0.25,
+        duration: 0.5 + Math.random() * 0.4,
+        delay: Math.random() * 0.05,
       };
     });
     setSparkles(newSparkles);
@@ -361,7 +495,7 @@ function CeremonialMedallion({ value, label, onReveal, index, isAllRevealed }) {
 
   return (
     <motion.div 
-      className="flex flex-col items-center w-full animate-float-tile"
+      className="flex flex-col items-center animate-float-tile"
       animate={{ y: [0, -5, 0] }}
       whileHover={{ 
         scale: 1.05,
@@ -377,72 +511,67 @@ function CeremonialMedallion({ value, label, onReveal, index, isAllRevealed }) {
         }
       }}
     >
+      {/* Sizing reduced by 15-20%: w-[72px] h-[102px] on Mobile, md:w-[98px] md:h-[140px] on Desktop */}
       <div 
         ref={containerRef}
-        className={`w-full aspect-[2/3] rounded-xl bg-gradient-to-br from-[#8E7037] via-[#F3DA90] to-[#8E7037] p-[4px] relative flex items-center justify-center overflow-hidden transition-all duration-1000 ${
+        className={`w-[72px] h-[102px] md:w-[98px] md:h-[140px] rounded-lg md:rounded-xl bg-gradient-to-br from-[#BF953F] via-[#DFCA98] to-[#B38728] p-[1px] md:p-[1.5px] relative flex items-center justify-center overflow-hidden transition-all duration-1000 ${
           isAllRevealed 
-            ? "shadow-[0_0_35px_rgba(212,175,55,0.75),_inset_0_1.5px_2px_rgba(255,255,255,0.85)] scale-102" 
-            : "shadow-[0_12px_28px_rgba(0,0,0,0.45),inset_0_1.5px_2px_rgba(255,255,255,0.75)]"
+            ? "shadow-[0_0_12px_rgba(212,175,55,0.35),_inset_0_0.5px_1px_rgba(255,255,255,0.8)] scale-102" 
+            : "shadow-[0_4px_10px_rgba(0,0,0,0.3),inset_0_0.5px_1px_rgba(255,255,255,0.5)]"
         }`}
       >
-        {/* Inner core textured cream marble paper casing */}
-        <div className="w-full h-full rounded-lg bg-gradient-to-br from-[#FDF8F0] via-[#FAF5EC] to-[#F8F2E8] p-[3px] flex flex-col items-center justify-center relative shadow-[inset_0_2px_8px_rgba(0,0,0,0.1)] overflow-hidden">
+        {/* BOTTOM REVEAL LAYER: Warm ivory paper texture with matte gold accents */}
+        <div className="w-full h-full rounded-md md:rounded-lg bg-gradient-to-br from-[#fffdf8] via-[#f7efe1] to-[#efe3d0] p-[2px] flex flex-col items-center justify-center relative shadow-[inset_0_1.5px_6px_rgba(74,8,27,0.12)] overflow-hidden">
           
-          {/* Burgundy Inset Layer border */}
-          <div className="absolute inset-1.5 rounded-md border border-[#8F1C3C]/35 pointer-events-none z-0" />
-          
-          {/* Subtle Islamic geometric pattern watermark inside card */}
-          <div className="absolute inset-0 opacity-[0.02] pointer-events-none z-0" 
+          {/* Subtle paper grain texture */}
+          <div className="absolute inset-0 opacity-[0.04] pointer-events-none z-0" 
                style={{ 
-                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
-                 backgroundSize: "60px 60px" 
+                 backgroundImage: "radial-gradient(circle at 50% 50%, #4A081B 1px, transparent 1px), radial-gradient(circle at 0 0, #4A081B 1px, transparent 1px)", 
+                 backgroundSize: "6px 6px" 
                }} />
 
-          {/* Hidden value display with blur-to-sharp animation and gold bloom shadow */}
-          <motion.div 
-            className="flex flex-col items-center z-10 w-full"
-            initial={false}
-            animate={isRevealed ? {
-              filter: ["blur(10px)", "blur(0px)"],
-              scale: [0.9, 1.1, 1],
-            } : {
-              filter: "blur(0px)",
-              scale: 1
-            }}
-            transition={{
-              duration: 0.9,
-              ease: "easeOut",
-            }}
-          >
+          {/* Gold Inset border */}
+          <div className="absolute inset-1 rounded-sm md:rounded-md border border-[#D4AF37]/35 pointer-events-none z-0" />
+          
+          {/* Faint Islamic geometric pattern watermark */}
+          <div className="absolute inset-0 opacity-[0.015] pointer-events-none z-0" 
+               style={{ 
+                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
+                 backgroundSize: "40px 40px" 
+               }} />
+
+          {/* Revealed value display: Always visible underneath the canvas to allow dynamic reveal during scratching */}
+          <div className="flex flex-col items-center z-10 w-full">
             {/* Label header above value */}
-            <span className="font-cinzel text-[8px] md:text-[9px] uppercase tracking-wider text-[#753A3A] mb-2 opacity-85 font-semibold">
+            <span className="font-cinzel text-[6.5px] md:text-[7.5px] uppercase tracking-wider text-[#856124] mb-1.5 font-semibold z-10">
               {label}
             </span>
 
             {/* Large luxury serif typography date value */}
             <span 
-              className="font-cormorant text-2xl md:text-5xl font-bold tracking-normal text-[#4A081B] select-all transition-all duration-700 leading-none"
+              className={`font-cormorant font-bold tracking-normal text-[#4A081B] select-all leading-none z-10 ${
+                label.toLowerCase() === "month" 
+                  ? "text-[20px] md:text-[28px] uppercase font-semibold" 
+                  : "text-[24px] md:text-[34px]"
+              }`}
               style={{
-                textShadow: isRevealed 
-                  ? "0 0 16px rgba(232, 199, 106, 0.95), 0 0 4px rgba(212, 175, 55, 0.45)" 
-                  : "none"
+                textShadow: "0 1px 1px rgba(255, 255, 255, 0.95)"
               }}
             >
               {value}
             </span>
-          </motion.div>
+          </div>
         </div>
 
-        {/* Scratch Canvas (Burgundy Enamel Luxury Layer) */}
+        {/* TOP SCRATCH LAYER: Deep glossy burgundy foil with metallic finish */}
         <AnimatePresence>
           {!isRevealed && (
             <motion.canvas
               ref={canvasRef}
               exit={{ 
                 opacity: 0, 
-                scale: 0.92, 
-                filter: "blur(10px)",
-                transition: { duration: 0.6, ease: "easeOut" } 
+                scale: 0.96, 
+                transition: { duration: 0.4, ease: "easeOut" } 
               }}
               onMouseDown={startScratching}
               onMouseMove={scratch}
@@ -451,29 +580,20 @@ function CeremonialMedallion({ value, label, onReveal, index, isAllRevealed }) {
               onTouchStart={startScratching}
               onTouchMove={scratch}
               onTouchEnd={stopScratching}
-              className="absolute inset-[4px] rounded-lg z-30 cursor-pointer touch-none"
+              className="absolute inset-[1px] md:inset-[1.5px] rounded-md md:rounded-lg z-30 cursor-pointer touch-none"
             />
           )}
         </AnimatePresence>
 
-        {/* Luxury Reflection Sweep Overlay (Brighter for interactive guide) */}
+        {/* Particles Canvas Overlay (Draws scratch particles) */}
         {!isRevealed && (
-          <div className="absolute inset-[4px] rounded-lg overflow-hidden pointer-events-none z-35">
-            <motion.div
-              className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/45 to-transparent skew-x-30"
-              animate={{
-                left: ["-150%", "200%"],
-              }}
-              transition={{
-                duration: 1.6,
-                repeat: Infinity,
-                repeatDelay: 3.0,
-                ease: "easeInOut",
-                delay: index * 0.5,
-              }}
-            />
-          </div>
+          <canvas
+            ref={particleCanvasRef}
+            className="absolute inset-[1px] md:inset-[1.5px] rounded-md md:rounded-lg pointer-events-none z-40"
+          />
         )}
+
+
 
         {/* Local Sparkles Bloom burst */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
@@ -496,58 +616,116 @@ function CeremonialMedallion({ value, label, onReveal, index, isAllRevealed }) {
                 }}
                 className="absolute"
               >
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <svg width="6" height="6" viewBox="0 0 12 12" fill="none">
                   <path 
                     d="M 6 0 L 7.5 4.5 L 12 6 L 7.5 7.5 L 6 12 L 4.5 7.5 L 0 6 L 4.5 4.5 Z" 
                     fill="#FFF8ED" 
-                    className="drop-shadow-[0_0_4px_#D4AF37]"
+                    className="drop-shadow-[0_0_3px_#D4AF37]"
                   />
                 </svg>
               </motion.div>
             ))}
           </AnimatePresence>
         </div>
-
-        {/* Scratch Drag Particles Overlay (Dissolving Enamel & Gold Dust) */}
-        <div className="absolute inset-0 pointer-events-none z-35 overflow-hidden">
-          {dragParticles.map((p) => (
-            <div
-              key={p.id}
-              className="absolute rounded-full"
-              style={{
-                left: p.x,
-                top: p.y,
-                width: `${p.scale * (p.type === "enamel" ? 12 : 7)}px`,
-                height: `${p.scale * (p.type === "enamel" ? 12 : 7)}px`,
-                backgroundColor: p.color,
-                opacity: p.opacity,
-                transform: "translate(-50%, -50%) rotate(45deg)",
-                boxShadow: p.type === "gold" ? `0 0 6px ${p.color}` : "none",
-                borderRadius: p.type === "enamel" ? "1px" : "50%",
-              }}
-            />
-          ))}
-        </div>
       </div>
-      <span className="font-cormorant text-[10px] md:text-xs uppercase tracking-widest text-[#FFF8ED]/75 font-semibold mt-3">
+      <span className="font-cormorant text-[9px] md:text-xs uppercase tracking-widest text-[#FFF8ED]/75 font-semibold mt-2.5">
         {label}
       </span>
     </motion.div>
   );
 }
 
+// Countdown Card Sub-component
+function CountdownCard({ value, label, format }) {
+  const formattedVal = format(value);
+
+  return (
+    <div className="flex flex-col items-center flex-1 max-w-[62px] md:max-w-[74px]">
+      
+      {/* Clock Casing with Gold Gradient Borders (Ivory panel on dark backdrop) */}
+      <div className="relative w-full h-[62px] md:h-[74px] bg-gradient-to-br from-[#BF953F] via-[#DFCA98] to-[#B38728] p-[2px] rounded-xl shadow-[0_6px_16px_rgba(0,0,0,0.35)] flex items-center justify-center overflow-hidden">
+        
+        {/* Inner core textured cream marble paper casing */}
+        <div className="w-full h-full rounded-lg bg-gradient-to-br from-[#fffdf8] via-[#f7efe1] to-[#efe3d0] p-[1.5px] flex items-center justify-center relative shadow-[inset_0_1.5px_6px_rgba(74,8,27,0.12)] overflow-hidden">
+          
+          {/* Burgundy Inset Layer border */}
+          <div className="absolute inset-0.5 rounded-md border border-[#8F1C3C]/20 pointer-events-none z-0" />
+          
+          {/* Double Inner Frame details */}
+          <div className="absolute inset-[2px] border border-[#D4AF37]/10 rounded-md pointer-events-none" />
+
+          {/* Physical center-split line simulating mechanical flip clock */}
+          <div className="absolute left-0 right-0 top-1/2 h-[0.5px] bg-[#D4AF37]/20 z-10 shadow-[0_0.5px_1px_rgba(0,0,0,0.15)]" />
+          
+          {/* Shading gradients top and bottom to create physical depth */}
+          <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-black/[0.02] to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/[0.015] to-transparent pointer-events-none" />
+
+          {/* Rolling Number */}
+          <div className="relative overflow-hidden h-8 flex items-center justify-center z-20">
+            <AnimatePresence mode="popLayout">
+              <motion.span
+                key={formattedVal}
+                initial={{ y: 16, opacity: 0, filter: "blur(2px)" }}
+                animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+                exit={{ y: -16, opacity: 0, filter: "blur(2px)" }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="font-cormorant text-[20px] md:text-[28px] font-semibold text-[#4A081B] tracking-wider block drop-shadow-[0_0.5px_0.5px_rgba(255,255,255,0.7)]"
+              >
+                {formattedVal}
+              </motion.span>
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+
+      {/* Card Label */}
+      <span className="font-inter text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-[#FFF8ED]/75 mt-2.5 font-bold">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+// Separator Colon with slow pulsing opacity
+function SeparatorColon() {
+  return (
+    <motion.div 
+      animate={{ opacity: [0.3, 1, 0.3] }}
+      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+      className="flex flex-col gap-1.5 pb-5 text-[#E8C76A] drop-shadow-[0_0_6px_rgba(232,199,106,0.6)] font-semibold text-sm md:text-base"
+    >
+      <span>•</span>
+      <span>•</span>
+    </motion.div>
+  );
+}
+
 function ScratchDate() {
+  const targetDate = new Date("2026-12-09T00:00:00").getTime();
+  
   const [revealedCards, setRevealedCards] = useState([false, false, false]);
   const [celebrationParticles, setCelebrationParticles] = useState([]);
   const [bgStars, setBgStars] = useState([]);
   const [shimmerActive, setShimmerActive] = useState(false);
   const [showRewardText, setShowRewardText] = useState(false);
+  const [showCelebrationPopup, setShowCelebrationPopup] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
 
   const allRevealed = revealedCards.every((v) => v);
 
   useEffect(() => {
+    setMounted(true);
+    
     // Generate background gold/champagne slow floating dust
-    const generated = Array.from({ length: 24 }).map((_, i) => ({
+    const generated = Array.from({ length: 32 }).map((_, i) => ({
       id: i,
       left: `${Math.random() * 100}%`,
       size: Math.random() * 2.2 + 1.2,
@@ -556,6 +734,29 @@ function ScratchDate() {
       opacity: Math.random() * 0.35 + 0.15,
     }));
     setBgStars(generated);
+
+    // Countdown calculation
+    const calculateTime = () => {
+      const now = new Date().getTime();
+      const difference = targetDate - now;
+
+      if (difference <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+      setTimeLeft({ days, hours, minutes, seconds });
+    };
+
+    calculateTime();
+    const interval = setInterval(calculateTime, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleCardReveal = (index) => {
@@ -564,10 +765,29 @@ function ScratchDate() {
       next[index] = true;
       if (next.every((v) => v)) {
         setShimmerActive(true);
-        triggerCelebration();
+
+        // Sequence:
+        // 1. Third card reveals
+        // 2. 300ms pause
+        // 3. Centered luxury popper burst (confetti) & gold particles spread outward
+        // 4. Success popup appears
         setTimeout(() => {
-          setShowRewardText(true);
-        }, 600);
+          // Centered symmetric popper burst
+          confetti({
+            particleCount: 120,
+            spread: 360,
+            startVelocity: 35,
+            origin: { x: 0.5, y: 0.5 },
+            colors: ["#E8C76A", "#D4AF37", "#FFF8ED", "#4A081B"],
+          });
+          
+          triggerCelebration();
+
+          setTimeout(() => {
+            setShowCelebrationPopup(true);
+            setShowRewardText(true);
+          }, 500);
+        }, 300);
       }
       return next;
     });
@@ -576,37 +796,55 @@ function ScratchDate() {
   const triggerCelebration = () => {
     playChimeSound();
 
-    // Spawn luxury celebration particles (cream rose petals, gold sparks, and gold foil chips)
-    const particlesList = Array.from({ length: 90 }).map((_, i) => {
+    // Spawn symmetric radial celebration particles (cream rose petals, gold sparks, and gold foil chips)
+    const particleCount = 45;
+    const particlesList = Array.from({ length: particleCount }).map((_, i) => {
+      const angle = (i * 2 * Math.PI) / particleCount; // Perfect symmetric circle angles
+      const speed = 2.5 + Math.random() * 3.5;
       const typeRand = Math.random();
       let type = "gold";
-      if (typeRand < 0.35) type = "petal";
-      else if (typeRand < 0.7) type = "sparkle";
+      if (typeRand < 0.3) type = "petal";
+      else if (typeRand < 0.6) type = "sparkle";
 
       return {
         id: i,
         type,
         x: 0,
         y: 0,
-        scale: Math.random() * 0.8 + 0.3,
-        rotation: Math.random() * 360,
-        spin: Math.random() * 180 - 90,
-        vx: (Math.random() * 200 - 100) * 0.8,
-        vy: -(Math.random() * 180 + 120) * 0.8,
-        gravity: Math.random() * 40 + 30, // low gravity slow fall
-        duration: Math.random() * 1.5 + 2.5, // 2.5s - 4.0s slow drift
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        scale: Math.random() * 0.55 + 0.35,
+        rotation: angle * (180 / Math.PI), // Align initial rotation with angle
+        spin: Math.random() * 90 - 45,
+        duration: 1.8 + Math.random() * 1.0, // Slow drift duration
       };
     });
     setCelebrationParticles(particlesList);
   };
 
+  const formatNumber = (num) => String(num).padStart(2, "0");
+
   return (
     <section 
       style={{
-        background: `linear-gradient(to bottom, #2A000C 0%, #4a0018 30%, #5A001E 70%, #7a1438 100%)`
+        background: `linear-gradient(to bottom, #2A000C 0%, #4a0018 25%, #5A001E 50%, #4a0018 75%, #2A000C 100%)`
       }}
-      className="pt-24 pb-8 px-6 relative flex flex-col items-center justify-center overflow-hidden"
+      className="pt-28 pb-28 px-6 relative flex flex-col items-center justify-center overflow-hidden"
     >
+      {/* Curved section transition divider at the bottom of the continuous panel */}
+      <SectionDivider />
+
+      {/* CSS glow keyframe registration */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes gold-glow-pulse {
+          0% { text-shadow: 0 0 8px rgba(243, 218, 144, 0.6), 0 0 2px rgba(212, 175, 55, 0.3); }
+          50% { text-shadow: 0 0 16px rgba(243, 218, 144, 0.95), 0 0 4px rgba(212, 175, 55, 0.5); }
+          100% { text-shadow: 0 0 8px rgba(243, 218, 144, 0.6), 0 0 2px rgba(212, 175, 55, 0.3); }
+        }
+        .animate-gold-glow {
+          animation: gold-glow-pulse 2s infinite ease-in-out;
+        }
+      `}} />
       
       {/* Top Gold Arch Section Divider */}
       <LuxuryDivider className="absolute top-0 left-0 right-0 z-20 -translate-y-[15px] rotate-180" />
@@ -636,9 +874,10 @@ function ScratchDate() {
         </svg>
       </div>
 
-      {/* Layer 3: Top-heavy gold glow bleeding & center spotlight glow behind card */}
+      {/* Ambient spot lighting (Consistent with unified continuous panel) */}
       <div className="absolute top-0 left-0 right-0 h-40 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.12)_0%,transparent_70%)] pointer-events-none z-0" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] md:w-[600px] h-[350px] md:h-[600px] bg-[radial-gradient(circle,rgba(142,17,58,0.32)_0%,rgba(94,0,31,0.08)_50%,transparent_100%)] rounded-full blur-[60px] pointer-events-none z-0" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] md:w-[600px] h-[350px] md:h-[600px] bg-[radial-gradient(circle,rgba(142,17,58,0.25)_0%,transparent_80%)] rounded-full blur-[60px] pointer-events-none z-0" />
+      <div className="absolute top-3/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] md:w-[600px] h-[350px] md:h-[600px] bg-[radial-gradient(circle,rgba(142,17,58,0.2)_0%,transparent_80%)] rounded-full blur-[60px] pointer-events-none z-0" />
 
       {/* Center bloom burst when all are revealed */}
       <AnimatePresence>
@@ -668,27 +907,26 @@ function ScratchDate() {
               <motion.div
                 key={p.id}
                 initial={{ 
-                  x: p.x, 
-                  y: p.y, 
+                  x: 0, 
+                  y: 0, 
                   scale: 0.1, 
                   opacity: 1, 
                   rotate: p.rotation 
                 }}
                 animate={{
-                  x: p.vx * 1.8,
-                  y: [0, p.vy * 0.7, p.vy * 0.7 + p.gravity * 2.5],
-                  scale: p.scale,
-                  opacity: [1, 1, 0], 
+                  x: p.vx * 65,
+                  y: p.vy * 65,
+                  scale: [0.1, p.scale, 0],
+                  opacity: [1, 0.9, 0], 
                   rotate: p.rotation + p.spin
                 }}
                 transition={{
                   duration: p.duration,
-                  ease: [0.22, 1, 0.36, 1]
+                  ease: "easeOut"
                 }}
                 className="absolute"
               >
                 {p.type === "petal" ? (
-                  // Elegant white/cream flower petal
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path 
                       d="M 12 2 C 7 2 4 6 4 11 C 4 17 8 22 12 22 C 16 22 20 17 20 11 C 20 6 17 2 12 2 Z" 
@@ -704,7 +942,6 @@ function ScratchDate() {
                     </defs>
                   </svg>
                 ) : p.type === "sparkle" ? (
-                  // Twinkling golden sparkle star
                   <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
                     <path 
                       d="M 6 0 L 7.5 4.5 L 12 6 L 7.5 7.5 L 6 12 L 4.5 7.5 L 0 6 L 4.5 4.5 Z" 
@@ -713,7 +950,6 @@ function ScratchDate() {
                     />
                   </svg>
                 ) : (
-                  // Luxury gold foil chip
                   <div 
                     className="w-3.5 h-2 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] rounded-xs shadow-[0_1px_3px_rgba(0,0,0,0.15)]"
                     style={{
@@ -797,13 +1033,17 @@ function ScratchDate() {
         )}
       </AnimatePresence>
 
-      {/* Heading Viewport Reveal */}
+      {/* ====================================================== */}
+      {/* BLOCK 1: DATE REVEAL */}
+      {/* ====================================================== */}
+      
+      {/* Date Reveal Title Reveal */}
       <motion.div 
         initial={{ opacity: 0, filter: "blur(12px)", y: 25 }}
         whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.85, ease: "easeOut" }}
-        className="text-center mb-12 max-w-sm relative z-10"
+        className="text-center mb-10 relative z-10"
       >
         <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.3em] text-[#E8C76A] font-semibold flex items-center justify-center gap-1">
           The Sacred Date
@@ -821,13 +1061,13 @@ function ScratchDate() {
         <div className="w-12 h-[1px] bg-[#D4AF37]/50 mx-auto mt-4" />
       </motion.div>
 
-      {/* Rectangular Reveal Tiles Container */}
+      {/* Centered Luxury Reveal Cards container with balanced spacing */}
       <motion.div 
         initial={{ opacity: 0, filter: "blur(12px)", y: 20 }}
         whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.85, ease: "easeOut", delay: 0.15 }}
-        className="grid grid-cols-3 gap-4 sm:gap-6 justify-center w-full max-w-[340px] md:max-w-[480px] relative z-10"
+        className="flex flex-row gap-2.5 md:gap-4 justify-center items-center w-full max-w-max mx-auto relative z-10"
       >
         <CeremonialMedallion value="09" label="Day" onReveal={handleCardReveal} index={0} isAllRevealed={allRevealed} />
         <CeremonialMedallion value="DEC" label="Month" onReveal={handleCardReveal} index={1} isAllRevealed={allRevealed} />
@@ -865,7 +1105,7 @@ function ScratchDate() {
       </AnimatePresence>
 
       {/* Progress Helper Indicator */}
-      <div className="mt-10 h-5 flex items-center justify-center text-center relative z-10">
+      <div className="mt-8 h-5 flex items-center justify-center text-center relative z-10">
         {!allRevealed ? (
           <p className="font-inter text-[9px] tracking-[0.25em] text-[#FFF8ED]/70 uppercase">
             Scratch the luxury tiles to reveal union date
@@ -880,6 +1120,147 @@ function ScratchDate() {
           </motion.p>
         )}
       </div>
+
+      {/* ====================================================== */}
+      {/* TRANSITION: ORNAMENTAL CURVED DIVIDER WITH GOLD ACCENTS */}
+      {/* ====================================================== */}
+      <div className="w-full flex items-center justify-center my-14 pointer-events-none relative z-10">
+        <div className="flex-1 h-[0.5px] bg-gradient-to-r from-transparent via-[#D4AF37]/35 to-transparent" />
+        <svg className="w-20 h-10 text-[#D4AF37]/75 fill-none stroke-current" viewBox="0 0 100 50">
+          <path d="M 5,25 C 25,25 35,5 50,20 C 65,5 75,25 95,25" strokeWidth="1.2" />
+          <circle cx="50" cy="20" r="2.5" fill="currentColor" />
+          <path d="M 25,25 Q 50,45 75,25" strokeWidth="0.6" strokeDasharray="2,2" />
+        </svg>
+        <div className="flex-1 h-[0.5px] bg-gradient-to-r from-transparent via-[#D4AF37]/35 to-transparent" />
+      </div>
+
+      {/* ====================================================== */}
+      {/* BLOCK 2: COUNTDOWN TIMER */}
+      {/* ====================================================== */}
+      
+      {/* Countdown Title Reveal */}
+      <motion.div
+        initial={{ opacity: 0, filter: "blur(12px)", y: 25 }}
+        whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.85, ease: "easeOut" }}
+        className="text-center mb-10 relative z-10"
+      >
+        <span className="font-cormorant text-xs md:text-sm uppercase tracking-[0.3em] text-[#E8C76A] font-semibold flex items-center justify-center gap-1.5">
+          Counting the Moments
+          <motion.span 
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ repeat: Infinity, duration: 2.5 }}
+            className="inline-block"
+          >
+            ✦
+          </motion.span>
+        </span>
+        <h2 className="font-cormorant text-3xl md:text-4xl text-[#FFF8ED] mt-2 tracking-wide font-light">
+          Until the Nikah
+        </h2>
+        <div className="w-12 h-[1px] bg-[#D4AF37]/60 mx-auto mt-4" />
+      </motion.div>
+
+      {/* Timer Grid Viewport Reveal with 15-20% reduced cards */}
+      <motion.div 
+        initial={{ opacity: 0, filter: "blur(12px)", y: 20 }}
+        whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.85, ease: "easeOut", delay: 0.15 }}
+        className="flex items-center gap-1.5 md:gap-3.5 justify-center max-w-lg w-full px-4 relative z-10"
+      >
+        <CountdownCard value={timeLeft.days} label="Days" format={formatNumber} />
+        <SeparatorColon />
+        <CountdownCard value={timeLeft.hours} label="Hours" format={formatNumber} />
+        <SeparatorColon />
+        <CountdownCard value={timeLeft.minutes} label="Minutes" format={formatNumber} />
+        <SeparatorColon />
+        <CountdownCard value={timeLeft.seconds} label="Seconds" format={formatNumber} />
+      </motion.div>
+
+      {/* Glassmorphic Success Celebration Modal (Using React Portal) */}
+      {mounted && createPortal(
+        <AnimatePresence>
+          {showCelebrationPopup && (
+            <motion.div
+              key="celebration-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowCelebrationPopup(false)}
+              className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md cursor-pointer"
+            >
+              <motion.div
+                key="celebration-card"
+                initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 15 }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-md bg-gradient-to-b from-[#FFFDF9]/95 to-[#F6EBDD]/95 border border-[#D4AF37]/50 rounded-[28px] p-8 md:p-10 shadow-[0_24px_60px_rgba(74,8,27,0.18),inset_0_1.5px_3px_rgba(255,255,255,0.7)] relative overflow-hidden cursor-default text-center backdrop-blur-xl"
+              >
+                {/* Close Button X */}
+                <button
+                  type="button"
+                  onClick={() => setShowCelebrationPopup(false)}
+                  className="absolute top-4 right-4 text-[#4A081B]/50 hover:text-[#4A081B] transition-colors cursor-pointer focus:outline-none z-10"
+                >
+                  <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+
+                {/* Elegant gold corner ornaments */}
+                <div className="absolute top-3 left-3 w-6 h-6 border-t border-l border-[#D4AF37]/40 rounded-tl-sm pointer-events-none" />
+                <div className="absolute top-3 right-3 w-6 h-6 border-t border-r border-[#D4AF37]/40 rounded-tr-sm pointer-events-none" />
+                <div className="absolute bottom-3 left-3 w-6 h-6 border-b border-l border-[#D4AF37]/40 rounded-bl-sm pointer-events-none" />
+                <div className="absolute bottom-3 right-3 w-6 h-6 border-b border-r border-[#D4AF37]/40 rounded-br-sm pointer-events-none" />
+
+                {/* Medallion Gold Icon */}
+                <div className="w-14 h-14 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/45 flex items-center justify-center mx-auto mb-6 text-[#E8C76A] shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                  <svg className="w-6.5 h-6.5 text-[#E8C76A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499c-.105-.347-.492-.546-.861-.485a9.001 9.001 0 1 0 7.824 7.824c.06-.369-.138-.756-.485-.861l-6.478-1.478-1.478-6.478Z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15h.008v.008H12V15Z" />
+                  </svg>
+                </div>
+
+                <span className="font-cinzel text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#856124] font-semibold mb-4 block">
+                  The Sacred Date Unlocked
+                </span>
+
+                {/* Sacred Arabic Calligraphy */}
+                <p className="font-amiri text-[1.8rem] md:text-[2.2rem] leading-none tracking-wide text-center text-[#4A081B] font-bold mb-4 drop-shadow-[0_1px_1.5px_rgba(212,175,55,0.4)]">
+                  بَارَكَ ٱللَّٰهُ لَكُمَا وَبَارَكَ عَلَيْكُمَا
+                </p>
+
+                {/* Revealed Date text */}
+                <h2 className="font-cormorant text-4xl md:text-5xl font-bold text-[#4A081B] tracking-normal mb-1 drop-shadow-[0_1px_1px_rgba(212,175,55,0.25)]">
+                  09 DEC 2026
+                </h2>
+                
+                <p className="font-cormorant italic text-base text-[#4A081B]/85 tracking-wider mb-2 font-medium">
+                  Wednesday
+                </p>
+
+                <p className="font-cormorant text-[#4A081B]/70 text-sm md:text-base leading-relaxed max-w-xs mx-auto mb-8">
+                  We look forward to welcoming you to celebrate our union.
+                </p>
+
+                {/* Save the Date Action Button */}
+                <button
+                  type="button"
+                  onClick={() => setShowCelebrationPopup(false)}
+                  className="px-10 py-3.5 rounded-full border border-[#856124]/60 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] text-[#2D040F] font-cinzel text-xs font-bold tracking-[0.25em] shadow-[inset_0_2px_3px_rgba(255,255,255,0.85),0_4px_18px_rgba(212,175,55,0.35)] cursor-pointer hover:scale-105 transition-transform"
+                >
+                  SAVE THE DATE
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </section>
   );
 }
