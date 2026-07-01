@@ -176,7 +176,7 @@ function CeremonialMedallion({ value, label, onReveal, index, isAllRevealed }) {
     return () => window.removeEventListener("resize", resizeCanvas);
   }, []);
 
-  const drawMedallionFoil = (canvas) => {
+  function drawMedallionFoil(canvas) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 

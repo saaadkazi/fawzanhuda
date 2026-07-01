@@ -445,7 +445,7 @@ function Dua() {
                             Your Blessings & Duas
                           </div>
                           <p className="font-cormorant italic text-base text-[#FFF8ED]/90 leading-relaxed">
-                            "{savedRsvp.message}"
+                            &ldquo;{savedRsvp.message}&rdquo;
                           </p>
                         </>
                       )}
@@ -715,7 +715,7 @@ function Dua() {
                           Your Blessings & Duas
                         </div>
                         <p className="font-cormorant italic text-base text-[#FFF8ED]/90 leading-relaxed">
-                          "{savedRsvp.message}"
+                          &ldquo;{savedRsvp.message}&rdquo;
                         </p>
                       </>
                     )}
