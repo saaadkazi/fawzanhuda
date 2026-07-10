@@ -107,7 +107,6 @@ function GrandOpening({ isOpen, onOpen, onStartOpening, children }) {
 
     setIsTransitioning(true);
     setTapTriggered(true);
-    setStage("cracking");
     
     // Play metallic tap sound at click onset
     playMetallicTap();
@@ -115,6 +114,36 @@ function GrandOpening({ isOpen, onOpen, onStartOpening, children }) {
     if (onStartOpening) {
       onStartOpening();
     }
+
+    if (isMobile) {
+      setStage("transitioning");
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setStage("opened");
+          onOpen(); // Mount main scroll sections
+          setShowDoorsOverlay(false);
+          if (ambientWind) ambientWind.stop();
+        }
+      });
+
+      tl.to(medallionRef.current, {
+        scale: 0.8,
+        opacity: 0,
+        duration: 0.2,
+        ease: "power2.out"
+      });
+
+      tl.to(cameraContainerRef.current, {
+        opacity: 0,
+        duration: 0.5,
+        ease: "power1.inOut"
+      }, 0.15);
+
+      return;
+    }
+
+    setStage("cracking");
 
     // GSAP sequencing for cinematic envelope opening flow
     const tl = gsap.timeline({

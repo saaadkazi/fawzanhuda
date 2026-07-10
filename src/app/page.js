@@ -74,7 +74,7 @@ export default function Home() {
           onOpen={handleOpenInvitation}
           onStartOpening={handleStartOpening}
         >
-          {(status === "transitioning" || status === "opened") && (
+          {status !== "loading" && (
             <main className="w-full relative flex flex-col min-h-screen">
                {/* Critical Hero preloaded instantly in background during transition */}
               <Hero />

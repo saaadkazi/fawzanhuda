@@ -123,6 +123,7 @@ function Parents() {
 
   return (
     <section 
+      id="parents-section"
       style={{
         background: "radial-gradient(circle at center, #FFFDF9 0%, #F6EBDD 60%, #EFE3D3 100%)"
       }}

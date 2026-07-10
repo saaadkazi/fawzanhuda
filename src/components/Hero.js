@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useEffect, useState } from "react";
 import FloralOrnament from "./FloralOrnament";
 
@@ -95,11 +95,30 @@ export default function Hero() {
   const [isMobile, setIsMobile] = useState(false);
   const [isWaveActive, setIsWaveActive] = useState(false);
   const [isCardTapped, setIsCardTapped] = useState(false);
-  const [pointer, setPointer] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [isEntering, setIsEntering] = useState(false);
   const [introPlayed, setIntroPlayed] = useState(false);
+
+  // Buttery-smooth hardware accelerated hover spring configurations
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springConfig = { stiffness: 90, damping: 22 };
+  const smoothX = useSpring(mouseX, springConfig);
+  const smoothY = useSpring(mouseY, springConfig);
+
+  const layer1X = useTransform(smoothX, (x) => x * 4.5);
+  const layer1Y = useTransform(smoothY, (y) => y * 4.5);
+
+  const layer2X = useTransform(smoothX, (x) => x * 8);
+  const layer2Y = useTransform(smoothY, (y) => y * 8);
+
+  const layer3X = useTransform(smoothX, (x) => x * 14);
+  const layer3Y = useTransform(smoothY, (y) => y * 14);
+
+  const rotateX = useTransform(smoothY, (y) => isMobile ? 0 : -y * 3.5);
+  const rotateY = useTransform(smoothX, (x) => isMobile ? 0 : x * 3.5);
 
   useEffect(() => {
     if (globalHeroIntroPlayed) {
@@ -159,7 +178,8 @@ export default function Hero() {
       const x = (clientX - window.innerWidth / 2) / (window.innerWidth / 2);
       const y = (clientY - window.innerHeight / 2) / (window.innerHeight / 2);
       
-      setPointer({ x, y });
+      mouseX.set(x);
+      mouseY.set(y);
     };
 
     window.addEventListener("mousemove", handlePointerMove);
@@ -196,15 +216,19 @@ export default function Hero() {
     if (isEntering) return;
     setIsEntering(true);
     
-    setTimeout(() => {
+    const nextSection = document.getElementById("parents-section");
+    if (nextSection) {
+      nextSection.scrollIntoView({ behavior: "smooth" });
+    } else {
       window.scrollTo({
-        top: window.innerHeight * 0.95,
+        top: window.innerHeight,
         behavior: "smooth"
       });
-      setTimeout(() => {
-        setIsEntering(false);
-      }, 1000);
-    }, 850);
+    }
+
+    setTimeout(() => {
+      setIsEntering(false);
+    }, 1200);
   };
 
   const scrollRatio = typeof window !== "undefined" ? Math.min(scrollY / 300, 1) : 0;
@@ -272,14 +296,14 @@ export default function Hero() {
   const groomStagger = {
     hidden: {},
     visible: {
-      transition: { staggerChildren: 0.08, delayChildren: introPlayed ? 0 : 5.2 }
+      transition: { staggerChildren: 0.08, delayChildren: isMobile ? (introPlayed ? 0 : 1.0) : (introPlayed ? 0 : 5.2) }
     }
   };
 
   const brideStagger = {
     hidden: {},
     visible: {
-      transition: { staggerChildren: 0.08, delayChildren: introPlayed ? 0 : 6.3 }
+      transition: { staggerChildren: 0.08, delayChildren: isMobile ? (introPlayed ? 0 : 1.8) : (introPlayed ? 0 : 6.3) }
     }
   };
 
@@ -438,11 +462,10 @@ export default function Hero() {
           PARALLAX LAYER 1 (0.2x): BACKGROUND PALACE & ARCHES
           ================================================== */}
       <motion.div 
-        animate={{
-          x: pointer.x * 4.5,
-          y: pointer.y * 4.5
+        style={{
+          x: layer1X,
+          y: layer1Y
         }}
-        transition={{ type: "spring", stiffness: 85, damping: 26 }}
         className="absolute inset-0 z-[2] pointer-events-none"
       >
         <div className="absolute inset-0 bg-gradient-to-t from-[#2D040F]/90 via-transparent to-transparent pointer-events-none" />
@@ -458,30 +481,11 @@ export default function Hero() {
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{
-            scale: isEntering ? 1.35 : 1,
-            opacity: isEntering ? 0.95 : (mounted ? 1 : 0),
+            scale: isEntering ? 1.1 : 1,
+            opacity: isEntering ? 0 : (mounted ? 0.35 : 0),
           }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="absolute w-[260px] h-[360px] md:w-[390px] md:h-[550px] rounded-[180px_180px_60px_60px] bg-gradient-to-b from-[#D4AF37] to-transparent blur-[50px] md:blur-[90px] animate-noor-1"
-        />
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{
-            scale: isEntering ? 1.25 : 1,
-            opacity: isEntering ? 0.98 : (mounted ? 1 : 0),
-          }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="absolute w-[200px] h-[280px] md:w-[300px] md:h-[420px] rounded-[135px_135px_40px_40px] bg-gradient-to-b from-[#FFFDF9] to-transparent blur-[35px] md:blur-[60px] animate-noor-2"
-        />
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{
-            scale: isEntering ? 1.15 : 1,
-            opacity: isEntering ? 0.99 : (mounted ? 1 : 0),
-          }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="absolute w-[130px] h-[180px] md:w-[180px] md:h-[250px] rounded-full bg-[#FFFDF9] blur-[15px] md:blur-[24px] opacity-80"
-          style={{ transform: "translate(-50%, -50%)" }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[260px] h-[360px] md:w-[390px] md:h-[550px] rounded-[180px_180px_60px_60px] bg-gradient-to-b from-[#D4AF37] to-transparent blur-[50px] md:blur-[90px] animate-noor-1"
         />
       </div>
 
@@ -491,14 +495,14 @@ export default function Hero() {
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ 
-          opacity: 1,
-          x: pointer.x * 8,
-          y: pointer.y * 8
+          opacity: 1
         }}
         transition={{ 
-          opacity: { duration: 1.5, delay: 1.0 },
-          x: { type: "spring", stiffness: 85, damping: 26 },
-          y: { type: "spring", stiffness: 85, damping: 26 }
+          opacity: { duration: 1.5, delay: 1.0 }
+        }}
+        style={{
+          x: layer2X,
+          y: layer2Y
         }}
         className="absolute inset-0 pointer-events-none overflow-hidden z-[4] transform-gpu will-change-transform"
       >
@@ -563,27 +567,25 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0, scale: 0.92, y: 30 }}
           animate={{ 
-            opacity: isEntering ? 0 : 1, 
-            y: (pointer.y * 14) + (-scrollRatio * 25) + (isEntering ? -30 : 0), 
-            x: pointer.x * 14,
-            scale: isEntering ? 1.04 : 1,
-            rotateX: isMobile ? 0 : (-pointer.y * 3.5) + (isEntering ? -2 : 0),
-            rotateY: isMobile ? 0 : (pointer.x * 3.5) + (isEntering ? 2 : 0),
-            filter: isEntering ? "blur(4px)" : "blur(0px)"
+            opacity: isEntering ? 0.3 : 1, 
+            scale: 1,
+            y: 0
           }}
           transition={{ 
-            opacity: isEntering ? { duration: 0.65, ease: "easeOut" } : { duration: 1.2, delay: introPlayed ? 0 : 4.0, ease: [0.215, 0.61, 0.355, 1] },
-            scale: { duration: 1.2, delay: introPlayed ? 0 : 4.0, ease: [0.215, 0.61, 0.355, 1] },
-            filter: { duration: 0.6, ease: "easeOut" },
-            y: { type: "spring", stiffness: 85, damping: 26 },
-            x: { type: "spring", stiffness: 85, damping: 26 },
-            rotateX: { type: "spring", stiffness: 85, damping: 26 },
-            rotateY: { type: "spring", stiffness: 85, damping: 26 }
+            opacity: isEntering ? { duration: 0.4, ease: "easeOut" } : { duration: 1.2, delay: isMobile ? (introPlayed ? 0 : 0.4) : (introPlayed ? 0 : 4.0), ease: [0.215, 0.61, 0.355, 1] },
+            scale: { duration: 1.2, delay: isMobile ? (introPlayed ? 0 : 0.4) : (introPlayed ? 0 : 4.0), ease: [0.215, 0.61, 0.355, 1] },
+            y: { duration: 1.2, delay: isMobile ? (introPlayed ? 0 : 0.4) : (introPlayed ? 0 : 4.0), ease: [0.215, 0.61, 0.355, 1] }
           }}
           onClick={handleCardTap}
           whileTap={{ scale: 0.992 }}
-          className="relative w-[80vw] h-[64svh] md:w-auto md:max-w-[365px] md:h-auto p-[2px] md:p-[4px] bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#B38728] rounded-[126px_126px_18px_18px] md:rounded-[162px_162px_22px_22px] shadow-[0_25px_60px_-15px_rgba(32,3,10,0.65),0_0_35px_rgba(212,175,55,0.25)] flex flex-col items-center justify-center overflow-hidden cursor-pointer animate-card-float transform-gpu will-change-transform"
-          style={{ transformStyle: "preserve-3d" }}
+          style={{
+            x: layer3X,
+            y: layer3Y,
+            rotateX,
+            rotateY,
+            transformStyle: "preserve-3d"
+          }}
+          className={`relative w-[80vw] h-[64svh] md:w-auto md:max-w-[365px] md:h-auto p-[2px] md:p-[4px] bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#B38728] rounded-[126px_126px_18px_18px] md:rounded-[162px_162px_22px_22px] shadow-[0_25px_60px_-15px_rgba(32,3,10,0.65),0_0_35px_rgba(212,175,55,0.25)] flex flex-col items-center justify-center overflow-hidden cursor-pointer transform-gpu will-change-transform ${isMobile ? "animate-card-float" : ""}`}
         >
           {/* Inner illuminated glow halo */}
           <div className="absolute inset-[0.5px] border border-[#FFFDF9]/45 rounded-[125.5px_125.5px_17.5px_17.5px] md:rounded-[161.5px_161.5px_21.5px_21.5px] pointer-events-none z-10 animate-border-shimmer" />
@@ -646,7 +648,7 @@ export default function Hero() {
           <motion.div 
             initial={{ opacity: 0, filter: "blur(4px)" }}
             animate={{ opacity: 1, filter: "blur(0px)" }}
-            transition={{ duration: 0.95, delay: introPlayed ? 0 : 5.0, ease: "easeOut" }}
+            transition={{ duration: 0.95, delay: isMobile ? (introPlayed ? 0 : 0.8) : (introPlayed ? 0 : 5.0), ease: "easeOut" }}
             className="w-full flex-1 flex flex-col items-center justify-between z-10"
           >
             
@@ -674,7 +676,7 @@ export default function Hero() {
               initial="hidden"
               animate="visible"
               variants={groomStagger}
-              className="font-cormorant text-[42px] md:text-[80px] font-bold text-[#4A081B] tracking-tighter leading-none"
+              className="font-cormorant text-[42px] md:text-[56px] font-bold text-[#4A081B] tracking-tighter leading-none"
             >
               {splitName("Fauzan", groomStagger, false)}
             </motion.h1>
@@ -724,7 +726,7 @@ export default function Hero() {
               initial="hidden"
               animate="visible"
               variants={brideStagger}
-              className="font-cormorant text-[42px] md:text-[80px] font-bold text-[#4A081B] tracking-tighter leading-none mb-1 md:mb-6"
+              className="font-cormorant text-[42px] md:text-[56px] font-bold text-[#4A081B] tracking-tighter leading-none mb-1 md:mb-4"
             >
               {splitName("Huda", brideStagger, true)}
             </motion.h1>
@@ -754,7 +756,7 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0, scale: 0.6 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.0, delay: introPlayed ? 0 : 4.3 }}
+          transition={{ duration: 1.0, delay: isMobile ? (introPlayed ? 0 : 0.8) : (introPlayed ? 0 : 4.3) }}
           className="relative w-8 h-6 flex items-center justify-center pointer-events-none z-10 my-0.5 md:hidden"
         >
           {/* Glowing vertical line */}
@@ -784,10 +786,10 @@ export default function Hero() {
             y: scrollRatio * 15
           }}
           transition={{ 
-            opacity: { duration: 1.0, delay: introPlayed ? 0 : 4.3, ease: "easeOut" },
+            opacity: { duration: 1.0, delay: isMobile ? (introPlayed ? 0 : 0.8) : (introPlayed ? 0 : 4.3), ease: "easeOut" },
             scale: { repeat: Infinity, duration: 3.0, ease: "easeInOut" }
           }}
-          className="mt-1 z-20 md:mt-10 flex flex-col items-center justify-center pointer-events-auto"
+          className="mt-1 z-20 md:mt-6 flex flex-col items-center justify-center pointer-events-auto"
         >
           <motion.button
             onClick={handleEnterClick}
