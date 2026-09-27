@@ -82,7 +82,7 @@ const PalacePavilionBackdrop = () => {
       <img 
         src="/hero_palace_bg.jpg" 
         alt="Luxury Islamic Wedding Pavilion Venue Desktop" 
-        className="hidden md:block absolute inset-0 w-full h-full object-cover object-[50%_36%] sm:object-[50%_42%] md:object-center pointer-events-none transform-gpu scale-[1.02]" 
+        className="hidden md:block absolute inset-0 w-full h-full object-cover object-[50%_top] pointer-events-none transform-gpu" 
       />
 
       {/* 2. Slow Continuous Warm Light Breathing behind Arch */}
@@ -816,14 +816,24 @@ export default function Hero() {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.85, ease: "easeOut" }}
-          className="mt-1 sm:mt-[clamp(6px,1.8vh,20px)] mb-1 z-20 flex flex-col items-center justify-center pointer-events-auto"
+          className="mt-1.5 sm:mt-2.5 md:mt-[clamp(16px,3.5vh,36px)] mb-1 z-20 flex flex-col items-center justify-center pointer-events-auto"
         >
           <motion.button
             onClick={handleEnterClick}
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
-            transition={{ type: "spring", stiffness: 400, damping: 18 }}
-            className="w-[clamp(60px,15vw,90px)] h-[clamp(60px,15vw,90px)] rounded-full p-[2px] bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#B38728] shadow-[0_6px_20px_rgba(212,175,55,0.45),0_0_12px_rgba(212,175,55,0.15)] hover:shadow-[0_10px_30px_rgba(232,199,106,0.6)] transition-shadow duration-300 relative group flex items-center justify-center cursor-pointer select-none focus:outline-none"
+            animate={{ 
+              boxShadow: [
+                "0 6px 18px rgba(212,175,55,0.35), 0 0 10px rgba(212,175,55,0.15)",
+                "0 8px 24px rgba(232,199,106,0.55), 0 0 16px rgba(212,175,55,0.3)",
+                "0 6px 18px rgba(212,175,55,0.35), 0 0 10px rgba(212,175,55,0.15)"
+              ]
+            }}
+            transition={{ 
+              boxShadow: { duration: 4.5, repeat: Infinity, ease: "easeInOut" },
+              scale: { type: "spring", stiffness: 400, damping: 18 }
+            }}
+            className="w-[clamp(60px,15vw,80px)] h-[clamp(60px,15vw,80px)] md:w-20 md:h-20 rounded-full p-[2px] bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#B38728] relative group flex items-center justify-center cursor-pointer select-none focus:outline-none"
           >
             {/* Center Burgundy Core */}
             <div className="w-full h-full rounded-full bg-gradient-to-b from-[#4A081B] via-[#310411] to-[#1F000A] shadow-[inset_0_2px_5px_rgba(0,0,0,0.65)] flex flex-col items-center justify-center p-2 relative overflow-hidden">
