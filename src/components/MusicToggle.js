@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 
 // Single shared global audio instance to prevent duplicates and desync
 let globalAudio = null;
-let globalGestureUnlocked = false;
 
 export function getGlobalAudio() {
   if (typeof window === "undefined") return null;
@@ -15,41 +14,6 @@ export function getGlobalAudio() {
     globalAudio.loop = true;
     globalAudio.preload = "auto";
     globalAudio.volume = 0; // Start at 0 and fade in programmatically
-
-    // Global background gesture unlock helper
-    const unlockAudioOnGesture = () => {
-      if (!globalAudio) return;
-      globalGestureUnlocked = true;
-      if (globalAudio.dataset.playing === "true" && globalAudio.paused) {
-        globalAudio.play().then(() => {
-          removeGlobalGestureListeners();
-        }).catch(() => {});
-      }
-    };
-
-    const addGlobalGestureListeners = () => {
-      if (typeof window === "undefined") return;
-      window.addEventListener("pointerdown", unlockAudioOnGesture, { capture: true });
-      window.addEventListener("touchstart", unlockAudioOnGesture, { capture: true });
-      window.addEventListener("click", unlockAudioOnGesture, { capture: true });
-      window.addEventListener("scroll", unlockAudioOnGesture, { capture: true });
-      window.addEventListener("touchmove", unlockAudioOnGesture, { capture: true });
-      window.addEventListener("keydown", unlockAudioOnGesture, { capture: true });
-    };
-
-    const removeGlobalGestureListeners = () => {
-      if (typeof window === "undefined") return;
-      window.removeEventListener("pointerdown", unlockAudioOnGesture, { capture: true });
-      window.removeEventListener("touchstart", unlockAudioOnGesture, { capture: true });
-      window.removeEventListener("click", unlockAudioOnGesture, { capture: true });
-      window.removeEventListener("scroll", unlockAudioOnGesture, { capture: true });
-      window.removeEventListener("touchmove", unlockAudioOnGesture, { capture: true });
-      window.removeEventListener("keydown", unlockAudioOnGesture, { capture: true });
-    };
-
-    globalAudio._addGestureListeners = addGlobalGestureListeners;
-    globalAudio._removeGestureListeners = removeGlobalGestureListeners;
-    addGlobalGestureListeners();
   }
   return globalAudio;
 }
@@ -63,7 +27,10 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
     setMounted(true);
     const audio = getGlobalAudio();
     if (audio) {
-      audio.dataset.playing = isPlaying ? "true" : "false";
+      const isActuallyPlaying = Boolean(!audio.paused);
+      if (isActuallyPlaying !== isPlaying) {
+        setIsPlaying(isActuallyPlaying);
+      }
     }
 
     return () => {
@@ -76,7 +43,6 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
     const audio = getGlobalAudio();
     if (!audio) return;
 
-    // Track state on custom DOM property for event listener check
     audio.dataset.playing = isPlaying ? "true" : "false";
     const targetVolume = 0.35; // Soft background level
 
@@ -86,54 +52,54 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
 
     let isListening = false;
 
-    const startPlayback = () => {
+    // Passive listener for any user interaction (scroll/touch) to resume audio if blocked earlier
+    const handlePassiveUnlock = () => {
       if (!audio) return;
-      
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            audio.dataset.playing = "true";
+      if (audio.paused && audio.dataset.playing === "true") {
+        const p = audio.play();
+        if (p !== undefined) {
+          p.then(() => {
+            setIsPlaying(true);
             removeInteractionListeners();
-          })
-          .catch((err) => {
-            console.log("Autoplay waiting for user gesture:", err);
-            // Autoplay was blocked by browser policy; keep listening for any gesture
-            addInteractionListeners();
-          });
-      }
-    };
-
-    const handleUserInteraction = () => {
-      if (audio && audio.paused && isPlaying) {
-        startPlayback();
+          }).catch(() => {});
+        }
       }
     };
 
     const addInteractionListeners = () => {
       if (isListening) return;
       isListening = true;
-      window.addEventListener("pointerdown", handleUserInteraction, { capture: true });
-      window.addEventListener("touchstart", handleUserInteraction, { capture: true });
-      window.addEventListener("click", handleUserInteraction, { capture: true });
-      window.addEventListener("scroll", handleUserInteraction, { capture: true });
-      window.addEventListener("touchmove", handleUserInteraction, { capture: true });
-      window.addEventListener("keydown", handleUserInteraction, { capture: true });
+      window.addEventListener("pointerdown", handlePassiveUnlock, { capture: true, passive: true });
+      window.addEventListener("touchstart", handlePassiveUnlock, { capture: true, passive: true });
+      window.addEventListener("click", handlePassiveUnlock, { capture: true, passive: true });
+      window.addEventListener("scroll", handlePassiveUnlock, { capture: true, passive: true });
     };
 
     const removeInteractionListeners = () => {
       if (!isListening) return;
       isListening = false;
-      window.removeEventListener("pointerdown", handleUserInteraction, { capture: true });
-      window.removeEventListener("touchstart", handleUserInteraction, { capture: true });
-      window.removeEventListener("click", handleUserInteraction, { capture: true });
-      window.removeEventListener("scroll", handleUserInteraction, { capture: true });
-      window.removeEventListener("touchmove", handleUserInteraction, { capture: true });
-      window.removeEventListener("keydown", handleUserInteraction, { capture: true });
+      window.removeEventListener("pointerdown", handlePassiveUnlock, { capture: true });
+      window.removeEventListener("touchstart", handlePassiveUnlock, { capture: true });
+      window.removeEventListener("click", handlePassiveUnlock, { capture: true });
+      window.removeEventListener("scroll", handlePassiveUnlock, { capture: true });
     };
 
     if (isPlaying) {
-      startPlayback();
+      if (audio.paused) {
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              audio.dataset.playing = "true";
+              removeInteractionListeners();
+            })
+            .catch((err) => {
+              console.log("Autoplay waiting for user gesture:", err);
+              audio.dataset.playing = "true"; // Keep intent to play on gesture
+              addInteractionListeners();
+            });
+        }
+      }
 
       // Smooth volume fade-in
       fadeIntervalRef.current = setInterval(() => {
@@ -145,7 +111,6 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
       }, 50);
     } else {
       removeInteractionListeners();
-      if (audio._removeGestureListeners) audio._removeGestureListeners();
       
       // Smooth volume fade-out and pause
       fadeIntervalRef.current = setInterval(() => {
@@ -204,6 +169,32 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
     return () => observer.disconnect();
   }, []);
 
+  // Direct toggle click handler - executes audio.play() synchronously inside user click
+  const handleToggleClick = () => {
+    const audio = getGlobalAudio();
+    if (!audio) return;
+
+    if (!isPlaying || audio.paused) {
+      audio.dataset.playing = "true";
+      audio.volume = 0.35;
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch((err) => {
+            console.log("User toggle play failed:", err);
+            setIsPlaying(false);
+          });
+      } else {
+        setIsPlaying(true);
+      }
+    } else {
+      setIsPlaying(false);
+    }
+  };
+
   if (!mounted) return null;
 
   // Resolve dynamic styles based on background theme for inverted contrast
@@ -240,7 +231,7 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
       <motion.button
         whileHover={{ scale: 1.04 }}
         whileTap={{ scale: 0.96 }}
-        onClick={() => setIsPlaying(!isPlaying)}
+        onClick={handleToggleClick}
         className={`h-9 px-3 rounded-full md:backdrop-blur-md flex items-center gap-2 cursor-pointer border transition-all duration-500 ease-in-out relative group ${buttonStyle.container}`}
         aria-label="Toggle music"
       >

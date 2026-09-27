@@ -6,7 +6,7 @@ import Lenis from "lenis";
 import dynamic from "next/dynamic";
 import Preloader from "@/components/Preloader";
 import GrandOpening from "@/components/GrandOpening";
-import MusicToggle from "@/components/MusicToggle";
+import MusicToggle, { getGlobalAudio } from "@/components/MusicToggle";
 import Hero from "@/components/Hero";
 import Parents from "@/components/Parents";
 import ScratchDate from "@/components/ScratchDate";
@@ -54,12 +54,15 @@ export default function Home() {
       {/* Foundational Persistent R3F WebGL Canvas */}
       <ThreeCanvas />
 
-      {/* 1. Fullscreen Preloader (Automatic timed loading + completion flash) */}
+      {/* 1. Fullscreen Preloader (Automatic timed loading + completion transition) */}
       <AnimatePresence>
         {status === "loading" && (
           <Preloader onComplete={() => {
             setStatus("opened");
-            setIsMusicPlaying(true);
+            // Check real audio state to prevent UI desynchronization if autoplay was blocked
+            const audio = getGlobalAudio();
+            const isPlayingNow = Boolean(audio && !audio.paused);
+            setIsMusicPlaying(isPlayingNow);
           }} />
         )}
       </AnimatePresence>
@@ -69,7 +72,7 @@ export default function Home() {
         <MusicToggle isPlaying={isMusicPlaying} setIsPlaying={setIsMusicPlaying} />
       )}
 
-      {/* 3. Main Scrollable Content (Rendered underneath preloader so Hero is ready immediately) */}
+      {/* 3. Main Scrollable Content */}
       <GrandOpening>
         <main className="w-full relative flex flex-col min-h-screen">
           <Hero />

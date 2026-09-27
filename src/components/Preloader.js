@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { playChime } from "@/utils/audioSynth";
 import { getGlobalAudio } from "@/components/MusicToggle";
 
@@ -30,13 +30,29 @@ export default function Preloader({ onComplete }) {
   const [mounted, setMounted] = useState(false);
   const [assetsReady, setAssetsReady] = useState(false);
 
+  const progressTimerRef = useRef(null);
+  const completionTimeoutRef = useRef(null);
+
   useEffect(() => {
     setMounted(true);
 
-    // Asynchronously preload critical assets with fallback timeout
+    // 1. Immediately attempt background music autoplay on load via global singleton
+    const audio = getGlobalAudio();
+    if (audio) {
+      audio.dataset.playing = "true";
+      audio.volume = 0.35;
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.log("Preloader initial autoplay blocked by browser policy:", err);
+          audio.dataset.playing = "false";
+        });
+      }
+    }
+
+    // 2. Asynchronously preload critical assets
     const preloadAssets = async () => {
       try {
-        getGlobalAudio(); // Pre-warm audio instance and buffer
         const fontPromise = typeof document !== "undefined" && document.fonts
           ? document.fonts.ready
           : Promise.resolve();
@@ -66,13 +82,13 @@ export default function Preloader({ onComplete }) {
       setAssetsReady(true);
     });
 
-    // Elegant, smooth cubic ease-out loading curve (2.2s duration)
-    const duration = 2200;
+    // 3. Smooth, luxury loading curve (1.8s duration)
+    const duration = 1800;
     const intervalTime = 40;
     const totalSteps = duration / intervalTime;
     let currentStep = 0;
 
-    const timer = setInterval(() => {
+    progressTimerRef.current = setInterval(() => {
       currentStep++;
       const t = currentStep / totalSteps;
       const easedT = 1 - Math.pow(1 - t, 3.2);
@@ -80,19 +96,24 @@ export default function Preloader({ onComplete }) {
       setProgress(nextProgress);
 
       if (currentStep >= totalSteps) {
-        clearInterval(timer);
+        if (progressTimerRef.current) clearInterval(progressTimerRef.current);
         playChime();
-        // Short intentional delay at 100% for a polished completion feel
-        setTimeout(() => {
+        
+        // Polished 350ms completion delay before fading out
+        completionTimeoutRef.current = setTimeout(() => {
           setIsFinished(true);
         }, 350);
       }
     }, intervalTime);
 
-    return () => clearInterval(timer);
+    // Clean up all timer IDs safely on unmount to prevent orphan callbacks
+    return () => {
+      if (progressTimerRef.current) clearInterval(progressTimerRef.current);
+      if (completionTimeoutRef.current) clearTimeout(completionTimeoutRef.current);
+    };
   }, []);
 
-  // Complete preloader when both progress and assets resolve
+  // Complete preloader automatically when both progress and assets resolve
   useEffect(() => {
     if (isFinished && assetsReady) {
       onComplete();
@@ -144,7 +165,7 @@ export default function Preloader({ onComplete }) {
       <div className="relative z-20 flex flex-col items-center">
         
         {/* Circular Casing for Progress Arc and Dark Maroon Medallion */}
-        <div className="relative w-52 h-52 md:w-60 md:h-60 flex items-center justify-center mb-8">
+        <div className="relative w-52 h-52 md:w-60 md:h-60 flex items-center justify-center mb-6">
           
           {/* Outer Soft Gold Ambient Glow */}
           <div className="absolute w-44 h-44 md:w-48 md:h-48 rounded-full bg-[#D4AF37]/15 blur-2xl pointer-events-none z-0" />
@@ -229,21 +250,23 @@ export default function Preloader({ onComplete }) {
         </div>
 
         {/* Loading status caption */}
-        <motion.p
-          animate={{
-            opacity: [0.65, 1, 0.65],
-            letterSpacing: ["0.32em", "0.36em", "0.32em"],
-          }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-          className="font-cormorant text-xs md:text-sm uppercase text-[#4A081B] tracking-[0.32em] font-semibold mb-1"
-        >
-          Loading Your Invitation
-        </motion.p>
-        
-        {/* Progress Percentage */}
-        <span className="font-inter text-[9px] tracking-[0.25em] text-[#856124] uppercase font-bold">
-          {progress}%
-        </span>
+        <div className="flex flex-col items-center">
+          <motion.p
+            animate={{
+              opacity: [0.65, 1, 0.65],
+              letterSpacing: ["0.32em", "0.36em", "0.32em"],
+            }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+            className="font-cormorant text-xs md:text-sm uppercase text-[#4A081B] tracking-[0.32em] font-semibold mb-1"
+          >
+            Loading Your Invitation
+          </motion.p>
+          
+          {/* Progress Percentage */}
+          <span className="font-inter text-[9px] tracking-[0.25em] text-[#856124] uppercase font-bold">
+            {progress}%
+          </span>
+        </div>
       </div>
     </motion.div>
   );
