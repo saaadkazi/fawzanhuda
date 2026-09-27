@@ -707,9 +707,11 @@ export default function Hero() {
       {/* ==================================================
           STABLE RESPONSIVE ARCH-INTEGRATED TEXT CENTERPIECE
           ================================================== */}
-      <div className="relative z-10 flex flex-col items-center max-w-lg w-full text-center select-none my-auto">
-        
-        {/* Borderless text centerpiece positioned directly inside the architectural arch */}
+      
+      {/* --------------------------------------------------
+          1. DEDICATED MOBILE HERO CONTENT TREE (< 768px)
+          -------------------------------------------------- */}
+      <div className="flex md:hidden relative z-10 flex-col items-center max-w-lg w-full text-center select-none my-auto">
         <motion.div
           initial={{ opacity: 0, scale: 0.98, y: 8, filter: "blur(2px)" }}
           animate={{ 
@@ -722,12 +724,11 @@ export default function Hero() {
             duration: 0.85,
             ease: [0.22, 1, 0.36, 1]
           }}
-          className="relative w-[78vw] sm:w-[84vw] md:w-[70vw] max-w-[320px] sm:max-w-[460px] px-2 sm:px-4 py-0.5 sm:py-2 flex flex-col items-center justify-center pointer-events-auto select-none my-auto"
+          className="relative w-[78vw] max-w-[320px] px-2 py-0.5 flex flex-col items-center justify-center pointer-events-auto select-none my-auto"
         >
-          {/* Sequential text reveals positioned inside the background arch */}
           <div className="w-full flex flex-col items-center justify-center text-center z-10">
             {/* Top Islamic star rosette */}
-            <div className="w-5 h-5 sm:w-8 sm:h-8 md:w-9 md:h-9 text-[#856124] mb-0.5 sm:mb-[clamp(2px,0.8vh,12px)] relative flex items-center justify-center">
+            <div className="w-5 h-5 text-[#856124] mb-0.5 relative flex items-center justify-center">
               <svg className="w-full h-full drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.4">
                 <path d="M 50 15 L 85 50 L 50 85 L 15 50 Z" />
                 <path d="M 50 25 L 75 50 L 50 75 L 25 50 Z" />
@@ -736,12 +737,12 @@ export default function Hero() {
             </div>
 
             {/* Families Line */}
-            <p className="font-cormorant italic text-[clamp(8.5px,2.2vw,14px)] text-[#5C3D1E] tracking-[0.15em] sm:tracking-[0.26em] uppercase mb-0.5 sm:mb-[clamp(2px,0.8vh,12px)] font-semibold drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] px-1">
+            <p className="font-cormorant italic text-[clamp(8.5px,2.2vw,12px)] text-[#5C3D1E] tracking-[0.14em] uppercase mb-0.5 font-semibold drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] px-1">
               Together with their families
             </p>
 
             {/* Groom Label */}
-            <p className="font-inter text-[clamp(7px,1.8vw,9.5px)] uppercase tracking-[0.2em] sm:tracking-[0.25em] text-[#856124] font-bold mb-0 sm:mb-0.5 select-none">
+            <p className="font-inter text-[clamp(7px,1.8vw,8.5px)] uppercase tracking-[0.2em] text-[#856124] font-bold mb-0 select-none">
               THE GROOM
             </p>
 
@@ -753,18 +754,18 @@ export default function Hero() {
             />
 
             {/* Star Rosette Divider */}
-            <div className="my-0.5 sm:my-[clamp(2px,0.8vh,12px)] w-full flex items-center justify-center gap-2 sm:gap-4 relative pointer-events-none">
+            <div className="my-0.5 w-full flex items-center justify-center gap-2 relative pointer-events-none">
               <motion.span 
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 style={{ transformOrigin: "right center" }}
-                className="h-[0.5px] w-6 sm:w-12 bg-gradient-to-r from-transparent to-[#856124]/60" 
+                className="h-[0.5px] w-6 bg-gradient-to-r from-transparent to-[#856124]/60" 
               />
               <div className="relative flex items-center justify-center">
-                <div className="absolute w-6 h-6 sm:w-10 sm:h-10 rounded-full border border-[#856124]/30 pointer-events-none z-30" />
+                <div className="absolute w-6 h-6 rounded-full border border-[#856124]/30 pointer-events-none z-30" />
                 <div className="text-[#856124] flex items-center justify-center drop-shadow-[0_0_8px_rgba(212,175,55,0.4)] z-10">
-                  <svg className="w-4 h-4 sm:w-6.5 sm:h-6.5 animate-pulse-slow" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <svg className="w-4 h-4 animate-pulse-slow" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M 50 12 L 61 39 L 88 50 L 61 61 L 50 88 L 39 61 L 12 50 L 39 39 Z" />
                     <circle cx="50" cy="50" r="7.5" fill="currentColor" />
                   </svg>
@@ -775,12 +776,12 @@ export default function Hero() {
                 animate={{ scaleX: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 style={{ transformOrigin: "left center" }}
-                className="h-[0.5px] w-6 sm:w-12 bg-gradient-to-l from-transparent to-[#856124]/60" 
+                className="h-[0.5px] w-6 bg-gradient-to-l from-transparent to-[#856124]/60" 
               />
             </div>
 
             {/* Bride Label */}
-            <p className="font-inter text-[clamp(7px,1.8vw,9.5px)] uppercase tracking-[0.2em] sm:tracking-[0.25em] text-[#856124] font-bold mb-0 sm:mb-0.5 select-none">
+            <p className="font-inter text-[clamp(7px,1.8vw,8.5px)] uppercase tracking-[0.2em] text-[#856124] font-bold mb-0 select-none">
               THE BRIDE
             </p>
 
@@ -792,31 +793,31 @@ export default function Hero() {
             />
 
             {/* Honor request line */}
-            <p className="font-inter text-[clamp(7px,1.8vw,10px)] text-[#856124] font-bold uppercase tracking-[0.14em] sm:tracking-[0.25em] mt-1 sm:mt-[clamp(1px,0.5vh,6px)] mb-0.5 sm:mb-[clamp(1px,0.5vh,6px)] px-1">
+            <p className="font-inter text-[clamp(7px,1.8vw,9px)] text-[#856124] font-bold uppercase tracking-[0.12em] mt-1 mb-0.5 px-1">
               Request the honor of your presence
             </p>
 
             {/* Nikah ceremony description */}
-            <p className="font-cormorant italic text-[clamp(11px,2.8vw,20px)] text-[#3D2314] font-medium max-w-[210px] sm:max-w-[300px] leading-tight sm:leading-relaxed drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
+            <p className="font-cormorant italic text-[clamp(11px,2.8vw,16px)] text-[#3D2314] font-medium max-w-[210px] leading-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
               at their blessed Nikah ceremony
             </p>
 
             {/* Subtle gold line divider */}
-            <div className="w-8 sm:w-12 h-[0.5px] bg-[#856124]/50 my-0.5 sm:my-[clamp(2px,0.6vh,8px)] pointer-events-none" />
+            <div className="w-8 h-[0.5px] bg-[#856124]/50 my-0.5 pointer-events-none" />
 
             {/* Sacred Date Micro-Detail */}
-            <p className="font-cinzel text-[clamp(8px,2.0vw,10.5px)] tracking-[0.2em] sm:tracking-[0.28em] text-[#856124] font-bold mb-0.5 sm:mb-0">
+            <p className="font-cinzel text-[clamp(8px,2.0vw,10px)] tracking-[0.18em] text-[#856124] font-bold mb-0.5">
               09 • 12 • 2026
             </p>
           </div>
         </motion.div>
 
-        {/* Premium Medallion CTA Button ("TAP TO ENTER") with Refined Continuous Idle Motion */}
+        {/* Mobile TAP TO ENTER CTA Button */}
         <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.85, ease: "easeOut" }}
-          className="mt-1.5 sm:mt-2.5 md:mt-[clamp(16px,3.5vh,36px)] mb-1 z-20 flex flex-col items-center justify-center pointer-events-auto"
+          className="mt-1.5 mb-1 z-20 flex flex-col items-center justify-center pointer-events-auto"
         >
           <motion.button
             onClick={handleEnterClick}
@@ -833,15 +834,10 @@ export default function Hero() {
               boxShadow: { duration: 4.5, repeat: Infinity, ease: "easeInOut" },
               scale: { type: "spring", stiffness: 400, damping: 18 }
             }}
-            className="w-[clamp(60px,15vw,80px)] h-[clamp(60px,15vw,80px)] md:w-20 md:h-20 rounded-full p-[2px] bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#B38728] relative group flex items-center justify-center cursor-pointer select-none focus:outline-none"
+            className="w-[62px] h-[62px] rounded-full p-[2px] bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#B38728] relative group flex items-center justify-center cursor-pointer select-none focus:outline-none"
           >
-            {/* Center Burgundy Core */}
             <div className="w-full h-full rounded-full bg-gradient-to-b from-[#4A081B] via-[#310411] to-[#1F000A] shadow-[inset_0_2px_5px_rgba(0,0,0,0.65)] flex flex-col items-center justify-center p-2 relative overflow-hidden">
-              
-              {/* Inner Gold Bead Trim Ring */}
               <div className="absolute inset-[3px] border border-dashed border-[#FCF6BA]/35 rounded-full pointer-events-none z-10" />
-              
-              {/* Gold Light Sweep Across Medallion */}
               <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
                 <motion.div
                   animate={{ x: ["-100%", "200%"] }}
@@ -849,12 +845,10 @@ export default function Hero() {
                   className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-[#FCF6BA]/35 to-transparent skew-x-12"
                 />
               </div>
-
-              {/* Refined Downward Chevron Movement */}
               <motion.svg 
                 animate={{ y: [0, 2.5, 0] }}
                 transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-                className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#FCF6BA] mb-0.5" 
+                className="w-3 h-3 text-[#FCF6BA] mb-0.5" 
                 fill="none" 
                 stroke="currentColor" 
                 strokeWidth="2.8" 
@@ -862,15 +856,168 @@ export default function Hero() {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
               </motion.svg>
-
-              {/* Engraved Luxury Text */}
-              <span className="font-cinzel text-[6.5px] sm:text-[7.5px] md:text-[8px] tracking-[0.2em] font-extrabold text-[#FCF6BA] leading-tight text-center drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
+              <span className="font-cinzel text-[6.5px] tracking-[0.2em] font-extrabold text-[#FCF6BA] leading-tight text-center drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
                 TAP TO<br />ENTER
               </span>
             </div>
           </motion.button>
         </motion.div>
+      </div>
 
+      {/* --------------------------------------------------
+          2. LOCKED DESKTOP / TABLET HERO CONTENT TREE (>= 768px)
+          -------------------------------------------------- */}
+      <div className="hidden md:flex relative z-10 flex-col items-center max-w-lg w-full text-center select-none my-auto">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98, y: 8, filter: "blur(2px)" }}
+          animate={{ 
+            opacity: isEntering ? 0.3 : 1, 
+            scale: 1,
+            y: 0,
+            filter: "blur(0px)"
+          }}
+          transition={{ 
+            duration: 0.85,
+            ease: [0.22, 1, 0.36, 1]
+          }}
+          className="relative w-[70vw] max-w-[460px] px-4 py-2 flex flex-col items-center justify-center pointer-events-auto select-none my-auto"
+        >
+          <div className="w-full flex flex-col items-center justify-center text-center z-10">
+            {/* Top Islamic star rosette */}
+            <div className="w-8 sm:w-8 md:w-9 md:h-9 text-[#856124] mb-[clamp(2px,0.8vh,12px)] relative flex items-center justify-center">
+              <svg className="w-full h-full drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.4">
+                <path d="M 50 15 L 85 50 L 50 85 L 15 50 Z" />
+                <path d="M 50 25 L 75 50 L 50 75 L 25 50 Z" />
+                <circle cx="50" cy="50" r="6" fill="currentColor" />
+              </svg>
+            </div>
+
+            {/* Families Line */}
+            <p className="font-cormorant italic text-[clamp(10px,2.6vw,14px)] text-[#5C3D1E] tracking-[0.26em] uppercase mb-[clamp(2px,0.8vh,12px)] font-semibold drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] px-1">
+              Together with their families
+            </p>
+
+            {/* Groom Label */}
+            <p className="font-inter text-[clamp(7.5px,2.0vw,9.5px)] uppercase tracking-[0.25em] text-[#856124] font-bold mb-0.5 select-none">
+              THE GROOM
+            </p>
+
+            {/* Groom Name */}
+            <LetterInteractiveName 
+              fullName="Fawzan" 
+              isBride={false} 
+              isMobile={isMobile} 
+            />
+
+            {/* Star Rosette Divider */}
+            <div className="my-[clamp(2px,0.8vh,12px)] w-full flex items-center justify-center gap-4 relative pointer-events-none">
+              <motion.span 
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                style={{ transformOrigin: "right center" }}
+                className="h-[0.5px] w-12 bg-gradient-to-r from-transparent to-[#856124]/60" 
+              />
+              <div className="relative flex items-center justify-center">
+                <div className="absolute w-10 h-10 rounded-full border border-[#856124]/30 pointer-events-none z-30" />
+                <div className="text-[#856124] flex items-center justify-center drop-shadow-[0_0_8px_rgba(212,175,55,0.4)] z-10">
+                  <svg className="w-6.5 h-6.5 animate-pulse-slow" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M 50 12 L 61 39 L 88 50 L 61 61 L 50 88 L 39 61 L 12 50 L 39 39 Z" />
+                    <circle cx="50" cy="50" r="7.5" fill="currentColor" />
+                  </svg>
+                </div>
+              </div>
+              <motion.span 
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                style={{ transformOrigin: "left center" }}
+                className="h-[0.5px] w-12 bg-gradient-to-l from-transparent to-[#856124]/60" 
+              />
+            </div>
+
+            {/* Bride Label */}
+            <p className="font-inter text-[clamp(7.5px,2.0vw,9.5px)] uppercase tracking-[0.25em] text-[#856124] font-bold mb-0.5 select-none">
+              THE BRIDE
+            </p>
+
+            {/* Bride Name */}
+            <LetterInteractiveName 
+              fullName="Huda" 
+              isBride={true} 
+              isMobile={isMobile} 
+            />
+
+            {/* Honor request line */}
+            <p className="font-inter text-[clamp(7.5px,2.0vw,10px)] text-[#856124] font-bold uppercase tracking-[0.25em] my-[clamp(1px,0.5vh,6px)] px-1">
+              Request the honor of your presence
+            </p>
+
+            {/* Nikah ceremony description */}
+            <p className="font-cormorant italic text-[clamp(11px,2.8vw,20px)] text-[#3D2314] font-medium max-w-[300px] leading-relaxed drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
+              at their blessed Nikah ceremony
+            </p>
+
+            {/* Subtle gold line divider */}
+            <div className="w-12 h-[0.5px] bg-[#856124]/50 my-[clamp(2px,0.6vh,8px)] pointer-events-none" />
+
+            {/* Sacred Date Micro-Detail */}
+            <p className="font-cinzel text-[clamp(8px,2.0vw,10.5px)] tracking-[0.28em] text-[#856124] font-bold mb-0">
+              09 • 12 • 2026
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Desktop TAP TO ENTER CTA Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.85, ease: "easeOut" }}
+          className="mt-[clamp(16px,3.5vh,36px)] mb-1 z-20 flex flex-col items-center justify-center pointer-events-auto"
+        >
+          <motion.button
+            onClick={handleEnterClick}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+            animate={{ 
+              boxShadow: [
+                "0 6px 18px rgba(212,175,55,0.35), 0 0 10px rgba(212,175,55,0.15)",
+                "0 8px 24px rgba(232,199,106,0.55), 0 0 16px rgba(212,175,55,0.3)",
+                "0 6px 18px rgba(212,175,55,0.35), 0 0 10px rgba(212,175,55,0.15)"
+              ]
+            }}
+            transition={{ 
+              boxShadow: { duration: 4.5, repeat: Infinity, ease: "easeInOut" },
+              scale: { type: "spring", stiffness: 400, damping: 18 }
+            }}
+            className="w-20 h-20 rounded-full p-[2px] bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#B38728] relative group flex items-center justify-center cursor-pointer select-none focus:outline-none"
+          >
+            <div className="w-full h-full rounded-full bg-gradient-to-b from-[#4A081B] via-[#310411] to-[#1F000A] shadow-[inset_0_2px_5px_rgba(0,0,0,0.65)] flex flex-col items-center justify-center p-2 relative overflow-hidden">
+              <div className="absolute inset-[3px] border border-dashed border-[#FCF6BA]/35 rounded-full pointer-events-none z-10" />
+              <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+                <motion.div
+                  animate={{ x: ["-100%", "200%"] }}
+                  transition={{ repeat: Infinity, duration: 4.0, ease: "linear", delay: 0.5 }}
+                  className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-[#FCF6BA]/35 to-transparent skew-x-12"
+                />
+              </div>
+              <motion.svg 
+                animate={{ y: [0, 2.5, 0] }}
+                transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+                className="w-3.5 h-3.5 text-[#FCF6BA] mb-0.5" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2.8" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+              </motion.svg>
+              <span className="font-cinzel text-[8px] tracking-[0.2em] font-extrabold text-[#FCF6BA] leading-tight text-center drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
+                TAP TO<br />ENTER
+              </span>
+            </div>
+          </motion.button>
+        </motion.div>
       </div>
 
       {/* Royal Gold Arch Section Divider */}

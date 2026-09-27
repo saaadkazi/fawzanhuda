@@ -245,7 +245,7 @@ function Parents() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.06)_0%,transparent_70%)] pointer-events-none z-0" />
 
           {/* Top Micro-Icon (Tiny gold crescent) */}
-          <div className="w-4.5 h-4.5 text-[#D4AF37] mb-1.5 relative z-10">
+          <div className="w-4.5 h-4.5 text-[#D4AF37] mb-1 relative z-10">
             <svg className="w-full h-full" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12.3 2a10 10 0 0 0-1.9.2 10.4 10.4 0 0 1 .4 3c0 5.4-4 9.8-9.2 10.4a10.2 10.2 0 0 0 10.7 8.3 10 10 0 0 0 9.8-10A10 10 0 0 0 12.3 2z" />
             </svg>
@@ -257,12 +257,17 @@ function Parents() {
           </span>
 
           {/* Tiny gold leaf ornament line */}
-          <div className="w-16 h-[0.5px] bg-[#D4AF37]/45 mx-auto mb-2.5" />
+          <div className="w-16 h-[0.5px] bg-[#D4AF37]/45 mx-auto mb-2" />
 
-          {/* Hero Name (Zainuddin Kadir Kazi) */}
-          <h3 className="font-cormorant text-xl md:text-[23px] font-bold text-[#4A081B] tracking-wide mb-1.5 relative z-10 leading-tight">
-            Zainuddin Kadir Kazi
-          </h3>
+          {/* Hero Names */}
+          <div className="space-y-0.5 relative z-10 mb-1.5">
+            <h3 className="font-cormorant text-lg md:text-[21px] font-bold text-[#4A081B] tracking-wide leading-tight">
+              Zainuddin Kadir Kazi
+            </h3>
+            <h3 className="font-cormorant text-lg md:text-[21px] font-bold text-[#4A081B] tracking-wide leading-tight">
+              Fatimbi Zainuddin Kazi
+            </h3>
+          </div>
 
           {/* Subheading details */}
           <p className="font-cormorant text-[9.5px] md:text-[11px] text-[#856124] tracking-wider relative z-10 font-semibold uppercase">
