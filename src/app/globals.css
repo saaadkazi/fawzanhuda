@@ -218,4 +218,17 @@ body {
   z-index: 1;
 }
 
+/* Hide Next.js Dev Indicator Logo / Badge */
+[data-next-badge],
+[data-nextjs-toast],
+[data-nextjs-portal],
+nextjs-portal,
+#nextjs-dev-tools,
+div[class*="nextjs-toast"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 

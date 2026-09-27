@@ -71,11 +71,18 @@ const PalaceArchFrame = () => null;
 const PalacePavilionBackdrop = () => {
   return (
     <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden select-none max-w-full">
-      {/* 1. Photorealistic 8K Master Reference Venue Image */}
+      {/* 1a. Dedicated Mobile 9:16 Master Venue Asset (< 768px) */}
+      <img 
+        src="/hero_palace_bg_mobile.jpg" 
+        alt="Luxury Islamic Wedding Pavilion Venue Mobile" 
+        className="block md:hidden absolute inset-0 w-full h-full object-cover object-center pointer-events-none transform-gpu" 
+      />
+
+      {/* 1b. Photorealistic 8K Master Desktop & Tablet Venue Asset (>= 768px - Untouched Original) */}
       <img 
         src="/hero_palace_bg.jpg" 
-        alt="Luxury Islamic Wedding Pavilion Venue" 
-        className="absolute inset-0 w-full h-full object-cover object-[50%_36%] sm:object-[50%_42%] md:object-center pointer-events-none transform-gpu scale-[1.02]" 
+        alt="Luxury Islamic Wedding Pavilion Venue Desktop" 
+        className="hidden md:block absolute inset-0 w-full h-full object-cover object-[50%_36%] sm:object-[50%_42%] md:object-center pointer-events-none transform-gpu scale-[1.02]" 
       />
 
       {/* 2. Slow Continuous Warm Light Breathing behind Arch */}
@@ -275,7 +282,7 @@ const LetterInteractiveName = ({ fullName, isBride = false, isMobile }) => {
   return (
     <div 
       onPointerLeave={handleContainerLeave}
-      className={`relative inline-flex items-center justify-center select-none font-cormorant text-[clamp(36px,8.5vw,62px)] font-bold text-[#4A081B] tracking-tighter leading-none py-[clamp(1px,0.4vh,6px)] my-0 ${
+      className={`relative inline-flex items-center justify-center select-none font-cormorant text-[clamp(28px,7.5vw,62px)] sm:text-[clamp(36px,8.5vw,62px)] font-bold text-[#4A081B] tracking-tighter leading-none py-0 sm:py-[clamp(1px,0.4vh,6px)] my-0 ${
         isBride ? "living-gold-name-huda" : "living-gold-name-fawzan"
       }`}
     >
@@ -405,20 +412,6 @@ export default function Hero() {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  useEffect(() => {
-    if (!isMobile) return;
-    const interval = setInterval(() => {
-      setIsWaveActive(true);
-      setTimeout(() => setIsWaveActive(false), 2200);
-    }, 3800);
-    return () => clearInterval(interval);
-  }, [isMobile]);
-
-  const handleCardTap = () => {
-    setIsCardTapped(true);
-    setTimeout(() => setIsCardTapped(false), 1200);
-  };
 
   const handleEnterClick = () => {
     if (isEntering) return;
@@ -729,13 +722,12 @@ export default function Hero() {
             duration: 0.85,
             ease: [0.22, 1, 0.36, 1]
           }}
-          onClick={handleCardTap}
-          className="relative w-[92vw] sm:w-[84vw] md:w-[70vw] max-w-[460px] px-2 sm:px-4 py-1 sm:py-2 flex flex-col items-center justify-center pointer-events-auto select-none my-auto"
+          className="relative w-[78vw] sm:w-[84vw] md:w-[70vw] max-w-[320px] sm:max-w-[460px] px-2 sm:px-4 py-0.5 sm:py-2 flex flex-col items-center justify-center pointer-events-auto select-none my-auto"
         >
           {/* Sequential text reveals positioned inside the background arch */}
           <div className="w-full flex flex-col items-center justify-center text-center z-10">
             {/* Top Islamic star rosette */}
-            <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 text-[#856124] mb-[clamp(2px,0.8vh,12px)] relative flex items-center justify-center">
+            <div className="w-5 h-5 sm:w-8 sm:h-8 md:w-9 md:h-9 text-[#856124] mb-0.5 sm:mb-[clamp(2px,0.8vh,12px)] relative flex items-center justify-center">
               <svg className="w-full h-full drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.4">
                 <path d="M 50 15 L 85 50 L 50 85 L 15 50 Z" />
                 <path d="M 50 25 L 75 50 L 50 75 L 25 50 Z" />
@@ -744,12 +736,12 @@ export default function Hero() {
             </div>
 
             {/* Families Line */}
-            <p className="font-cormorant italic text-[clamp(10px,2.6vw,14px)] text-[#5C3D1E] tracking-[0.26em] uppercase mb-[clamp(2px,0.8vh,12px)] font-semibold drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]">
+            <p className="font-cormorant italic text-[clamp(8.5px,2.2vw,14px)] text-[#5C3D1E] tracking-[0.15em] sm:tracking-[0.26em] uppercase mb-0.5 sm:mb-[clamp(2px,0.8vh,12px)] font-semibold drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] px-1">
               Together with their families
             </p>
 
             {/* Groom Label */}
-            <p className="font-inter text-[clamp(7.5px,2.0vw,9.5px)] uppercase tracking-[0.25em] text-[#856124] font-bold mb-0.5 select-none">
+            <p className="font-inter text-[clamp(7px,1.8vw,9.5px)] uppercase tracking-[0.2em] sm:tracking-[0.25em] text-[#856124] font-bold mb-0 sm:mb-0.5 select-none">
               THE GROOM
             </p>
 
@@ -761,18 +753,18 @@ export default function Hero() {
             />
 
             {/* Star Rosette Divider */}
-            <div className="my-[clamp(2px,0.8vh,12px)] w-full flex items-center justify-center gap-3 sm:gap-4 relative pointer-events-none">
+            <div className="my-0.5 sm:my-[clamp(2px,0.8vh,12px)] w-full flex items-center justify-center gap-2 sm:gap-4 relative pointer-events-none">
               <motion.span 
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 style={{ transformOrigin: "right center" }}
-                className="h-[0.5px] w-10 sm:w-12 bg-gradient-to-r from-transparent to-[#856124]/60" 
+                className="h-[0.5px] w-6 sm:w-12 bg-gradient-to-r from-transparent to-[#856124]/60" 
               />
               <div className="relative flex items-center justify-center">
-                <div className="absolute w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-[#856124]/30 pointer-events-none z-30" />
+                <div className="absolute w-6 h-6 sm:w-10 sm:h-10 rounded-full border border-[#856124]/30 pointer-events-none z-30" />
                 <div className="text-[#856124] flex items-center justify-center drop-shadow-[0_0_8px_rgba(212,175,55,0.4)] z-10">
-                  <svg className="w-5 h-5 sm:w-6.5 sm:h-6.5 animate-pulse-slow" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <svg className="w-4 h-4 sm:w-6.5 sm:h-6.5 animate-pulse-slow" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M 50 12 L 61 39 L 88 50 L 61 61 L 50 88 L 39 61 L 12 50 L 39 39 Z" />
                     <circle cx="50" cy="50" r="7.5" fill="currentColor" />
                   </svg>
@@ -783,12 +775,12 @@ export default function Hero() {
                 animate={{ scaleX: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 style={{ transformOrigin: "left center" }}
-                className="h-[0.5px] w-10 sm:w-12 bg-gradient-to-l from-transparent to-[#856124]/60" 
+                className="h-[0.5px] w-6 sm:w-12 bg-gradient-to-l from-transparent to-[#856124]/60" 
               />
             </div>
 
             {/* Bride Label */}
-            <p className="font-inter text-[clamp(7.5px,2.0vw,9.5px)] uppercase tracking-[0.25em] text-[#856124] font-bold mb-0.5 select-none">
+            <p className="font-inter text-[clamp(7px,1.8vw,9.5px)] uppercase tracking-[0.2em] sm:tracking-[0.25em] text-[#856124] font-bold mb-0 sm:mb-0.5 select-none">
               THE BRIDE
             </p>
 
@@ -800,20 +792,20 @@ export default function Hero() {
             />
 
             {/* Honor request line */}
-            <p className="font-inter text-[clamp(7.5px,2.0vw,10px)] text-[#856124] font-bold uppercase tracking-[0.25em] my-[clamp(1px,0.5vh,6px)]">
+            <p className="font-inter text-[clamp(7px,1.8vw,10px)] text-[#856124] font-bold uppercase tracking-[0.14em] sm:tracking-[0.25em] mt-1 sm:mt-[clamp(1px,0.5vh,6px)] mb-0.5 sm:mb-[clamp(1px,0.5vh,6px)] px-1">
               Request the honor of your presence
             </p>
 
             {/* Nikah ceremony description */}
-            <p className="font-cormorant italic text-[clamp(11px,3vw,20px)] text-[#3D2314] font-medium max-w-[260px] sm:max-w-[300px] leading-relaxed drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
+            <p className="font-cormorant italic text-[clamp(11px,2.8vw,20px)] text-[#3D2314] font-medium max-w-[210px] sm:max-w-[300px] leading-tight sm:leading-relaxed drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
               at their blessed Nikah ceremony
             </p>
 
             {/* Subtle gold line divider */}
-            <div className="w-10 sm:w-12 h-[0.5px] bg-[#856124]/50 my-[clamp(2px,0.6vh,8px)] pointer-events-none" />
+            <div className="w-8 sm:w-12 h-[0.5px] bg-[#856124]/50 my-0.5 sm:my-[clamp(2px,0.6vh,8px)] pointer-events-none" />
 
             {/* Sacred Date Micro-Detail */}
-            <p className="font-cinzel text-[clamp(8px,2.2vw,10.5px)] tracking-[0.28em] text-[#856124] font-bold">
+            <p className="font-cinzel text-[clamp(8px,2.0vw,10.5px)] tracking-[0.2em] sm:tracking-[0.28em] text-[#856124] font-bold mb-0.5 sm:mb-0">
               09 • 12 • 2026
             </p>
           </div>
@@ -824,14 +816,14 @@ export default function Hero() {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.85, ease: "easeOut" }}
-          className="mt-[clamp(6px,1.8vh,20px)] mb-1 z-20 flex flex-col items-center justify-center pointer-events-auto"
+          className="mt-1 sm:mt-[clamp(6px,1.8vh,20px)] mb-1 z-20 flex flex-col items-center justify-center pointer-events-auto"
         >
           <motion.button
             onClick={handleEnterClick}
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
             transition={{ type: "spring", stiffness: 400, damping: 18 }}
-            className="w-[clamp(68px,17vw,90px)] h-[clamp(68px,17vw,90px)] rounded-full p-[2px] bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#B38728] shadow-[0_6px_20px_rgba(212,175,55,0.45),0_0_12px_rgba(212,175,55,0.15)] hover:shadow-[0_10px_30px_rgba(232,199,106,0.6)] transition-shadow duration-300 relative group flex items-center justify-center cursor-pointer select-none focus:outline-none"
+            className="w-[clamp(60px,15vw,90px)] h-[clamp(60px,15vw,90px)] rounded-full p-[2px] bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#B38728] shadow-[0_6px_20px_rgba(212,175,55,0.45),0_0_12px_rgba(212,175,55,0.15)] hover:shadow-[0_10px_30px_rgba(232,199,106,0.6)] transition-shadow duration-300 relative group flex items-center justify-center cursor-pointer select-none focus:outline-none"
           >
             {/* Center Burgundy Core */}
             <div className="w-full h-full rounded-full bg-gradient-to-b from-[#4A081B] via-[#310411] to-[#1F000A] shadow-[inset_0_2px_5px_rgba(0,0,0,0.65)] flex flex-col items-center justify-center p-2 relative overflow-hidden">
