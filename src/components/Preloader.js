@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { playChime } from "@/utils/audioSynth";
+import { getGlobalAudio } from "@/components/MusicToggle";
 
 // Corner Gold Ornament subcomponent matching invitation card style
 const PreloaderCornerOrnament = ({ position }) => {
@@ -35,6 +36,7 @@ export default function Preloader({ onComplete }) {
     // Asynchronously preload critical assets with fallback timeout
     const preloadAssets = async () => {
       try {
+        getGlobalAudio(); // Pre-warm audio instance and buffer
         const fontPromise = typeof document !== "undefined" && document.fonts
           ? document.fonts.ready
           : Promise.resolve();

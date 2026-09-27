@@ -53,14 +53,27 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
       clearInterval(fadeIntervalRef.current);
     }
 
-    if (isPlaying) {
-      // Trigger play if paused
+    const startPlayback = () => {
       if (audio.paused) {
         audio.play().catch((err) => {
-          console.log("Audio play blocked by browser autoplay policy:", err);
-          setIsPlaying(false);
+          console.log("Autoplay waiting for user interaction:", err);
         });
       }
+    };
+
+    if (isPlaying) {
+      startPlayback();
+
+      // Fallback: If autoplay was blocked by browser policy, resume on first user interaction
+      const handleUserInteraction = () => {
+        if (isPlaying && audio.paused) {
+          startPlayback();
+        }
+      };
+
+      window.addEventListener("pointerdown", handleUserInteraction, { once: true });
+      window.addEventListener("touchstart", handleUserInteraction, { once: true });
+      window.addEventListener("click", handleUserInteraction, { once: true });
 
       // Smooth volume fade-in
       fadeIntervalRef.current = setInterval(() => {
@@ -129,33 +142,31 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
   // Resolve dynamic styles based on background theme for inverted contrast
   const buttonStyle = isThemeDark
     ? {
-        // Background is dark -> Button is light (ivory pill with burgundy/gold accents)
-        container: `bg-[#FFF8ED]/95 border-[#D4AF37]/60 ${
-          isPlaying 
-            ? "shadow-[0_0_20px_rgba(212,175,55,0.35),_0_6px_24px_rgba(74,8,27,0.2)]" 
-            : "shadow-[0_6px_20px_rgba(74,8,27,0.14)]"
+      // Background is dark -> Button is light (ivory pill with burgundy/gold accents)
+      container: `bg-[#FFF8ED]/95 border-[#D4AF37]/60 ${isPlaying
+          ? "shadow-[0_0_20px_rgba(212,175,55,0.35),_0_6px_24px_rgba(74,8,27,0.2)]"
+          : "shadow-[0_6px_20px_rgba(74,8,27,0.14)]"
         }`,
-        badgeBg: "bg-[#4A081B] border-[#D4AF37]/50",
-        titleText: "text-[#4A081B]",
-        statusText: isPlaying ? "text-[#856124]" : "text-[#4A081B]/55",
-        icon: "text-[#FCF6BA]",
-        eqBar: "bg-[#D4AF37]",
-        pingBorder: "border-[#D4AF37]/40",
-      }
+      badgeBg: "bg-[#4A081B] border-[#D4AF37]/50",
+      titleText: "text-[#4A081B]",
+      statusText: isPlaying ? "text-[#856124]" : "text-[#4A081B]/55",
+      icon: "text-[#FCF6BA]",
+      eqBar: "bg-[#D4AF37]",
+      pingBorder: "border-[#D4AF37]/40",
+    }
     : {
-        // Background is light -> Button is dark (burgundy velvet pill with gold accents)
-        container: `bg-[#4A081B]/95 border-[#D4AF37]/60 ${
-          isPlaying 
-            ? "shadow-[0_0_24px_rgba(232,199,106,0.4),_0_6px_24px_rgba(0,0,0,0.3)]" 
-            : "shadow-[0_6px_20px_rgba(0,0,0,0.22)]"
+      // Background is light -> Button is dark (burgundy velvet pill with gold accents)
+      container: `bg-[#4A081B]/95 border-[#D4AF37]/60 ${isPlaying
+          ? "shadow-[0_0_24px_rgba(232,199,106,0.4),_0_6px_24px_rgba(0,0,0,0.3)]"
+          : "shadow-[0_6px_20px_rgba(0,0,0,0.22)]"
         }`,
-        badgeBg: "bg-[#310411] border-[#D4AF37]/60",
-        titleText: "text-[#FCF6BA]",
-        statusText: isPlaying ? "text-[#E8C76A]" : "text-[#FFF8ED]/50",
-        icon: "text-[#FCF6BA]",
-        eqBar: "bg-[#E8C76A]",
-        pingBorder: "border-[#E8C76A]/40",
-      };
+      badgeBg: "bg-[#310411] border-[#D4AF37]/60",
+      titleText: "text-[#FCF6BA]",
+      statusText: isPlaying ? "text-[#E8C76A]" : "text-[#FFF8ED]/50",
+      icon: "text-[#FCF6BA]",
+      eqBar: "bg-[#E8C76A]",
+      pingBorder: "border-[#E8C76A]/40",
+    };
 
   return (
     <div className="fixed top-4 right-4 z-50 select-none">
