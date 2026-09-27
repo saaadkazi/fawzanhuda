@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import FloralOrnament from "./FloralOrnament";
 
@@ -23,33 +23,40 @@ const CardCornerOrnament = ({ position }) => {
   );
 };
 
-// Royal Swaying Lanterns inside the Hero chamber background (Performance-optimized for mobile 60 FPS)
+// Royal Swaying Lanterns with Organic Candlelight Flicker (Unsynchronized)
 const SwayingLantern = ({ position }) => {
   const isLeft = position === "left";
   return (
     <motion.div
-      animate={{ rotate: isLeft ? [-1.8, 1.8, -1.8] : [1.8, -1.8, 1.8] }}
-      transition={{ duration: 9.0, repeat: Infinity, ease: "easeInOut", delay: isLeft ? 0 : 2.5 }}
+      animate={{ rotate: isLeft ? [-1.5, 1.5, -1.5] : [1.5, -1.5, 1.5] }}
+      transition={{ duration: 11.0, repeat: Infinity, ease: "easeInOut", delay: isLeft ? 0 : 3.2 }}
       style={{ transformOrigin: "top center" }}
-      className={`absolute top-0 ${isLeft ? "left-4 md:left-16" : "right-4 md:right-16"} w-12 md:w-20 h-[300px] z-10 pointer-events-none transform-gpu will-change-transform`}
+      className={`absolute top-0 ${isLeft ? "left-4 md:left-16" : "right-4 md:right-16"} w-12 md:w-20 h-[300px] z-10 pointer-events-none transform-gpu`}
     >
-      {/* Hanging Chain (No expensive box shadow) */}
+      {/* Hanging Chain */}
       <div className="w-[1px] h-[110px] md:h-[150px] bg-gradient-to-b from-[#856124] via-[#D4AF37] to-[#FCF6BA] mx-auto opacity-75" />
       
-      {/* Intricately detailed vectors representing palace lanterns */}
+      {/* Palace Lantern */}
       <div className="w-9 h-14 md:w-12 md:h-18 mx-auto relative flex flex-col items-center justify-start text-[#D4AF37]">
-        {/* Glow halo (Using radial gradient instead of expensive CSS blur filter) */}
-        <div 
-          className="absolute top-2.5 w-8 h-8 rounded-full opacity-35 animate-pulse"
+        {/* Organic Candlelight Glow Halo */}
+        <motion.div 
+          animate={{ opacity: isLeft ? [0.25, 0.55, 0.3, 0.6, 0.25] : [0.4, 0.2, 0.55, 0.3, 0.4] }}
+          transition={{ duration: 7.5, repeat: Infinity, ease: "easeInOut", delay: isLeft ? 0 : 2.0 }}
+          className="absolute top-2.5 w-8 h-8 rounded-full pointer-events-none"
           style={{
-            background: "radial-gradient(circle, rgba(255, 209, 102, 0.45) 0%, transparent 70%)"
+            background: "radial-gradient(circle, rgba(255, 209, 102, 0.55) 0%, transparent 70%)"
           }}
         />
         <svg className="w-full h-full fill-current drop-shadow-[0_2px_5px_rgba(212,175,55,0.4)]" viewBox="0 0 40 60">
           <path d="M 20 2 L 10 15 L 30 15 Z" />
           <path d="M 10 15 L 30 15 L 35 45 L 20 55 L 5 45 Z" fill="none" stroke="currentColor" strokeWidth="1" />
-          {/* Flame core */}
-          <circle cx="20" cy="32" r="5" className="fill-[#FFEAA7] animate-pulse" />
+          {/* Flame Core */}
+          <motion.circle 
+            cx="20" cy="32" r="5" 
+            animate={{ scale: [1, 1.12, 0.96, 1.08, 1], opacity: [0.85, 1, 0.8, 1, 0.85] }}
+            transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: isLeft ? 0 : 1.5 }}
+            className="fill-[#FFEAA7]" 
+          />
           <circle cx="20" cy="32" r="3.2" className="fill-[#FFD166]" />
         </svg>
       </div>
@@ -70,6 +77,108 @@ const PalacePavilionBackdrop = () => {
         alt="Luxury Islamic Wedding Pavilion Venue" 
         className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none transform-gpu scale-[1.01]" 
       />
+
+      {/* 2. Slow Continuous Warm Light Breathing behind Arch */}
+      <motion.div
+        animate={{ opacity: [0.35, 0.65, 0.35], scale: [0.99, 1.03, 0.99] }}
+        transition={{ duration: 8.5, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute inset-0 pointer-events-none z-[1]"
+        style={{
+          background: "radial-gradient(circle at 50% 45%, rgba(255, 235, 180, 0.32) 0%, rgba(212, 175, 55, 0.12) 35%, transparent 70%)"
+        }}
+      />
+    </div>
+  );
+};
+
+// Interactive Luxury Typography Name Component (Monogram Transformation & Champagne Light Sweep)
+const InteractiveName = ({ fullName, monogram, isBride = false, isMobile }) => {
+  const [isTransformed, setIsTransformed] = useState(false);
+  const [isShimmering, setIsShimmering] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+      setPrefersReducedMotion(mediaQuery.matches);
+    }
+  }, []);
+
+  // Periodic Idle Champagne Light Sweep (Every ~8.5-10s unsynced between groom and bride)
+  useEffect(() => {
+    const idleDelay = isBride ? 9500 : 8000;
+    const interval = setInterval(() => {
+      if (!isTransformed && !prefersReducedMotion) {
+        setIsShimmering(true);
+        setTimeout(() => setIsShimmering(false), 1400);
+      }
+    }, idleDelay);
+
+    return () => clearInterval(interval);
+  }, [isTransformed, isBride, prefersReducedMotion]);
+
+  const triggerTransformation = () => {
+    if (isTransformed || prefersReducedMotion) return;
+
+    setIsShimmering(true);
+    setIsTransformed(true);
+
+    // Hold monogram state for ~700ms then smoothly resolve back to full name
+    setTimeout(() => {
+      setIsTransformed(false);
+    }, 700);
+
+    setTimeout(() => {
+      setIsShimmering(false);
+    }, 1400);
+  };
+
+  return (
+    <div
+      onPointerEnter={!isMobile ? triggerTransformation : undefined}
+      onClick={isMobile ? triggerTransformation : undefined}
+      className="relative inline-flex items-center justify-center cursor-pointer select-none px-3 py-1 rounded-sm overflow-hidden transform-gpu"
+    >
+      {/* Light Sweep Highlight Overlay */}
+      <motion.div
+        animate={
+          isShimmering
+            ? { x: ["-100%", "200%"], opacity: [0, 0.75, 0] }
+            : { x: "-100%", opacity: 0 }
+        }
+        transition={{ duration: 1.2, ease: "easeInOut" }}
+        className="absolute inset-0 pointer-events-none bg-gradient-to-r from-transparent via-[#FCF6BA]/60 to-transparent skew-x-12 z-20"
+      />
+
+      {/* Main Typography Box maintaining fixed layout bounds so text never shifts position */}
+      <div className="relative flex items-center justify-center min-h-[46px] md:min-h-[62px]">
+        <AnimatePresence mode="wait">
+          {!isTransformed ? (
+            <motion.h1
+              key="fullname"
+              initial={{ opacity: 0, filter: "blur(4px)" }}
+              animate={{ opacity: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, filter: "blur(4px)" }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+              className="font-cormorant text-[46px] md:text-[62px] font-bold text-[#4A081B] tracking-tighter leading-none drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)]"
+            >
+              {fullName}
+            </motion.h1>
+          ) : (
+            <motion.div
+              key="monogram"
+              initial={{ opacity: 0, filter: "blur(4px)", scale: 0.95 }}
+              animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
+              exit={{ opacity: 0, filter: "blur(4px)", scale: 0.95 }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+              className="font-cormorant text-[46px] md:text-[62px] font-bold text-[#856124] tracking-tighter leading-none drop-shadow-[0_0_12px_rgba(212,175,55,0.6)] flex items-center justify-center gap-1"
+            >
+              <span>{monogram}</span>
+              <span className="w-2 h-2 rounded-full bg-[#D4AF37] inline-block mb-1 shadow-[0_0_8px_#FCF6BA]" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
@@ -80,31 +189,8 @@ let globalHeroIntroPlayed = false;
 export default function Hero() {
   const [particles, setParticles] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
-  const [isWaveActive, setIsWaveActive] = useState(false);
-  const [isCardTapped, setIsCardTapped] = useState(false);
-  const [mounted, setMounted] = useState(true);
   const [isEntering, setIsEntering] = useState(false);
   const [introPlayed, setIntroPlayed] = useState(false);
-
-  // Buttery-smooth hardware accelerated hover spring configurations
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const springConfig = { stiffness: 90, damping: 22 };
-  const smoothX = useSpring(mouseX, springConfig);
-  const smoothY = useSpring(mouseY, springConfig);
-
-  const layer1X = useTransform(smoothX, (x) => x * 4.5);
-  const layer1Y = useTransform(smoothY, (y) => y * 4.5);
-
-  const layer2X = useTransform(smoothX, (x) => x * 8);
-  const layer2Y = useTransform(smoothY, (y) => y * 8);
-
-  const layer3X = useTransform(smoothX, (x) => x * 14);
-  const layer3Y = useTransform(smoothY, (y) => y * 14);
-
-  const rotateX = useTransform(smoothY, (y) => isMobile ? 0 : -y * 3.5);
-  const rotateY = useTransform(smoothX, (x) => isMobile ? 0 : x * 3.5);
 
   useEffect(() => {
     if (globalHeroIntroPlayed) {
@@ -119,12 +205,11 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
-    setMounted(true);
     const checkMobileVal = typeof window !== "undefined" && window.innerWidth < 768;
     setIsMobile(checkMobileVal);
 
     // Dynamic pre-distributed gold particles
-    const particleCount = checkMobileVal ? 24 : 48;
+    const particleCount = checkMobileVal ? 12 : 24;
     const generated = Array.from({ length: particleCount }).map((_, i) => {
       const types = ["dot", "spark", "orb"];
       const type = types[i % types.length];
@@ -133,10 +218,10 @@ export default function Hero() {
       let duration = Math.random() * 15 + 15;
       
       if (type === "orb") {
-        size = Math.random() * 14 + 6;
+        size = Math.random() * 10 + 4;
         duration = Math.random() * 20 + 20;
       } else if (type === "spark") {
-        size = Math.random() * 3 + 1.5;
+        size = Math.random() * 2.5 + 1.5;
         duration = Math.random() * 12 + 10;
       } else {
         size = Math.random() * 1.5 + 1;
@@ -157,20 +242,8 @@ export default function Hero() {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
 
-    const handlePointerMove = (e) => {
-      if (window.innerWidth < 768) return; // Desktop mouse tilt only
-      const x = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
-      const y = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
-      
-      mouseX.set(x);
-      mouseY.set(y);
-    };
-
-    window.addEventListener("mousemove", handlePointerMove, { passive: true });
-
     return () => {
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("mousemove", handlePointerMove);
     };
   }, []);
 
@@ -208,80 +281,6 @@ export default function Hero() {
   };
 
   const scrollRatio = typeof window !== "undefined" ? Math.min(scrollY / 300, 1) : 0;
-
-  const splitName = (name, parentVariant, isBride = false) => {
-    return (
-      <motion.span variants={parentVariant} className="inline-flex justify-center flex-wrap gap-x-1 select-none">
-        {name.split("").map((char, index) => {
-          const delayOffset = isBride ? 0.6 + index * 0.08 : index * 0.08;
-
-          return (
-            <motion.span
-              key={index}
-              variants={{
-                hidden: { opacity: 0, y: 12, filter: "blur(4px)" },
-                visible: { 
-                  opacity: 1, 
-                  y: 0, 
-                  filter: "blur(0px)", 
-                  transition: { duration: 0.45, ease: "easeOut" } 
-                }
-              }}
-              animate={
-                isMobile && isWaveActive
-                  ? {
-                      y: [0, -7, 0],
-                      color: ["#4A081B", "#D4AF37", "#4A081B"],
-                      textShadow: [
-                        "0 0 0px rgba(212, 175, 55, 0)",
-                        "0 0 12px rgba(212, 175, 55, 0.85)",
-                        "0 0 0px rgba(212, 175, 55, 0)"
-                      ]
-                    }
-                  : "visible"
-              }
-              transition={
-                isMobile && isWaveActive
-                  ? {
-                      duration: 0.85,
-                      delay: delayOffset,
-                      ease: "easeInOut"
-                    }
-                  : { duration: 0.45, ease: "easeOut" }
-              }
-              whileHover={
-                !isMobile
-                  ? {
-                      y: -8,
-                      color: "#D4AF37",
-                      textShadow: "0 0 12px rgba(212, 175, 55, 0.85)",
-                      transition: { type: "spring", stiffness: 350, damping: 14 }
-                    }
-                  : {}
-              }
-              className="inline-block cursor-default font-bold drop-shadow-[0_0_8px_rgba(212,175,55,0.25)] tracking-tighter transition-all duration-300"
-            >
-              {char === " " ? "\u00A0" : char}
-            </motion.span>
-          );
-        })}
-      </motion.span>
-    );
-  };
-
-  const groomStagger = {
-    hidden: {},
-    visible: {
-      transition: { staggerChildren: 0.08, delayChildren: isMobile ? (introPlayed ? 0 : 1.0) : (introPlayed ? 0 : 5.2) }
-    }
-  };
-
-  const brideStagger = {
-    hidden: {},
-    visible: {
-      transition: { staggerChildren: 0.08, delayChildren: isMobile ? (introPlayed ? 0 : 1.8) : (introPlayed ? 0 : 6.3) }
-    }
-  };
 
   return (
     <section 
@@ -416,25 +415,14 @@ export default function Hero() {
       <FloralOrnament position="bottom-left" opacity={0.55} />
       <FloralOrnament position="bottom-right" opacity={0.55} />
 
-      {/* ==================================================
-          PARALLAX LAYER 1 (0.2x): BACKGROUND PALACE & ARCHES
-          ================================================== */}
-      <motion.div 
-        style={{
-          x: layer1X,
-          y: layer1Y
-        }}
-        className="absolute inset-0 z-[2] pointer-events-none"
-      >
-        {/* Core Illuminated Palace Archway */}
-        <PalaceArchFrame entering={isEntering} />
-      </motion.div>
+      {/* Archway Layer (Photorealistic Arch is rendered in PalacePavilionBackdrop) */}
+      <div className="absolute inset-0 z-[2] pointer-events-none">
+        <PalaceArchFrame />
+      </div>
 
 
 
-      {/* ==================================================
-          PARALLAX LAYER 2 (0.5x): GOLD PARTICLES LAYER
-          ================================================== */}
+      {/* Layer 2: Gold Dust Particles */}
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ 
@@ -443,11 +431,7 @@ export default function Hero() {
         transition={{ 
           opacity: { duration: 1.5, delay: 1.0 }
         }}
-        style={{
-          x: layer2X,
-          y: layer2Y
-        }}
-        className="absolute inset-0 pointer-events-none overflow-hidden z-[4] transform-gpu will-change-transform"
+        className="absolute inset-0 pointer-events-none overflow-hidden z-[4]"
       >
         {particles.map((p) => {
           let particleEl;
@@ -502,7 +486,7 @@ export default function Hero() {
       </motion.div>
 
       {/* ==================================================
-          PARALLAX LAYER 3 (1.0x): ARCH-INTEGRATED TEXT CENTERPIECE
+          STABLE ARCH-INTEGRATED TEXT CENTERPIECE
           ================================================== */}
       <div className="relative z-10 flex flex-col items-center max-w-lg w-full text-center select-none pt-0">
         
@@ -520,13 +504,6 @@ export default function Hero() {
             y: { duration: 1.2, delay: isMobile ? (introPlayed ? 0 : 0.4) : (introPlayed ? 0 : 4.0), ease: [0.215, 0.61, 0.355, 1] }
           }}
           onClick={handleCardTap}
-          style={{
-            x: layer3X,
-            y: layer3Y,
-            rotateX,
-            rotateY,
-            transformStyle: "preserve-3d"
-          }}
           className="relative w-full max-w-[340px] md:max-w-[440px] px-4 py-2 flex flex-col items-center justify-center pointer-events-auto select-none"
         >
           {/* Sequential text stagger reveals positioned directly inside the background arch */}
@@ -556,14 +533,12 @@ export default function Hero() {
             </p>
 
             {/* Groom Name */}
-            <motion.h1
-              initial="hidden"
-              animate="visible"
-              variants={groomStagger}
-              className="font-cormorant text-[46px] md:text-[62px] font-bold text-[#4A081B] tracking-tighter leading-none drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)]"
-            >
-              {splitName("Fawzan", groomStagger, false)}
-            </motion.h1>
+            <InteractiveName 
+              fullName="Fawzan" 
+              monogram="F." 
+              isBride={false} 
+              isMobile={isMobile} 
+            />
 
             {/* Star Rosette Divider */}
             <div className="my-2.5 md:my-4 w-full flex items-center justify-center gap-4 relative pointer-events-none">
@@ -575,15 +550,7 @@ export default function Hero() {
                 className="h-[0.5px] w-12 bg-gradient-to-r from-transparent to-[#856124]/60" 
               />
               <div className="relative flex items-center justify-center">
-                <motion.div
-                  animate={
-                    isCardTapped
-                      ? { scale: [1, 2.0, 1], opacity: [0.95, 0] }
-                      : { scale: 1, opacity: 0 }
-                  }
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="absolute w-10 h-10 rounded-full border border-[#856124] pointer-events-none z-30"
-                />
+                <div className="absolute w-10 h-10 rounded-full border border-[#856124]/30 pointer-events-none z-30" />
                 <div className="text-[#856124] flex items-center justify-center drop-shadow-[0_0_8px_rgba(212,175,55,0.4)] z-10">
                   <svg className="w-6.5 h-6.5 animate-pulse-slow" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M 50 12 L 61 39 L 88 50 L 61 61 L 50 88 L 39 61 L 12 50 L 39 39 Z" />
@@ -606,14 +573,12 @@ export default function Hero() {
             </p>
 
             {/* Bride Name */}
-            <motion.h1
-              initial="hidden"
-              animate="visible"
-              variants={brideStagger}
-              className="font-cormorant text-[46px] md:text-[62px] font-bold text-[#4A081B] tracking-tighter leading-none mb-2 md:mb-4 drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)]"
-            >
-              {splitName("Huda", brideStagger, true)}
-            </motion.h1>
+            <InteractiveName 
+              fullName="Huda" 
+              monogram="H." 
+              isBride={true} 
+              isMobile={isMobile} 
+            />
 
             {/* Honor request line */}
             <p className="font-inter text-[8px] md:text-[10px] text-[#856124] font-bold uppercase tracking-[0.25em] mb-1.5 md:mb-3">
@@ -660,48 +625,49 @@ export default function Hero() {
           <div className="absolute bottom-0 w-1 h-1 rounded-full bg-[#FFFDF9] border border-[#D4AF37] shadow-[0_0_4px_rgba(212,175,55,0.6)]" />
         </motion.div>
 
-        {/* Premium Medallion CTA Button ("TAP TO ENTER") */}
+        {/* Premium Medallion CTA Button ("TAP TO ENTER") with Refined Continuous Idle Motion */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ 
-            opacity: 1, 
-            scale: isEntering ? 0.96 : [1, 1.03, 1],
-            y: scrollRatio * 15
-          }}
-          transition={{ 
-            opacity: { duration: 1.0, delay: isMobile ? (introPlayed ? 0 : 0.8) : (introPlayed ? 0 : 4.3), ease: "easeOut" },
-            scale: { repeat: Infinity, duration: 3.0, ease: "easeInOut" }
-          }}
-          className="mt-1 z-20 md:mt-6 flex flex-col items-center justify-center pointer-events-auto"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.0, delay: isMobile ? (introPlayed ? 0 : 0.8) : (introPlayed ? 0 : 4.3) }}
+          className="mt-3 md:mt-6 z-20 flex flex-col items-center justify-center pointer-events-auto"
         >
           <motion.button
             onClick={handleEnterClick}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
-            transition={{ type: "spring", stiffness: 450, damping: 15 }}
-            className="w-20 h-20 md:w-[90px] md:h-[90px] rounded-full p-[2.2px] bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#B38728] shadow-[0_8px_25px_rgba(212,175,55,0.45),0_0_15px_rgba(212,175,55,0.15),inset_0_1.5px_2px_rgba(255,255,255,0.85)] hover:shadow-[0_12px_35px_rgba(232,199,106,0.6)] transition-shadow duration-300 relative group flex items-center justify-center cursor-pointer select-none focus:outline-none"
+            transition={{ type: "spring", stiffness: 400, damping: 18 }}
+            className="w-20 h-20 md:w-[90px] md:h-[90px] rounded-full p-[2.2px] bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#B38728] shadow-[0_8px_25px_rgba(212,175,55,0.45),0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_12px_35px_rgba(232,199,106,0.6)] transition-shadow duration-300 relative group flex items-center justify-center cursor-pointer select-none focus:outline-none"
           >
-            {/* Center burgundy core */}
+            {/* Center Burgundy Core */}
             <div className="w-full h-full rounded-full bg-gradient-to-b from-[#4A081B] via-[#310411] to-[#1F000A] shadow-[inset_0_2px_5px_rgba(0,0,0,0.65)] flex flex-col items-center justify-center p-2 relative overflow-hidden">
               
-              {/* Inner gold bead trim ring */}
+              {/* Inner Gold Bead Trim Ring */}
               <div className="absolute inset-[3.5px] border border-dashed border-[#FCF6BA]/35 rounded-full pointer-events-none z-10" />
               
-              {/* Gold light sweep across medallion */}
+              {/* Gold Light Sweep Across Medallion */}
               <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
                 <motion.div
                   animate={{ x: ["-100%", "200%"] }}
-                  transition={{ repeat: Infinity, duration: 3.5, ease: "linear", delay: 0.5 }}
+                  transition={{ repeat: Infinity, duration: 4.0, ease: "linear", delay: 0.5 }}
                   className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-[#FCF6BA]/35 to-transparent skew-x-12"
                 />
               </div>
 
-              {/* Bouncing Gold chevron arrow */}
-              <svg className="w-3.5 h-3.5 text-[#FCF6BA] animate-bounce mb-0.5" fill="none" stroke="currentColor" strokeWidth="2.8" viewBox="0 0 24 24">
+              {/* Refined Downward Chevron Movement (2.5px max, 3.2s loop) */}
+              <motion.svg 
+                animate={{ y: [0, 2.5, 0] }}
+                transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+                className="w-3.5 h-3.5 text-[#FCF6BA] mb-0.5" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2.8" 
+                viewBox="0 0 24 24"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-              </svg>
+              </motion.svg>
 
-              {/* Engraved luxury text */}
+              {/* Engraved Luxury Text */}
               <span className="font-cinzel text-[7px] md:text-[8px] tracking-[0.2em] font-extrabold text-[#FCF6BA] leading-tight text-center drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
                 TAP TO<br />ENTER
               </span>
