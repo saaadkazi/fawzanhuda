@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 
 // Single shared global audio instance to prevent duplicates and desync
 let globalAudio = null;
+let globalGestureUnlocked = false;
 
 export function getGlobalAudio() {
   if (typeof window === "undefined") return null;
@@ -14,6 +15,41 @@ export function getGlobalAudio() {
     globalAudio.loop = true;
     globalAudio.preload = "auto";
     globalAudio.volume = 0; // Start at 0 and fade in programmatically
+
+    // Global background gesture unlock helper
+    const unlockAudioOnGesture = () => {
+      if (!globalAudio) return;
+      globalGestureUnlocked = true;
+      if (globalAudio.dataset.playing === "true" && globalAudio.paused) {
+        globalAudio.play().then(() => {
+          removeGlobalGestureListeners();
+        }).catch(() => {});
+      }
+    };
+
+    const addGlobalGestureListeners = () => {
+      if (typeof window === "undefined") return;
+      window.addEventListener("pointerdown", unlockAudioOnGesture, { capture: true });
+      window.addEventListener("touchstart", unlockAudioOnGesture, { capture: true });
+      window.addEventListener("click", unlockAudioOnGesture, { capture: true });
+      window.addEventListener("scroll", unlockAudioOnGesture, { capture: true });
+      window.addEventListener("touchmove", unlockAudioOnGesture, { capture: true });
+      window.addEventListener("keydown", unlockAudioOnGesture, { capture: true });
+    };
+
+    const removeGlobalGestureListeners = () => {
+      if (typeof window === "undefined") return;
+      window.removeEventListener("pointerdown", unlockAudioOnGesture, { capture: true });
+      window.removeEventListener("touchstart", unlockAudioOnGesture, { capture: true });
+      window.removeEventListener("click", unlockAudioOnGesture, { capture: true });
+      window.removeEventListener("scroll", unlockAudioOnGesture, { capture: true });
+      window.removeEventListener("touchmove", unlockAudioOnGesture, { capture: true });
+      window.removeEventListener("keydown", unlockAudioOnGesture, { capture: true });
+    };
+
+    globalAudio._addGestureListeners = addGlobalGestureListeners;
+    globalAudio._removeGestureListeners = removeGlobalGestureListeners;
+    addGlobalGestureListeners();
   }
   return globalAudio;
 }
@@ -32,11 +68,6 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
 
     return () => {
       if (fadeIntervalRef.current) clearInterval(fadeIntervalRef.current);
-      // Clean up / pause the audio on HMR or component unmount
-      const audioToPause = getGlobalAudio();
-      if (audioToPause) {
-        audioToPause.pause();
-      }
     };
   }, []);
 
@@ -53,27 +84,56 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
       clearInterval(fadeIntervalRef.current);
     }
 
+    let isListening = false;
+
     const startPlayback = () => {
-      if (audio.paused) {
-        audio.play().catch((err) => {
-          console.log("Autoplay waiting for user interaction:", err);
-        });
+      if (!audio) return;
+      
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            audio.dataset.playing = "true";
+            removeInteractionListeners();
+          })
+          .catch((err) => {
+            console.log("Autoplay waiting for user gesture:", err);
+            // Autoplay was blocked by browser policy; keep listening for any gesture
+            addInteractionListeners();
+          });
       }
+    };
+
+    const handleUserInteraction = () => {
+      if (audio && audio.paused && isPlaying) {
+        startPlayback();
+      }
+    };
+
+    const addInteractionListeners = () => {
+      if (isListening) return;
+      isListening = true;
+      window.addEventListener("pointerdown", handleUserInteraction, { capture: true });
+      window.addEventListener("touchstart", handleUserInteraction, { capture: true });
+      window.addEventListener("click", handleUserInteraction, { capture: true });
+      window.addEventListener("scroll", handleUserInteraction, { capture: true });
+      window.addEventListener("touchmove", handleUserInteraction, { capture: true });
+      window.addEventListener("keydown", handleUserInteraction, { capture: true });
+    };
+
+    const removeInteractionListeners = () => {
+      if (!isListening) return;
+      isListening = false;
+      window.removeEventListener("pointerdown", handleUserInteraction, { capture: true });
+      window.removeEventListener("touchstart", handleUserInteraction, { capture: true });
+      window.removeEventListener("click", handleUserInteraction, { capture: true });
+      window.removeEventListener("scroll", handleUserInteraction, { capture: true });
+      window.removeEventListener("touchmove", handleUserInteraction, { capture: true });
+      window.removeEventListener("keydown", handleUserInteraction, { capture: true });
     };
 
     if (isPlaying) {
       startPlayback();
-
-      // Fallback: If autoplay was blocked by browser policy, resume on first user interaction
-      const handleUserInteraction = () => {
-        if (isPlaying && audio.paused) {
-          startPlayback();
-        }
-      };
-
-      window.addEventListener("pointerdown", handleUserInteraction, { once: true });
-      window.addEventListener("touchstart", handleUserInteraction, { once: true });
-      window.addEventListener("click", handleUserInteraction, { once: true });
 
       // Smooth volume fade-in
       fadeIntervalRef.current = setInterval(() => {
@@ -84,6 +144,9 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
         }
       }, 50);
     } else {
+      removeInteractionListeners();
+      if (audio._removeGestureListeners) audio._removeGestureListeners();
+      
       // Smooth volume fade-out and pause
       fadeIntervalRef.current = setInterval(() => {
         if (audio.volume > 0.03) {
@@ -95,6 +158,10 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
         }
       }, 30);
     }
+
+    return () => {
+      removeInteractionListeners();
+    };
   }, [isPlaying, setIsPlaying]);
 
   // Centralized tab visibility change listener to pause background audio when tab is hidden
