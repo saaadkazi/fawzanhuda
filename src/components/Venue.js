@@ -124,7 +124,7 @@ function Venue() {
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full bg-gradient-to-br from-[#FFFDF9]/95 via-[#FFFDF9]/98 to-[#F5EAD9]/95 px-6 py-10 md:px-10 rounded-[140px_140px_20px_20px] border border-[#D4AF37]/45 shadow-[0_24px_55px_rgba(74,8,27,0.08),0_4px_16px_rgba(0,0,0,0.03),inset_0_2px_4px_rgba(255,255,255,0.7)] backdrop-blur-md flex flex-col items-center text-center relative overflow-hidden transition-all duration-300 hover:shadow-[0_20px_45px_rgba(212,175,55,0.18)]"
+          className="w-full bg-gradient-to-br from-[#FFFDF9]/98 via-[#FFFDF9]/98 to-[#F5EAD9]/95 px-6 py-10 md:px-10 rounded-[140px_140px_20px_20px] border border-[#D4AF37]/45 shadow-[0_24px_55px_rgba(74,8,27,0.08),0_4px_16px_rgba(0,0,0,0.03),inset_0_2px_4px_rgba(255,255,255,0.7)] md:backdrop-blur-md flex flex-col items-center text-center relative overflow-hidden transition-all duration-300 hover:shadow-[0_20px_45px_rgba(212,175,55,0.18)]"
         >
           {/* Subtle burgundy radial inner glow */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(74,8,27,0.02)_0%,transparent_75%)] pointer-events-none z-0" />

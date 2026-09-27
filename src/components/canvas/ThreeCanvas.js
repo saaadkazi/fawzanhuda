@@ -7,6 +7,7 @@ import Environment from "./Environment";
 
 export default function ThreeCanvas() {
   const [dpr, setDpr] = useState(1);
+  const [isHeroVisible, setIsHeroVisible] = useState(true);
 
   useEffect(() => {
     // Dynamic DPR setup respecting specification quality contract
@@ -26,12 +27,29 @@ export default function ThreeCanvas() {
     return () => window.removeEventListener("resize", updateDpr);
   }, []);
 
+  useEffect(() => {
+    const heroEl = document.getElementById("hero-section");
+    if (!heroEl) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsHeroVisible(entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+
+    observer.observe(heroEl);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div 
       className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
       aria-hidden="true"
+      style={{ display: isHeroVisible ? "block" : "none" }}
     >
       <Canvas
+        frameloop={isHeroVisible ? "always" : "never"}
         dpr={dpr}
         gl={{
           alpha: true,

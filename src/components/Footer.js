@@ -628,7 +628,7 @@ function Footer() {
   return (
     <footer className={`py-36 px-6 relative overflow-hidden flex flex-col items-center justify-center transition-all duration-1000 ${
       globalStage === "broken" || globalStage === "unlocked" 
-        ? "backdrop-blur-[3px] bg-gradient-to-b from-[#FFFDF9]/95 via-[#F6EBDD]/90 to-[#FFFDF9]/95" 
+        ? "md:backdrop-blur-[3px] bg-gradient-to-b from-[#FFFDF9]/95 via-[#F6EBDD]/90 to-[#FFFDF9]/95" 
         : "bg-gradient-to-b from-[#FFFDF9] via-[#F6EBDD] to-[#FFFDF9]"
     }`}>
       

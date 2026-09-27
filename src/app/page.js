@@ -22,9 +22,10 @@ export default function Home() {
   const [status, setStatus] = useState("loading"); // "loading" | "entrance" | "opened"
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
 
-  // Initialize Lenis smooth scroll once the invitation is opened
+  // Initialize Lenis smooth scroll once the invitation is opened (Desktop/Tablet only)
   useEffect(() => {
     if (status !== "opened") return;
+    if (typeof window !== "undefined" && window.innerWidth < 768) return;
 
     const lenis = new Lenis({
       duration: 0.9,

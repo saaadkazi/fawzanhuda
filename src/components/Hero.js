@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import FloralOrnament from "./FloralOrnament";
 
@@ -366,6 +366,9 @@ export default function Hero() {
   const [isMobile, setIsMobile] = useState(false);
   const [isEntering, setIsEntering] = useState(false);
 
+  const heroRef = useRef(null);
+  const isHeroInView = useInView(heroRef, { margin: "100px 0px 100px 0px" });
+
   useEffect(() => {
     const checkMobileVal = typeof window !== "undefined" && window.innerWidth < 768;
     setIsMobile(checkMobileVal);
@@ -428,10 +431,10 @@ export default function Hero() {
     }, 1200);
   };
 
-  const scrollRatio = typeof window !== "undefined" ? Math.min(scrollY / 300, 1) : 0;
-
   return (
     <section 
+      id="hero-section"
+      ref={heroRef}
       style={{
         background: "#4A081B"
       }}
@@ -648,7 +651,7 @@ export default function Hero() {
         }}
         className="absolute inset-0 pointer-events-none overflow-hidden z-[4]"
       >
-        {particles.map((p) => {
+        {isHeroInView && particles.map((p) => {
           let particleEl;
           if (p.type === "orb") {
             particleEl = (

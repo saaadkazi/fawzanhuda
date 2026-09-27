@@ -105,36 +105,23 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
     };
   }, [isPlaying]);
 
-  // Scroll background color brightness listener (Throttled with requestAnimationFrame)
+  // Theme detection using IntersectionObserver to eliminate scroll-driven reflows
   useEffect(() => {
-    let ticking = false;
+    const lightSection = document.getElementById("parents-section");
+    if (!lightSection) return;
 
-    const checkTheme = () => {
-      const lightSection = document.getElementById("parents-section");
-      let currentBgIsDark = true;
-
-      if (lightSection) {
-        const rect = lightSection.getBoundingClientRect();
-        if (rect.top <= 60 && rect.bottom >= 60) {
-          currentBgIsDark = false;
-        }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsThemeDark(!entry.isIntersecting);
+      },
+      {
+        rootMargin: "-60px 0px -40% 0px",
+        threshold: 0,
       }
+    );
 
-      setIsThemeDark(currentBgIsDark);
-      ticking = false;
-    };
-
-    const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(checkTheme);
-        ticking = true;
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    checkTheme();
-
-    return () => window.removeEventListener("scroll", handleScroll);
+    observer.observe(lightSection);
+    return () => observer.disconnect();
   }, []);
 
   if (!mounted) return null;
@@ -142,8 +129,8 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
   // Resolve dynamic styles based on background theme for inverted contrast
   const buttonStyle = isThemeDark
     ? {
-        // Background is dark -> Button is light (ivory glass pill with burgundy/gold accents)
-        container: `bg-[#FFF8ED]/90 border-[#D4AF37]/60 ${
+        // Background is dark -> Button is light (ivory pill with burgundy/gold accents)
+        container: `bg-[#FFF8ED]/95 border-[#D4AF37]/60 ${
           isPlaying 
             ? "shadow-[0_0_20px_rgba(212,175,55,0.35),_0_6px_24px_rgba(74,8,27,0.2)]" 
             : "shadow-[0_6px_20px_rgba(74,8,27,0.14)]"
@@ -156,7 +143,7 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
         pingBorder: "border-[#D4AF37]/40",
       }
     : {
-        // Background is light -> Button is dark (burgundy velvet glass pill with gold accents)
+        // Background is light -> Button is dark (burgundy velvet pill with gold accents)
         container: `bg-[#4A081B]/95 border-[#D4AF37]/60 ${
           isPlaying 
             ? "shadow-[0_0_24px_rgba(232,199,106,0.4),_0_6px_24px_rgba(0,0,0,0.3)]" 
@@ -176,7 +163,7 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
         whileHover={{ scale: 1.04 }}
         whileTap={{ scale: 0.96 }}
         onClick={() => setIsPlaying(!isPlaying)}
-        className={`h-9 px-3 rounded-full backdrop-blur-md flex items-center gap-2 cursor-pointer border transition-all duration-500 ease-in-out relative group ${buttonStyle.container}`}
+        className={`h-9 px-3 rounded-full md:backdrop-blur-md flex items-center gap-2 cursor-pointer border transition-all duration-500 ease-in-out relative group ${buttonStyle.container}`}
         aria-label="Toggle music"
       >
         {/* Left Circular Medallion Badge */}
