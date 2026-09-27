@@ -71,19 +71,15 @@ const PalaceArchFrame = () => null;
 const PalacePavilionBackdrop = () => {
   return (
     <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden select-none max-w-full">
-      {/* 1a. Dedicated Mobile 9:16 Master Venue Asset (< 768px) */}
-      <img 
-        src="/hero_palace_bg_mobile.jpg" 
-        alt="Luxury Islamic Wedding Pavilion Venue Mobile" 
-        className="block md:hidden absolute inset-0 w-full h-full object-cover object-center pointer-events-none transform-gpu" 
-      />
-
-      {/* 1b. Photorealistic 8K Master Desktop & Tablet Venue Asset (>= 768px - Untouched Original) */}
-      <img 
-        src="/hero_palace_bg.jpg" 
-        alt="Luxury Islamic Wedding Pavilion Venue Desktop" 
-        className="hidden md:block absolute inset-0 w-full h-full object-cover object-[50%_top] pointer-events-none transform-gpu" 
-      />
+      {/* Native HTML5 picture element for bulletproof background image switching */}
+      <picture className="absolute inset-0 w-full h-full pointer-events-none select-none">
+        <source media="(min-width: 768px)" srcSet="/hero_palace_bg.jpg" />
+        <img 
+          src="/hero_palace_bg_mobile.jpg" 
+          alt="Luxury Islamic Wedding Pavilion Venue" 
+          className="absolute inset-0 w-full h-full object-cover object-center md:object-[50%_top] pointer-events-none transform-gpu" 
+        />
+      </picture>
 
       {/* 2. Slow Continuous Warm Light Breathing behind Arch */}
       <motion.div
@@ -711,7 +707,7 @@ export default function Hero() {
       {/* --------------------------------------------------
           1. DEDICATED MOBILE HERO CONTENT TREE (< 768px)
           -------------------------------------------------- */}
-      <div className="flex md:hidden relative z-10 flex-col items-center max-w-lg w-full text-center select-none my-auto">
+      <div className="mobile-only-hero flex md:hidden relative z-10 flex-col items-center max-w-lg w-full text-center select-none my-auto">
         <motion.div
           initial={{ opacity: 0, scale: 0.98, y: 8, filter: "blur(2px)" }}
           animate={{ 
@@ -867,7 +863,7 @@ export default function Hero() {
       {/* --------------------------------------------------
           2. LOCKED DESKTOP / TABLET HERO CONTENT TREE (>= 768px)
           -------------------------------------------------- */}
-      <div className="hidden md:flex relative z-10 flex-col items-center max-w-lg w-full text-center select-none my-auto">
+      <div className="desktop-only-hero hidden md:flex relative z-10 flex-col items-center max-w-lg w-full text-center select-none my-auto">
         <motion.div
           initial={{ opacity: 0, scale: 0.98, y: 8, filter: "blur(2px)" }}
           animate={{ 

@@ -231,4 +231,17 @@ div[class*="nextjs-toast"] {
   pointer-events: none !important;
 }
 
+/* Strict Hero responsive display isolation */
+@media (max-width: 767.98px) {
+  .desktop-only-hero {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-only-hero {
+    display: none !important;
+  }
+}
+
 
