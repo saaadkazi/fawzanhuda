@@ -54,6 +54,21 @@ const SwayingLantern = ({ position }) => {
   );
 };
 
+// Core Illuminated Palace Arch Frame matching Hero master system
+const PalaceArchFrame = () => {
+  return (
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[88vw] md:w-auto md:max-w-[480px] h-[78vh] md:h-[620px] pointer-events-none z-0 transform-gpu will-change-transform">
+      <div className="absolute inset-0 bg-[#D4AF37]/10 blur-[36px] rounded-[150px_150px_24px_24px] animate-pulse-slow" />
+      <svg className="w-full h-full stroke-current fill-none stroke-[1.2] text-[#D4AF37]/30 drop-shadow-[0_0_10px_rgba(212,175,55,0.45)]" viewBox="0 0 100 150">
+        <path d="M 5,150 L 5,45 C 5,15 35,2 50,2 C 65,2 95,15 95,45 L 95,150" />
+        <path d="M 9,150 L 9,47 C 9,18 36,6 50,6 C 64,6 90,18 90,47 L 90,150" strokeDasharray="1.5,1.5" strokeWidth="0.5" />
+        <path d="M 47,4 L 50,1 L 53,4 L 50,7 Z" fill="#D4AF37" opacity="0.8" />
+        <circle cx="50" cy="4" r="1.5" fill="#FFFDF9" />
+      </svg>
+    </div>
+  );
+};
+
 // Web Audio API Synthesizer for high-fidelity luxury chime sound
 const playChimeSound = () => {
   if (typeof window === "undefined") return;
@@ -875,26 +890,44 @@ function ScratchDate() {
 
   return (
     <section 
-      className="pt-28 pb-28 px-6 relative flex flex-col items-center justify-center overflow-hidden bg-[#310411]"
+      style={{ background: "#4A081B" }}
+      className="relative py-28 px-4 md:px-6 flex flex-col items-center justify-center overflow-hidden min-h-screen z-10"
     >
-      {/* 1. Base Gradient & Radial Vignette matching Hero master system */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#1F000A] via-[#310411] to-[#4A081B] pointer-events-none z-0" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(110,15,42,0.45)_0%,rgba(49,4,17,0.85)_65%,rgba(31,0,10,0.98)_100%)] pointer-events-none z-0" />
+      {/* 1. Hero Vignette Edge Overlay */}
+      <div className="absolute inset-0 pointer-events-none z-[5] hero-vignette" />
 
-      {/* 2. Hero Master Golden Hexagon Background SVG Pattern */}
+      {/* 2. Velvet fabric grain overlay */}
       <div 
-        className="absolute inset-0 opacity-[0.14] pointer-events-none z-0 transform-gpu"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 17.32 L60 51.96 L30 69.28 L0 51.96 L0 17.32 Z' fill='none' stroke='%23D4AF37' stroke-width='0.6' stroke-opacity='0.12'/%3E%3Ccircle cx='30' cy='34.64' r='6' fill='none' stroke='%23D4AF37' stroke-width='0.5' stroke-opacity='0.1'/%3E%3C/svg%3E")`,
-          backgroundSize: "60px 60px"
-        }}
+        className="absolute inset-0 opacity-[0.025] pointer-events-none mix-blend-overlay z-[2]" 
+        style={{ 
+          backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.12) 0.5px, transparent 0.5px)`, 
+          backgroundSize: "2px 2px" 
+        }} 
       />
 
-      {/* 3. Swaying Royal Gold Palace Lanterns */}
+      {/* 3. Hero Master Golden Hexagon Background SVG Pattern Overlay */}
+      <div 
+        className="absolute inset-0 opacity-[0.045] pointer-events-none z-[1] transform-gpu" 
+        style={{ 
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
+          backgroundSize: "60px 60px" 
+        }} 
+      />
+
+      {/* 4. Swaying Golden lanterns */}
       <SwayingLantern position="left" />
       <SwayingLantern position="right" />
 
-      {/* Curved section transition divider at the bottom of the continuous panel */}
+      {/* 5. Outer Section Corner Floral Frame Ornaments */}
+      <FloralOrnament position="top-left" opacity={0.65} />
+      <FloralOrnament position="top-right" opacity={0.65} />
+      <FloralOrnament position="bottom-left" opacity={0.65} />
+      <FloralOrnament position="bottom-right" opacity={0.65} />
+
+      {/* 6. Palace Arch Frame Backing */}
+      <PalaceArchFrame />
+
+      {/* Curved section transition divider */}
       <SectionDivider />
 
       {/* CSS glow keyframe registration */}
@@ -912,19 +945,6 @@ function ScratchDate() {
       {/* Top Gold Arch Section Divider */}
       <LuxuryDivider className="absolute top-0 left-0 right-0 z-20 -translate-y-[15px] rotate-180" />
 
-      {/* Faint oversized Islamic arch and crescent lines for depth */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-[0.03]">
-        <svg className="w-[450px] h-[750px] md:w-[800px] md:h-[1250px] text-[#D4AF37] stroke-current fill-none stroke-[0.8] filter blur-[0.5px]" viewBox="0 0 100 150" preserveAspectRatio="none">
-          <path d="M 5,150 L 5,60 C 5,30 25,10 50,10 C 75,10 95,30 95,60 L 95,150" />
-          <path d="M 15,150 A 35,35 0 0,1 85,150" />
-        </svg>
-      </div>
-
-      {/* Ambient spot lighting (Consistent with unified continuous panel) */}
-      <div className="absolute top-0 left-0 right-0 h-40 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.12)_0%,transparent_70%)] pointer-events-none z-0" />
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] md:w-[600px] h-[350px] md:h-[600px] bg-[radial-gradient(circle,rgba(142,17,58,0.25)_0%,transparent_80%)] rounded-full blur-[60px] pointer-events-none z-0" />
-      <div className="absolute top-3/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] md:w-[600px] h-[350px] md:h-[600px] bg-[radial-gradient(circle,rgba(142,17,58,0.2)_0%,transparent_80%)] rounded-full blur-[60px] pointer-events-none z-0" />
-
       {/* Center bloom burst when all are revealed */}
       <AnimatePresence>
         {allRevealed && (
@@ -937,13 +957,6 @@ function ScratchDate() {
           />
         )}
       </AnimatePresence>
-
-      {/* Ambient dynamic diagonal light sweep */}
-      <div className="ambient-light-sweep" />
-
-      {/* Paper grain luxury texture overlay */}
-      <div className="absolute inset-0 opacity-[0.025] pointer-events-none" 
-           style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #FFF8ED 1px, transparent 1px), radial-gradient(circle at 0 0, #FFF8ED 1px, transparent 1px)", backgroundSize: "16px 16px, 8px 8px" }} />
 
       {/* Dynamic Celebration Particles */}
       <AnimatePresence>
@@ -1036,30 +1049,6 @@ function ScratchDate() {
         ))}
       </div>
 
-      {/* Slow ambient light sweep across background */}
-      <motion.div
-        animate={{
-          x: ["-10%", "10%", "-10%"],
-          y: ["-10%", "10%", "-10%"],
-          opacity: [0.12, 0.25, 0.12]
-        }}
-        transition={{
-          duration: 15,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="absolute w-[600px] h-[600px] bg-gradient-to-tr from-[#D4AF37]/10 to-transparent rounded-full blur-[100px] pointer-events-none z-0"
-        style={{ top: "15%", left: "10%" }}
-      />
-
-      {/* Subtle radial spotlight behind tiles */}
-      <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] md:w-[500px] h-[380px] md:h-[500px] rounded-full pointer-events-none z-0"
-        style={{
-          background: "radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(255, 255, 255, 0) 70%)"
-        }}
-      />
-
       {/* Luxury Shimmer Wave Overlay */}
       <AnimatePresence>
         {shimmerActive && (
@@ -1080,39 +1069,45 @@ function ScratchDate() {
       </AnimatePresence>
 
       {/* ====================================================== */}
-      {/* BLOCK 1: DATE REVEAL */}
+      {/* HERO MASTER ARCHED CARD SILHOUETTE ENCLOSURE */}
       {/* ====================================================== */}
-      
-      {/* Date Reveal Title Reveal */}
-      <motion.div 
-        initial={{ opacity: 0, filter: "blur(12px)", y: 25 }}
-        whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-        viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: 0.85, ease: "easeOut" }}
-        className="text-center mb-10 relative z-10 flex flex-col items-center justify-center"
-      >
-        <FloralOrnament className="w-16 h-8 text-[#D4AF37]/80 mb-2" />
-        <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.35em] text-[#E8C76A] font-semibold flex items-center justify-center gap-1">
-          The Sacred Date ✦
-        </span>
-        <h2 className="font-cormorant text-3xl md:text-5xl gold-shimmer-text mt-2 tracking-wide font-bold drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
-          Union Date Reveal
-        </h2>
-        <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mt-4" />
-      </motion.div>
+      <div className="relative z-20 w-full max-w-lg md:max-w-xl bg-gradient-to-b from-[#4A081B] via-[#310411] to-[#1F000A] p-6 md:p-10 rounded-[170px_170px_24px_24px] border border-[#D4AF37]/40 shadow-[0_20px_50px_rgba(0,0,0,0.6),0_0_30px_rgba(212,175,55,0.15)] flex flex-col items-center text-center overflow-hidden">
+        <CardCornerOrnament position="top-left" />
+        <CardCornerOrnament position="top-right" />
+        <CardCornerOrnament position="bottom-left" />
+        <CardCornerOrnament position="bottom-right" />
+        
+        {/* Date Reveal Title Reveal */}
+        <motion.div 
+          initial={{ opacity: 0, filter: "blur(12px)", y: 25 }}
+          whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.85, ease: "easeOut" }}
+          className="text-center mb-8 relative z-10 flex flex-col items-center justify-center pt-8 md:pt-12"
+        >
+          <FloralOrnament className="w-14 h-7 text-[#D4AF37]/80 mb-2" />
+          <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.35em] text-[#E8C76A] font-semibold flex items-center justify-center gap-1">
+            The Sacred Date ✦
+          </span>
+          <h2 className="font-cormorant text-3xl md:text-4xl gold-shimmer-text mt-2 tracking-wide font-bold drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
+            Union Date Reveal
+          </h2>
+          <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mt-4" />
+        </motion.div>
 
-      {/* Centered Luxury Reveal Cards container with balanced spacing */}
-      <motion.div 
-        initial={{ opacity: 0, filter: "blur(12px)", y: 20 }}
-        whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-        viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: 0.85, ease: "easeOut", delay: 0.15 }}
-        className="flex flex-row gap-2.5 md:gap-4 justify-center items-center w-full max-w-max mx-auto relative z-10"
-      >
-        <CeremonialMedallion value="09" label="Day" onReveal={handleCardReveal} index={0} isAllRevealed={allRevealed} />
-        <CeremonialMedallion value="DEC" label="Month" onReveal={handleCardReveal} index={1} isAllRevealed={allRevealed} />
-        <CeremonialMedallion value="2026" label="Year" onReveal={handleCardReveal} index={2} isAllRevealed={allRevealed} />
-      </motion.div>
+        {/* Centered Luxury Reveal Cards container with balanced spacing */}
+        <motion.div 
+          initial={{ opacity: 0, filter: "blur(12px)", y: 20 }}
+          whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.85, ease: "easeOut", delay: 0.15 }}
+          className="flex flex-row gap-2.5 md:gap-4 justify-center items-center w-full max-w-max mx-auto relative z-10 pb-4"
+        >
+          <CeremonialMedallion value="09" label="Day" onReveal={handleCardReveal} index={0} isAllRevealed={allRevealed} />
+          <CeremonialMedallion value="DEC" label="Month" onReveal={handleCardReveal} index={1} isAllRevealed={allRevealed} />
+          <CeremonialMedallion value="2026" label="Year" onReveal={handleCardReveal} index={2} isAllRevealed={allRevealed} />
+        </motion.div>
+      </div>
 
       {/* Alhamdulillah Sacred Date Revealed Text Overlay */}
       <AnimatePresence>

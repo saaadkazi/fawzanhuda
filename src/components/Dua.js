@@ -54,6 +54,21 @@ const SwayingLantern = ({ position }) => {
   );
 };
 
+// Core Illuminated Palace Arch Frame matching Hero master system
+const PalaceArchFrame = () => {
+  return (
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[88vw] md:w-auto md:max-w-[480px] h-[78vh] md:h-[620px] pointer-events-none z-0 transform-gpu will-change-transform">
+      <div className="absolute inset-0 bg-[#D4AF37]/10 blur-[36px] rounded-[150px_150px_24px_24px] animate-pulse-slow" />
+      <svg className="w-full h-full stroke-current fill-none stroke-[1.2] text-[#D4AF37]/30 drop-shadow-[0_0_10px_rgba(212,175,55,0.45)]" viewBox="0 0 100 150">
+        <path d="M 5,150 L 5,45 C 5,15 35,2 50,2 C 65,2 95,15 95,45 L 95,150" />
+        <path d="M 9,150 L 9,47 C 9,18 36,6 50,6 C 64,6 90,18 90,47 L 90,150" strokeDasharray="1.5,1.5" strokeWidth="0.5" />
+        <path d="M 47,4 L 50,1 L 53,4 L 50,7 Z" fill="#D4AF37" opacity="0.8" />
+        <circle cx="50" cy="4" r="1.5" fill="#FFFDF9" />
+      </svg>
+    </div>
+  );
+};
+
 function Dua() {
   const [stars, setStars] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -171,24 +186,42 @@ function Dua() {
 
   return (
     <section 
-      className="py-32 px-6 relative overflow-hidden flex flex-col items-center justify-center min-h-[65vh] bg-[#310411]"
+      style={{ background: "#4A081B" }}
+      className="relative py-28 px-4 md:px-6 flex flex-col items-center justify-center overflow-hidden min-h-screen z-10"
     >
-      {/* 1. Base Gradient & Radial Vignette matching Hero master system */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#1F000A] via-[#310411] to-[#4A081B] pointer-events-none z-0" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(110,15,42,0.45)_0%,rgba(49,4,17,0.85)_65%,rgba(31,0,10,0.98)_100%)] pointer-events-none z-0" />
+      {/* 1. Hero Vignette Edge Overlay */}
+      <div className="absolute inset-0 pointer-events-none z-[5] hero-vignette" />
 
-      {/* 2. Hero Master Golden Hexagon Background SVG Pattern */}
+      {/* 2. Velvet fabric grain overlay */}
       <div 
-        className="absolute inset-0 opacity-[0.14] pointer-events-none z-0 transform-gpu"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 17.32 L60 51.96 L30 69.28 L0 51.96 L0 17.32 Z' fill='none' stroke='%23D4AF37' stroke-width='0.6' stroke-opacity='0.12'/%3E%3Ccircle cx='30' cy='34.64' r='6' fill='none' stroke='%23D4AF37' stroke-width='0.5' stroke-opacity='0.1'/%3E%3C/svg%3E")`,
-          backgroundSize: "60px 60px"
-        }}
+        className="absolute inset-0 opacity-[0.025] pointer-events-none mix-blend-overlay z-[2]" 
+        style={{ 
+          backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.12) 0.5px, transparent 0.5px)`, 
+          backgroundSize: "2px 2px" 
+        }} 
       />
 
-      {/* 3. Swaying Royal Gold Palace Lanterns */}
+      {/* 3. Hero Master Golden Hexagon Background SVG Pattern Overlay */}
+      <div 
+        className="absolute inset-0 opacity-[0.045] pointer-events-none z-[1] transform-gpu" 
+        style={{ 
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
+          backgroundSize: "60px 60px" 
+        }} 
+      />
+
+      {/* 4. Swaying Golden lanterns */}
       <SwayingLantern position="left" />
       <SwayingLantern position="right" />
+
+      {/* 5. Outer Section Corner Floral Frame Ornaments */}
+      <FloralOrnament position="top-left" opacity={0.65} />
+      <FloralOrnament position="top-right" opacity={0.65} />
+      <FloralOrnament position="bottom-left" opacity={0.65} />
+      <FloralOrnament position="bottom-right" opacity={0.65} />
+
+      {/* 6. Palace Arch Frame Backing */}
+      <PalaceArchFrame />
       
       {/* Custom Styles for magical CTA sheen sweep and ripple ring animations */}
       <style dangerouslySetInnerHTML={{ __html: `
@@ -254,44 +287,6 @@ function Dua() {
       {/* Top Gold Arch Section Divider */}
       <LuxuryDivider className="absolute top-4 left-0 right-0 z-20 -translate-y-[15px] rotate-180" />
 
-      {/* Layer 2: Giant faint Islamic Arch Silhouette Frame with soft glow */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-        <div className="absolute w-[420px] h-[650px] md:w-[720px] md:h-[1050px] bg-[radial-gradient(circle,rgba(212,175,55,0.06)_0%,transparent_70%)] blur-[40px] pointer-events-none" />
-        <svg className="w-[320px] h-[550px] md:w-[580px] md:h-[950px] text-[#D4AF37] stroke-current fill-none stroke-[1.2] opacity-[0.05] filter drop-shadow-[0_0_8px_rgba(212,175,55,0.3)]" viewBox="0 0 100 150" preserveAspectRatio="none">
-          <path d="M 5,150 L 5,60 C 5,30 25,10 50,10 C 75,10 95,30 95,60 L 95,150" />
-          <path d="M 10,150 L 10,63 C 10,35 27,16 50,16 C 73,16 90,35 90,63 L 90,150" strokeDasharray="3,3" />
-        </svg>
-      </div>
-
-      {/* Ambient dynamic diagonal light sweep */}
-      <div className="ambient-light-sweep" />
-
-      {/* Slow ambient light sweep across background */}
-      <motion.div
-        animate={{
-          x: ["-10%", "10%", "-10%"],
-          y: ["-10%", "10%", "-10%"],
-          opacity: [0.12, 0.25, 0.12]
-        }}
-        transition={{
-          duration: 15,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="absolute w-[600px] h-[600px] bg-gradient-to-tr from-[#D4AF37]/10 to-transparent rounded-full blur-[100px] pointer-events-none z-0"
-        style={{ top: "15%", left: "10%" }}
-      />
-
-      {/* Ambient shifting fog/mist behind the card */}
-      <motion.div
-        animate={{
-          scale: [0.95, 1.05, 0.95],
-          opacity: [0.15, 0.28, 0.15]
-        }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute w-[500px] h-[300px] bg-[#7A1230]/30 rounded-full blur-[90px] pointer-events-none z-0"
-      />
-
       {/* Layer 4: Subtle Floating Gold Dust */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-[1]">
         {stars.map((s) => (
@@ -320,7 +315,7 @@ function Dua() {
         ))}
       </div>
 
-      <div className="max-w-2xl mx-auto relative z-10 flex flex-col items-center text-center px-4 w-full">
+      <div className="max-w-2xl mx-auto relative z-20 flex flex-col items-center text-center px-4 w-full">
         
         {/* Scroll Viewport Reveal Wrapper */}
         <motion.div
@@ -331,7 +326,7 @@ function Dua() {
           className="flex flex-col items-center w-full"
         >
           {/* Soft Moon Outline / Islamic Motif in gold */}
-          <div className="w-14 h-14 border border-[#D4AF37]/35 rounded-full flex items-center justify-center mb-8 opacity-80 shadow-[0_0_15px_rgba(216,178,110,0.15)]">
+          <div className="w-14 h-14 border border-[#D4AF37]/35 rounded-full flex items-center justify-center mb-6 opacity-80 shadow-[0_0_15px_rgba(216,178,110,0.15)]">
             <svg className="w-6 h-6 text-[#E8C76A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
               <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" fill="currentColor" fillOpacity="0.12" />
             </svg>
@@ -342,7 +337,7 @@ function Dua() {
               // Premium Skeleton Loading Card with matched layout height to avoid cumulative layout shift (CLS)
               <div 
                 key="rsvp-loading-skeleton"
-                className="w-full max-w-xl h-[320px] md:h-[350px] bg-gradient-to-br from-[#5A001E]/40 via-[#2A000C]/40 to-[#1A0008]/40 border border-[#D4AF37]/15 rounded-[30px] flex items-center justify-center relative overflow-hidden shadow-lg animate-pulse"
+                className="w-full max-w-xl h-[320px] md:h-[350px] bg-gradient-to-br from-[#5A001E]/40 via-[#2A000C]/40 to-[#1A0008]/40 border border-[#D4AF37]/15 rounded-[170px_170px_24px_24px] flex items-center justify-center relative overflow-hidden shadow-lg animate-pulse"
               >
                 <div className="flex flex-col items-center">
                   <svg className="animate-spin h-7 w-7 text-[#E8C76A] opacity-75" fill="none" viewBox="0 0 24 24">
@@ -359,64 +354,53 @@ function Dua() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -15, filter: "blur(8px)" }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
-                className="w-full max-w-xl bg-gradient-to-br from-[#BF953F] via-[#DFCA98] to-[#B38728] p-[1.5px] rounded-[30px] shadow-[0_24px_50px_rgba(0,0,0,0.5)] relative overflow-hidden animate-float-glow-card"
+                className="w-full max-w-lg md:max-w-xl bg-gradient-to-b from-[#4A081B] via-[#310411] to-[#1F000A] p-8 md:p-12 rounded-[170px_170px_24px_24px] border border-[#D4AF37]/40 shadow-[0_20px_50px_rgba(0,0,0,0.6),0_0_30px_rgba(212,175,55,0.15)] relative overflow-hidden flex flex-col items-center justify-center text-center animate-float-glow-card"
               >
-                {/* Inner core panel matching ScratchDate casing */}
-                <div className="w-full h-full bg-gradient-to-br from-[#4a0018] via-[#2A000C] to-[#1F000A] p-8 md:p-12 rounded-[29px] relative overflow-hidden flex flex-col items-center justify-center shadow-[inset_0_1px_3px_rgba(255,255,255,0.15)] z-10 text-center">
-                  
-                  {/* Subtle paper grain texture */}
-                  <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay z-0" 
-                       style={{ 
-                         backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.12) 0.5px, transparent 0.5px)`, 
-                         backgroundSize: "2px 2px" 
-                       }} />
+                {/* Subtle paper grain texture */}
+                <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay z-0" 
+                     style={{ 
+                       backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.12) 0.5px, transparent 0.5px)`, 
+                       backgroundSize: "2px 2px" 
+                     }} />
 
-                  {/* Faint Islamic pattern watermark */}
-                  <div className="absolute inset-0 opacity-[0.02] pointer-events-none z-0" 
-                       style={{ 
-                         backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
-                         backgroundSize: "40px 40px" 
-                       }} />
+                {/* Hero Master Gold Corner Ornaments */}
+                <CardCornerOrnament position="top-left" />
+                <CardCornerOrnament position="top-right" />
+                <CardCornerOrnament position="bottom-left" />
+                <CardCornerOrnament position="bottom-right" />
 
-                  {/* Hero Master Gold Corner Ornaments */}
-                  <CardCornerOrnament position="top-left" />
-                  <CardCornerOrnament position="top-right" />
-                  <CardCornerOrnament position="bottom-left" />
-                  <CardCornerOrnament position="bottom-right" />
+                {/* Heading with FloralOrnament & Gold Shimmer */}
+                <FloralOrnament className="w-14 h-7 text-[#D4AF37]/80 mb-2 relative z-10 pt-4" />
+                <h2 className="font-cormorant text-3xl md:text-4xl gold-shimmer-text tracking-wide mb-3 font-bold flex items-center justify-center gap-2 relative z-10 drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
+                  Confirm Your Presence ✨
+                </h2>
+                
+                <p className="font-cormorant italic text-base md:text-lg text-[#FFF8ED]/85 leading-relaxed max-w-md mx-auto mb-8 relative z-10">
+                  Your presence, blessings, and duas would mean the world to us.
+                </p>
 
-                  {/* Heading with FloralOrnament & Gold Shimmer */}
-                  <FloralOrnament className="w-16 h-8 text-[#D4AF37]/80 mb-2 relative z-10" />
-                  <h2 className="font-cormorant text-3xl md:text-5xl gold-shimmer-text tracking-wide mb-3 font-bold flex items-center justify-center gap-2 relative z-10 drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
-                    Confirm Your Presence ✨
-                  </h2>
-                  
-                  <p className="font-cormorant italic text-base md:text-lg text-[#FFF8ED]/85 leading-relaxed max-w-md mx-auto mb-8 relative z-10">
-                    Your presence, blessings, and duas would mean the world to us.
-                  </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full relative z-10 pb-2">
+                  {/* Attending Button - Gold gradient primary */}
+                  <motion.button
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                    onClick={(e) => { handleButtonClick(e); handleSelectRSVP("attend"); }}
+                    className="w-full sm:w-auto min-w-[200px] px-8 py-4 rounded-full border border-[#856124]/60 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] text-[#2D040F] font-cinzel text-xs font-bold tracking-[0.2em] shadow-[inset_0_2px_3px_rgba(255,255,255,0.85),inset_0_-1.5px_2px_rgba(0,0,0,0.25),0_4px_18px_rgba(212,175,55,0.35)] hover:shadow-[0_6px_25px_rgba(232,199,106,0.6)] cursor-pointer transition-all duration-300 shine-btn-sweep relative overflow-hidden focus:outline-none"
+                  >
+                    InshaAllah, I’ll Attend
+                  </motion.button>
 
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full relative z-10">
-                    {/* Attending Button - Gold gradient primary */}
-                    <motion.button
-                      whileHover={{ scale: 1.04 }}
-                      whileTap={{ scale: 0.96 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                      onClick={(e) => { handleButtonClick(e); handleSelectRSVP("attend"); }}
-                      className="w-full sm:w-auto min-w-[200px] px-8 py-4 rounded-full border border-[#856124]/60 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] text-[#2D040F] font-cinzel text-xs font-bold tracking-[0.2em] shadow-[inset_0_2px_3px_rgba(255,255,255,0.85),inset_0_-1.5px_2px_rgba(0,0,0,0.25),0_4px_18px_rgba(212,175,55,0.35)] hover:shadow-[0_6px_25px_rgba(232,199,106,0.6)] cursor-pointer transition-all duration-300 shine-btn-sweep relative overflow-hidden focus:outline-none"
-                    >
-                      InshaAllah, I’ll Attend
-                    </motion.button>
-
-                    {/* Sending My Duas Button - Outlined gold */}
-                    <motion.button
-                      whileHover={{ scale: 1.04 }}
-                      whileTap={{ scale: 0.96 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                      onClick={(e) => { handleButtonClick(e); handleSelectRSVP("dua"); }}
-                      className="w-full sm:w-auto min-w-[200px] border border-[#D4AF37]/65 bg-[#20030B]/35 hover:bg-[#D4AF37]/15 hover:border-[#FCF6BA] text-[#FFFDF9] font-cinzel text-xs font-bold tracking-widest py-4 px-8 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] cursor-pointer focus:outline-none relative overflow-hidden shine-btn-sweep"
-                    >
-                      Sending My Duas
-                    </motion.button>
-                  </div>
+                  {/* Sending My Duas Button - Outlined gold */}
+                  <motion.button
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                    onClick={(e) => { handleButtonClick(e); handleSelectRSVP("dua"); }}
+                    className="w-full sm:w-auto min-w-[200px] border border-[#D4AF37]/65 bg-[#20030B]/35 hover:bg-[#D4AF37]/15 hover:border-[#FCF6BA] text-[#FFFDF9] font-cinzel text-xs font-bold tracking-widest py-4 px-8 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] cursor-pointer focus:outline-none relative overflow-hidden shine-btn-sweep"
+                  >
+                    Sending My Duas
+                  </motion.button>
                 </div>
               </motion.div>
             ) : (
@@ -426,36 +410,26 @@ function Dua() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -15 }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
-                className="w-full max-w-xl bg-gradient-to-br from-[#BF953F] via-[#DFCA98] to-[#B38728] p-[1.5px] rounded-[30px] shadow-[0_24px_50px_rgba(0,0,0,0.5)] relative overflow-hidden animate-float-glow-card"
+                className="w-full max-w-lg md:max-w-xl bg-gradient-to-b from-[#4A081B] via-[#310411] to-[#1F000A] p-8 md:p-12 rounded-[170px_170px_24px_24px] border border-[#D4AF37]/40 shadow-[0_20px_50px_rgba(0,0,0,0.6),0_0_30px_rgba(212,175,55,0.15)] relative overflow-hidden flex flex-col items-center justify-center text-center animate-float-glow-card"
               >
-                {/* Inner core panel matching ScratchDate casing */}
-                <div className="w-full h-full bg-gradient-to-br from-[#4a0018] via-[#2A000C] to-[#1F000A] p-8 md:p-12 rounded-[29px] relative overflow-hidden flex flex-col items-center justify-center shadow-[inset_0_1px_3px_rgba(255,255,255,0.15)] z-10 text-center">
-                  
-                  {/* Subtle paper grain texture */}
-                  <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay z-0" 
-                       style={{ 
-                         backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.12) 0.5px, transparent 0.5px)`, 
-                         backgroundSize: "2px 2px" 
-                       }} />
+                {/* Subtle paper grain texture */}
+                <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay z-0" 
+                     style={{ 
+                       backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.12) 0.5px, transparent 0.5px)`, 
+                       backgroundSize: "2px 2px" 
+                     }} />
 
-                  {/* Faint Islamic pattern watermark */}
-                  <div className="absolute inset-0 opacity-[0.02] pointer-events-none z-0" 
-                       style={{ 
-                         backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
-                         backgroundSize: "40px 40px" 
-                       }} />
+                {/* Hero Master Gold Corner Ornaments */}
+                <CardCornerOrnament position="top-left" />
+                <CardCornerOrnament position="top-right" />
+                <CardCornerOrnament position="bottom-left" />
+                <CardCornerOrnament position="bottom-right" />
 
-                  {/* Elegant gold corner ornaments */}
-                  <div className="absolute top-4 left-4 w-6 h-6 border-t border-l border-[#D4AF37]/35 rounded-tl-md pointer-events-none z-10" />
-                  <div className="absolute top-4 right-4 w-6 h-6 border-t border-r border-[#D4AF37]/35 rounded-tr-md pointer-events-none z-10" />
-                  <div className="absolute bottom-4 left-4 w-6 h-6 border-b border-l border-[#D4AF37]/35 rounded-bl-md pointer-events-none z-10" />
-                  <div className="absolute bottom-4 right-4 w-6 h-6 border-b border-r border-[#D4AF37]/35 rounded-br-md pointer-events-none z-10" />
-
-                  <div className="w-12 h-12 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/45 flex items-center justify-center mx-auto mb-6 text-[#E8C76A] shadow-[0_0_12px_rgba(212,175,55,0.2)] z-10">
-                    <svg className="w-5.5 h-5.5 text-[#E8C76A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.746 3.746 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
-                    </svg>
-                  </div>
+                <div className="w-12 h-12 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/45 flex items-center justify-center mx-auto mb-6 text-[#E8C76A] shadow-[0_0_12px_rgba(212,175,55,0.2)] z-10 pt-2">
+                  <svg className="w-5.5 h-5.5 text-[#E8C76A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.746 3.746 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+                  </svg>
+                </div>
 
                   <h2 className="font-cormorant text-2xl md:text-3.5xl text-[#FFF8ED] tracking-wide mb-2 z-10">
                     JazakAllah Khair!
@@ -495,7 +469,6 @@ function Dua() {
                   >
                     Update Confirmation
                   </button>
-                </div>
               </motion.div>
             )}
           </AnimatePresence>

@@ -57,33 +57,20 @@ const SwayingLantern = ({ position }) => {
   );
 };
 
-// Illuminated Islamic Arch Frame surrounding the centerpiece card
-const PalaceArchFrame = ({ entering }) => {
+// Arch Frame Placeholder (Photorealistic Arch is present in hero_palace_bg.jpg)
+const PalaceArchFrame = () => null;
+
+// Master Luxury Islamic Pavilion Architectural Environment (Using Master Reference Background)
+const PalacePavilionBackdrop = () => {
   return (
-    <motion.div
-      initial={{ scale: 0.96, opacity: 0 }}
-      animate={{ 
-        scale: entering ? 1.15 : 1, 
-        opacity: entering ? 0 : 1,
-      }}
-      transition={{
-        scale: entering ? { duration: 0.85, ease: "easeOut" } : { duration: 2.8, ease: "easeOut" },
-        opacity: entering ? { duration: 0.75, ease: "easeOut" } : { duration: 2.2, ease: "easeOut" },
-      }}
-      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[84vw] md:w-auto md:max-w-[395px] h-[68vh] md:h-auto pointer-events-none z-0 transform-gpu will-change-transform"
-    >
-      {/* Arch backlighting bloom */}
-      <div className="absolute inset-0 bg-[#D4AF37]/10 blur-[36px] rounded-[150px_150px_24px_24px] animate-pulse-slow" />
-      {/* Sacred arch line vectors */}
-      <svg className="w-full h-full stroke-current fill-none stroke-[1.2] text-[#D4AF37]/30 drop-shadow-[0_0_10px_rgba(212,175,55,0.45)]" viewBox="0 0 100 150">
-        <path d="M 5,150 L 5,45 C 5,15 35,2 50,2 C 65,2 95,15 95,45 L 95,150" />
-        <path d="M 9,150 L 9,47 C 9,18 36,6 50,6 C 64,6 90,18 90,47 L 90,150" strokeDasharray="1.5,1.5" strokeWidth="0.5" />
-        
-        {/* Rosette at Peak */}
-        <path d="M 47,4 L 50,1 L 53,4 L 50,7 Z" fill="#D4AF37" opacity="0.8" />
-        <circle cx="50" cy="4" r="1.5" fill="#FFFDF9" />
-      </svg>
-    </motion.div>
+    <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden select-none">
+      {/* 1. Photorealistic 8K Master Reference Venue Image */}
+      <img 
+        src="/hero_palace_bg.jpg" 
+        alt="Luxury Islamic Wedding Pavilion Venue" 
+        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none transform-gpu scale-[1.01]" 
+      />
+    </div>
   );
 };
 
@@ -398,8 +385,8 @@ export default function Hero() {
         }
       `}} />
 
-      {/* Layer 1: Dark Vignette Edge Overlay */}
-      <div className="absolute inset-0 pointer-events-none z-[5] hero-vignette" />
+      {/* Layer 1: Master Architectural Pavilion Environment Backdrop */}
+      <PalacePavilionBackdrop />
 
       {/* Velvet fabric grain overlay (2.5% opacity) */}
       <div 
@@ -410,30 +397,24 @@ export default function Hero() {
         }} 
       />
 
-      {/* Layer 2: Exact Geometric Diamond Grid & Circular Motif Pattern Overlay */}
+      {/* Layer 5: Exact Geometric Diamond Grid & Circular Motif Pattern Overlay */}
       <div 
-        className="absolute inset-0 opacity-[0.045] pointer-events-none z-[1]" 
+        className="absolute inset-0 opacity-[0.035] pointer-events-none z-[1]" 
         style={{ 
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
           backgroundSize: "60px 60px" 
         }} 
       />
 
-      {/* Cinematic Mystical Drifting Fog Layers at bottom */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[150%] h-[200px] pointer-events-none overflow-hidden z-[4] opacity-[0.3]">
-        <div className="absolute bottom-[-50px] left-0 w-full h-[150px] bg-gradient-to-t from-[#8a1538] via-[#4a0218]/45 to-transparent blur-[40px] animate-fog-drift-1" />
-        <div className="absolute bottom-[-80px] left-[-20%] w-full h-[180px] bg-gradient-to-t from-[#D4AF37]/25 via-[#4a0218]/30 to-transparent blur-[50px] animate-fog-drift-2" style={{ animationDelay: "-6s" }} />
-      </div>
-
       {/* Swaying Golden lanterns */}
       <SwayingLantern position="left" />
       <SwayingLantern position="right" />
 
       {/* Corner floral frame ornaments */}
-      <FloralOrnament position="top-left" opacity={0.65} />
-      <FloralOrnament position="top-right" opacity={0.65} />
-      <FloralOrnament position="bottom-left" opacity={0.65} />
-      <FloralOrnament position="bottom-right" opacity={0.65} />
+      <FloralOrnament position="top-left" opacity={0.55} />
+      <FloralOrnament position="top-right" opacity={0.55} />
+      <FloralOrnament position="bottom-left" opacity={0.55} />
+      <FloralOrnament position="bottom-right" opacity={0.55} />
 
       {/* ==================================================
           PARALLAX LAYER 1 (0.2x): BACKGROUND PALACE & ARCHES
@@ -445,8 +426,6 @@ export default function Hero() {
         }}
         className="absolute inset-0 z-[2] pointer-events-none"
       >
-        <div className="absolute inset-0 bg-gradient-to-t from-[#2D040F]/90 via-transparent to-transparent pointer-events-none" />
-        
         {/* Core Illuminated Palace Archway */}
         <PalaceArchFrame entering={isEntering} />
       </motion.div>
@@ -523,13 +502,13 @@ export default function Hero() {
       </motion.div>
 
       {/* ==================================================
-          PARALLAX LAYER 3 (1.0x): CARD CENTERPIECE WITH INTRO
+          PARALLAX LAYER 3 (1.0x): ARCH-INTEGRATED TEXT CENTERPIECE
           ================================================== */}
       <div className="relative z-10 flex flex-col items-center max-w-lg w-full text-center select-none pt-0">
         
-        {/* Large layered glowing Islamic arch frame around card */}
+        {/* Borderless text centerpiece positioned directly inside the architectural arch */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.92, y: 30 }}
+          initial={{ opacity: 0, scale: 0.96, y: 20 }}
           animate={{ 
             opacity: isEntering ? 0.3 : 1, 
             scale: 1,
@@ -541,7 +520,6 @@ export default function Hero() {
             y: { duration: 1.2, delay: isMobile ? (introPlayed ? 0 : 0.4) : (introPlayed ? 0 : 4.0), ease: [0.215, 0.61, 0.355, 1] }
           }}
           onClick={handleCardTap}
-          whileTap={{ scale: 0.992 }}
           style={{
             x: layer3X,
             y: layer3Y,
@@ -549,76 +527,18 @@ export default function Hero() {
             rotateY,
             transformStyle: "preserve-3d"
           }}
-          className={`relative w-[80vw] h-[64svh] md:w-auto md:max-w-[365px] md:h-auto p-[2px] md:p-[4px] bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#B38728] rounded-[126px_126px_18px_18px] md:rounded-[162px_162px_22px_22px] shadow-[0_25px_60px_-15px_rgba(32,3,10,0.65),0_0_35px_rgba(212,175,55,0.25)] flex flex-col items-center justify-center overflow-hidden cursor-pointer transform-gpu will-change-transform ${isMobile ? "animate-card-float" : ""}`}
+          className="relative w-full max-w-[340px] md:max-w-[440px] px-4 py-2 flex flex-col items-center justify-center pointer-events-auto select-none"
         >
-          {/* Inner illuminated glow halo */}
-          <div className="absolute inset-[0.5px] border border-[#FFFDF9]/45 rounded-[125.5px_125.5px_17.5px_17.5px] md:rounded-[161.5px_161.5px_21.5px_21.5px] pointer-events-none z-10 animate-border-shimmer" />
-
-          {/* Inner Ivory Textured Invitation Card */}
-          <div className="relative w-full h-full bg-gradient-to-br from-[#FFFFFF] via-[#FFFDF9] to-[#F7F2E8] px-5 md:px-8 pt-9 md:pt-12 pb-5 md:pb-8 rounded-[124px_124px_16px_16px] md:rounded-[158px_158px_18px_18px] border border-[#856124]/30 shadow-[inset_0_1.5px_4px_rgba(255,255,255,0.95)] flex flex-col items-center justify-between overflow-hidden">
-            {/* Elegant Islamic card corner frame ornaments for depth */}
-            <CardCornerOrnament position="top-left" />
-            <CardCornerOrnament position="top-right" />
-            <CardCornerOrnament position="bottom-left" />
-            <CardCornerOrnament position="bottom-right" />
-
-            {/* Paper Grain Texture overlay */}
-            <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay z-0" 
-                 style={{ 
-                   backgroundImage: `radial-gradient(rgba(0, 0, 0, 0.15) 0.5px, transparent 0.5px)`, 
-                   backgroundSize: "3px 3px" 
-                 }} />
-            <div className="absolute inset-0 opacity-[0.015] pointer-events-none mix-blend-multiply z-0"
-                 style={{
-                   backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)'/%3E%3C/svg%3E")`
-                 }} />
-
-            {/* Card Center Rosette Watermark */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-[0.035] pointer-events-none z-0">
-              <svg className="w-48 h-48 text-[#D4AF37]" viewBox="0 0 100 100" fill="currentColor">
-                <path d="M 50,0 C 77.6,0 100,22.4 100,50 C 100,77.6 77.6,100 50,100 C 22.4,100 0,77.6 0,50 C 0,22.4 22.4,0 50,0 Z" fill="none" stroke="currentColor" strokeWidth="0.5" />
-                <path d="M 50,10 L 61,39 L 90,50 L 61,61 L 50,90 L 39,61 L 10,50 L 39,39 Z" />
-                <path d="M 50,20 L 59,41 L 80,50 L 59,59 L 50,80 L 41,59 L 20,50 L 41,41 Z" opacity="0.7" />
-              </svg>
-            </div>
-
-          {/* Gold sweep dynamic foil reflection light */}
-          <div className="gold-sweep-overlay" />
-
-          {/* Floral Corner Ornaments inside card bottom */}
-          <FloralOrnament position="bottom-left" opacity={0.35} />
-          <FloralOrnament position="bottom-right" opacity={0.35} />
-
-          {/* Golden inner arch border lining with border shimmer */}
-          <div className="absolute inset-[10px] border border-[#D4AF37]/25 rounded-[170px_170px_16px_16px] pointer-events-none z-10 animate-border-shimmer" />
-          <div className="absolute inset-[13px] border border-dashed border-[#D4AF37]/15 rounded-[167px_167px_13px_13px] pointer-events-none z-10 animate-border-shimmer" style={{ animationDelay: "1.5s" }} />
-
-          {/* Tap gold glow bloom pulse */}
-          <motion.div
-            animate={
-              isCardTapped
-                ? { opacity: [0, 0.5, 0], scale: [0.98, 1.02, 0.98] }
-                : { opacity: [0, 0.35, 0] }
-            }
-            transition={
-              isCardTapped 
-                ? { duration: 1.0, ease: "easeInOut" } 
-                : { delay: 4.2, duration: 1.8, ease: "easeInOut" }
-            }
-            className="absolute inset-0 bg-[#D4AF37]/5 rounded-[170px_170px_16px_16px] pointer-events-none z-0 blur-xl"
-          />
-
-          {/* Sequential text stagger reveals */}
+          {/* Sequential text stagger reveals positioned directly inside the background arch */}
           <motion.div 
             initial={{ opacity: 0, filter: "blur(4px)" }}
             animate={{ opacity: 1, filter: "blur(0px)" }}
             transition={{ duration: 0.95, delay: isMobile ? (introPlayed ? 0 : 0.8) : (introPlayed ? 0 : 5.0), ease: "easeOut" }}
-            className="w-full flex-1 flex flex-col items-center justify-between z-10"
+            className="w-full flex flex-col items-center justify-center text-center z-10"
           >
-            
             {/* Top Islamic star rosette */}
-            <div className="w-6.5 h-6.5 md:w-10 md:h-10 text-brand-gold mb-2.5 md:mb-6 relative">
-              <svg className="w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.2">
+            <div className="w-7 h-7 md:w-9 md:h-9 text-[#856124] mb-2 md:mb-4 relative flex items-center justify-center">
+              <svg className="w-full h-full drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.4">
                 <path d="M 50 15 L 85 50 L 50 85 L 15 50 Z" />
                 <path d="M 50 25 L 75 50 L 50 75 L 25 50 Z" />
                 <circle cx="50" cy="50" r="6" fill="currentColor" />
@@ -626,12 +546,12 @@ export default function Hero() {
             </div>
 
             {/* Families Line */}
-            <p className="font-cormorant italic text-[10px] md:text-sm text-brand-body tracking-[0.25em] uppercase mb-1.5 md:mb-5">
+            <p className="font-cormorant italic text-[11px] md:text-sm text-[#5C3D1E] tracking-[0.28em] uppercase mb-2 md:mb-4 font-semibold drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]">
               Together with their families
             </p>
 
             {/* Groom Label */}
-            <p className="font-inter text-[8px] md:text-[9px] uppercase tracking-[0.25em] text-[#D4AF37] font-bold mb-0.5 select-none">
+            <p className="font-inter text-[8px] md:text-[9.5px] uppercase tracking-[0.25em] text-[#856124] font-bold mb-0.5 select-none">
               THE GROOM
             </p>
 
@@ -640,19 +560,19 @@ export default function Hero() {
               initial="hidden"
               animate="visible"
               variants={groomStagger}
-              className="font-cormorant text-[42px] md:text-[56px] font-bold text-[#4A081B] tracking-tighter leading-none"
+              className="font-cormorant text-[46px] md:text-[62px] font-bold text-[#4A081B] tracking-tighter leading-none drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)]"
             >
               {splitName("Fawzan", groomStagger, false)}
             </motion.h1>
 
             {/* Star Rosette Divider */}
-            <div className="my-2.5 md:my-5 w-full flex items-center justify-center gap-4 relative pointer-events-none">
+            <div className="my-2.5 md:my-4 w-full flex items-center justify-center gap-4 relative pointer-events-none">
               <motion.span 
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ duration: 0.6, delay: 5.8, ease: "easeOut" }}
                 style={{ transformOrigin: "right center" }}
-                className="h-[0.5px] w-12 bg-gradient-to-r from-transparent to-[#D4AF37]/50" 
+                className="h-[0.5px] w-12 bg-gradient-to-r from-transparent to-[#856124]/60" 
               />
               <div className="relative flex items-center justify-center">
                 <motion.div
@@ -662,10 +582,10 @@ export default function Hero() {
                       : { scale: 1, opacity: 0 }
                   }
                   transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="absolute w-12 h-12 rounded-full border border-[#D4AF37] pointer-events-none z-30"
+                  className="absolute w-10 h-10 rounded-full border border-[#856124] pointer-events-none z-30"
                 />
-                <div className="text-[#D4AF37] flex items-center justify-center drop-shadow-[0_0_10px_rgba(212,175,55,0.65)] z-10">
-                  <svg className="w-8 h-8 animate-pulse-slow" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <div className="text-[#856124] flex items-center justify-center drop-shadow-[0_0_8px_rgba(212,175,55,0.4)] z-10">
+                  <svg className="w-6.5 h-6.5 animate-pulse-slow" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M 50 12 L 61 39 L 88 50 L 61 61 L 50 88 L 39 61 L 12 50 L 39 39 Z" />
                     <circle cx="50" cy="50" r="7.5" fill="currentColor" />
                   </svg>
@@ -676,12 +596,12 @@ export default function Hero() {
                 animate={{ scaleX: 1 }}
                 transition={{ duration: 0.6, delay: 5.8, ease: "easeOut" }}
                 style={{ transformOrigin: "left center" }}
-                className="h-[0.5px] w-12 bg-gradient-to-l from-transparent to-[#D4AF37]/50" 
+                className="h-[0.5px] w-12 bg-gradient-to-l from-transparent to-[#856124]/60" 
               />
             </div>
 
             {/* Bride Label */}
-            <p className="font-inter text-[8px] md:text-[9px] uppercase tracking-[0.25em] text-[#D4AF37] font-bold mb-0.5 select-none">
+            <p className="font-inter text-[8px] md:text-[9.5px] uppercase tracking-[0.25em] text-[#856124] font-bold mb-0.5 select-none">
               THE BRIDE
             </p>
 
@@ -690,30 +610,29 @@ export default function Hero() {
               initial="hidden"
               animate="visible"
               variants={brideStagger}
-              className="font-cormorant text-[42px] md:text-[56px] font-bold text-[#4A081B] tracking-tighter leading-none mb-1 md:mb-4"
+              className="font-cormorant text-[46px] md:text-[62px] font-bold text-[#4A081B] tracking-tighter leading-none mb-2 md:mb-4 drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)]"
             >
               {splitName("Huda", brideStagger, true)}
             </motion.h1>
 
             {/* Honor request line */}
-            <p className="font-inter text-[8px] md:text-[10px] text-brand-gold font-bold uppercase tracking-[0.25em] mb-1.5 md:mb-4">
+            <p className="font-inter text-[8px] md:text-[10px] text-[#856124] font-bold uppercase tracking-[0.25em] mb-1.5 md:mb-3">
               Request the honor of your presence
             </p>
 
             {/* Nikah ceremony description */}
-            <p className="font-cormorant italic text-xs md:text-xl text-brand-body max-w-[240px] md:max-w-[280px] leading-relaxed">
+            <p className="font-cormorant italic text-xs md:text-xl text-[#3D2314] font-medium max-w-[240px] md:max-w-[300px] leading-relaxed drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
               at their blessed Nikah ceremony
             </p>
 
             {/* Subtle gold line divider */}
-            <div className="w-12 h-[0.5px] bg-[#D4AF37]/50 mt-4.5 mb-2.5 md:mt-6 md:mb-4 pointer-events-none" />
+            <div className="w-12 h-[0.5px] bg-[#856124]/50 mt-3 mb-2 md:mt-5 md:mb-3 pointer-events-none" />
 
             {/* Sacred Date Micro-Detail */}
-            <p className="font-cinzel text-[8px] md:text-[9.5px] tracking-[0.25em] text-[#856124] font-bold">
+            <p className="font-cinzel text-[8.5px] md:text-[10.5px] tracking-[0.28em] text-[#856124] font-bold">
               09 • 12 • 2026
             </p>
-            </motion.div>
-          </div>
+          </motion.div>
         </motion.div>
 
         {/* Glowing visual connector linking card and medallion CTA on mobile */}
