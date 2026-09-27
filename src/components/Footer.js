@@ -108,7 +108,6 @@ const RoyalSeal = ({ setGlobalStage }) => {
   const [burstSparks, setBurstSparks] = useState([]);
   const [ameenClicked, setAmeenClicked] = useState(false);
   const [risingParticles, setRisingParticles] = useState([]);
-  const [settleParticlesList, setSettleParticlesList] = useState([]);
 
   const holdIntervalRef = useRef(null);
   const startTimeRef = useRef(null);
@@ -540,22 +539,6 @@ const RoyalSeal = ({ setGlobalStage }) => {
               />
             ))}
 
-            {/* Slow Drifting Gold Settle Particles on Card Reveal */}
-            {settleParticlesList.map((p) => (
-              <motion.span
-                key={p.id}
-                initial={{ x: p.x, y: p.startY, opacity: 0.85, scale: p.scale }}
-                animate={{ y: p.endY, opacity: 0 }}
-                transition={{ duration: p.duration, ease: "linear" }}
-                className="absolute w-1.2 h-1.2 rounded-full bg-[#E8C76A] pointer-events-none z-10"
-                style={{
-                  boxShadow: "0 0 6px #E8C76A",
-                  left: "50%",
-                  marginLeft: "-2px",
-                }}
-              />
-            ))}
-
             <span className="font-cormorant text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#856124] font-semibold mb-4 relative z-10">
               A Blessed Dua
             </span>
@@ -813,7 +796,7 @@ function Footer() {
           </motion.span>
           
           <span className="font-inter text-[8px] uppercase tracking-[0.3em] text-[#4A081B]/45 select-none">
-            Fauzan & Huda • 2026
+            Fawzan & Huda • 2026
           </span>
 
           {/* Right Twinkling Sparkle */}

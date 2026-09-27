@@ -95,8 +95,7 @@ export default function Hero() {
   const [isMobile, setIsMobile] = useState(false);
   const [isWaveActive, setIsWaveActive] = useState(false);
   const [isCardTapped, setIsCardTapped] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(true);
   const [isEntering, setIsEntering] = useState(false);
   const [introPlayed, setIntroPlayed] = useState(false);
 
@@ -172,29 +171,19 @@ export default function Hero() {
     window.addEventListener("resize", handleResize);
 
     const handlePointerMove = (e) => {
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      
-      const x = (clientX - window.innerWidth / 2) / (window.innerWidth / 2);
-      const y = (clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+      if (window.innerWidth < 768) return; // Desktop mouse tilt only
+      const x = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+      const y = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
       
       mouseX.set(x);
       mouseY.set(y);
     };
 
-    window.addEventListener("mousemove", handlePointerMove);
-    window.addEventListener("touchmove", handlePointerMove, { passive: true });
-
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("mousemove", handlePointerMove, { passive: true });
 
     return () => {
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handlePointerMove);
-      window.removeEventListener("touchmove", handlePointerMove);
-      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -310,7 +299,7 @@ export default function Hero() {
   return (
     <section 
       style={{
-        background: "radial-gradient(circle at center, #7A1237 0%, #5A001E 50%, #2A000C 100%)"
+        background: "#4A081B"
       }}
       className="relative h-[100svh] md:min-h-screen flex flex-col items-center justify-center px-4 py-4 md:pt-24 md:pb-12 overflow-hidden z-10"
     >
@@ -421,21 +410,9 @@ export default function Hero() {
         }} 
       />
 
-      {/* Layer 2: Silk Haze Ambient Atmospheric layer */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.035] z-[1]">
-        <div className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-[radial-gradient(circle_at_30%_30%,#7a1738_0%,transparent_50%),radial-gradient(circle_at_70%_70%,#D4AF37_0%,transparent_50%)] animate-silk-haze" />
-      </div>
-
-      {/* Volumetric Palace Light Rays */}
-      <div className="hidden md:block absolute inset-0 pointer-events-none overflow-hidden opacity-[0.03] z-[1]">
-        <div className="absolute top-0 left-1/4 w-[1px] h-full bg-gradient-to-b from-[#FFFDF9] via-[#D4AF37] to-transparent blur-[12px] rotate-[15deg] transform-gpu" />
-        <div className="absolute top-0 left-1/2 w-[2px] h-full bg-gradient-to-b from-[#FFFDF9] via-[#D4AF37] to-transparent blur-[20px] rotate-[15deg] transform-gpu" />
-        <div className="absolute top-0 left-3/4 w-[1px] h-full bg-gradient-to-b from-[#FFFDF9] via-[#D4AF37] to-transparent blur-[16px] rotate-[15deg] transform-gpu" />
-      </div>
-
-      {/* Layer 3: Islamic Geometric watermark */}
+      {/* Layer 2: Exact Geometric Diamond Grid & Circular Motif Pattern Overlay */}
       <div 
-        className="absolute inset-0 opacity-[0.04] pointer-events-none z-[1]" 
+        className="absolute inset-0 opacity-[0.045] pointer-events-none z-[1]" 
         style={{ 
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
           backgroundSize: "60px 60px" 
@@ -474,20 +451,7 @@ export default function Hero() {
         <PalaceArchFrame entering={isEntering} />
       </motion.div>
 
-      {/* ==================================================
-          NOOR LIGHT GLOW (Layered Backlighting Spotlights)
-          ================================================== */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[3] w-[450px] h-[650px] flex items-center justify-center transform-gpu will-change-transform">
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{
-            scale: isEntering ? 1.1 : 1,
-            opacity: isEntering ? 0 : (mounted ? 0.35 : 0),
-          }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[260px] h-[360px] md:w-[390px] md:h-[550px] rounded-[180px_180px_60px_60px] bg-gradient-to-b from-[#D4AF37] to-transparent blur-[50px] md:blur-[90px] animate-noor-1"
-        />
-      </div>
+
 
       {/* ==================================================
           PARALLAX LAYER 2 (0.5x): GOLD PARTICLES LAYER
@@ -678,7 +642,7 @@ export default function Hero() {
               variants={groomStagger}
               className="font-cormorant text-[42px] md:text-[56px] font-bold text-[#4A081B] tracking-tighter leading-none"
             >
-              {splitName("Fauzan", groomStagger, false)}
+              {splitName("Fawzan", groomStagger, false)}
             </motion.h1>
 
             {/* Star Rosette Divider */}

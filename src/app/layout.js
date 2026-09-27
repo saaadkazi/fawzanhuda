@@ -24,10 +24,10 @@ const amiri = Amiri({
 });
 
 export const metadata = {
-  title: "Fauzan & Huda - Blessed Nikah Ceremony",
-  description: "Together with their families, Fauzan & Huda request the honor of your presence at their blessed Nikah ceremony. Discover details, location, and countdown.",
-  keywords: ["Fauzan and Huda Wedding", "Nikah Ceremony", "Islamic Wedding Invitation", "Wedding Invitation"],
-  authors: [{ name: "Fauzan & Huda" }],
+  title: "Fawzan & Huda - Blessed Nikah Ceremony",
+  description: "Together with their families, Fawzan & Huda request the honor of your presence at their blessed Nikah ceremony. Discover details, location, and countdown.",
+  keywords: ["Fawzan and Huda Wedding", "Nikah Ceremony", "Islamic Wedding Invitation", "Wedding Invitation"],
+  authors: [{ name: "Fawzan & Huda" }],
 };
 
 export const viewport = {

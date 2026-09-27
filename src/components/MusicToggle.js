@@ -105,31 +105,34 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
     };
   }, [isPlaying]);
 
-  // Scroll background color brightness listener (Theme Adaptive)
+  // Scroll background color brightness listener (Throttled with requestAnimationFrame)
   useEffect(() => {
-    const handleScroll = () => {
-      const elements = document.querySelectorAll("section, footer");
-      let currentBgIsDark = true; // Default to dark (Hero)
+    let ticking = false;
 
-      elements.forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        // Check if this element covers the top-right viewport corner (y = 40px)
-        if (rect.top <= 40 && rect.bottom >= 40) {
-          const className = el.className || "";
-          // Ivory light backgrounds contain from-[#FFFDF9] or similar light stop classes
-          if (className.includes("from-[#FFFDF9]") || className.includes("from-[#FFFDF5]")) {
-            currentBgIsDark = false; // Background is light
-          } else {
-            currentBgIsDark = true; // Background is dark
-          }
+    const checkTheme = () => {
+      const lightSection = document.getElementById("parents-section");
+      let currentBgIsDark = true;
+
+      if (lightSection) {
+        const rect = lightSection.getBoundingClientRect();
+        if (rect.top <= 60 && rect.bottom >= 60) {
+          currentBgIsDark = false;
         }
-      });
+      }
 
       setIsThemeDark(currentBgIsDark);
+      ticking = false;
     };
 
-    window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Run immediately on mount
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(checkTheme);
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    checkTheme();
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -139,62 +142,71 @@ export default function MusicToggle({ isPlaying, setIsPlaying }) {
   // Resolve dynamic styles based on background theme for inverted contrast
   const buttonStyle = isThemeDark
     ? {
-        // Background is dark -> Button is light (ivory glass)
-        container: `bg-[#FFF8ED]/85 border-[#D4AF37]/50 ${
+        // Background is dark -> Button is light (ivory glass pill with burgundy/gold accents)
+        container: `bg-[#FFF8ED]/90 border-[#D4AF37]/60 ${
           isPlaying 
-            ? "shadow-[0_0_20px_rgba(212,175,55,0.35),_0_8px_32px_rgba(74,8,27,0.18)]" 
-            : "shadow-[0_8px_32px_rgba(74,8,27,0.12)]"
+            ? "shadow-[0_0_20px_rgba(212,175,55,0.35),_0_6px_24px_rgba(74,8,27,0.2)]" 
+            : "shadow-[0_6px_20px_rgba(74,8,27,0.14)]"
         }`,
-        subText: "text-[#4A081B]/60",
-        mainText: isPlaying ? "text-[#856124]" : "text-[#4A081B]/80",
-        icon: "text-[#4A081B]",
-        eqBar: "bg-[#856124]",
-        ping: "bg-[#D4AF37]",
-        pingBorder: "border-[#D4AF37]",
+        badgeBg: "bg-[#4A081B] border-[#D4AF37]/50",
+        titleText: "text-[#4A081B]",
+        statusText: isPlaying ? "text-[#856124]" : "text-[#4A081B]/55",
+        icon: "text-[#FCF6BA]",
+        eqBar: "bg-[#D4AF37]",
+        pingBorder: "border-[#D4AF37]/40",
       }
     : {
-        // Background is light -> Button is dark (mocha/burgundy glass)
-        container: `bg-[#4A081B]/95 border-[#E8C76A]/60 ${
+        // Background is light -> Button is dark (burgundy velvet glass pill with gold accents)
+        container: `bg-[#4A081B]/95 border-[#D4AF37]/60 ${
           isPlaying 
-            ? "shadow-[0_0_20px_rgba(232,199,106,0.45),_0_8px_32px_rgba(0,0,0,0.3)]" 
-            : "shadow-[0_8px_32px_rgba(0,0,0,0.2)]"
+            ? "shadow-[0_0_24px_rgba(232,199,106,0.4),_0_6px_24px_rgba(0,0,0,0.3)]" 
+            : "shadow-[0_6px_20px_rgba(0,0,0,0.22)]"
         }`,
-        subText: "text-[#FFF8ED]/60",
-        mainText: isPlaying ? "text-[#E8C76A] drop-shadow-[0_0_8px_rgba(232,199,106,0.5)]" : "text-[#FFF8ED]/70",
-        icon: "text-[#FFF8ED]",
+        badgeBg: "bg-[#310411] border-[#D4AF37]/60",
+        titleText: "text-[#FCF6BA]",
+        statusText: isPlaying ? "text-[#E8C76A]" : "text-[#FFF8ED]/50",
+        icon: "text-[#FCF6BA]",
         eqBar: "bg-[#E8C76A]",
-        ping: "bg-[#E8C76A]",
-        pingBorder: "border-[#E8C76A]",
+        pingBorder: "border-[#E8C76A]/40",
       };
 
   return (
-    <div className="fixed top-4 right-4 z-50">
+    <div className="fixed top-4 right-4 z-50 select-none">
       <motion.button
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.92 }}
+        whileHover={{ scale: 1.04 }}
+        whileTap={{ scale: 0.96 }}
         onClick={() => setIsPlaying(!isPlaying)}
-        className={`w-9 h-9 rounded-full backdrop-blur-md flex items-center justify-center cursor-pointer border transition-all duration-500 ease-in-out ${buttonStyle.container}`}
+        className={`h-9 px-3 rounded-full backdrop-blur-md flex items-center gap-2 cursor-pointer border transition-all duration-500 ease-in-out relative group ${buttonStyle.container}`}
         aria-label="Toggle music"
       >
-        {/* Equalizer / Icon side */}
-        <div className="flex items-center justify-center w-5 h-5 relative transition-colors duration-500">
+        {/* Left Circular Medallion Badge */}
+        <div className={`w-6 h-6 rounded-full flex items-center justify-center border shadow-inner transition-colors duration-500 relative z-10 ${buttonStyle.badgeBg}`}>
           {isPlaying ? (
             /* Animated Equalizer Bars when ON */
-            <div className="flex gap-[2px] items-end h-3.5 w-4 justify-center">
+            <div className="flex gap-[2px] items-end h-3 w-3 justify-center">
               <span className={`w-[1.5px] rounded-full animate-[bounce_0.8s_infinite_0.1s] h-3 transition-all duration-500 ${buttonStyle.eqBar}`} />
               <span className={`w-[1.5px] rounded-full animate-[bounce_0.5s_infinite_0.3s] h-3.5 transition-all duration-500 ${buttonStyle.eqBar}`} />
-              <span className={`w-[1.5px] rounded-full animate-[bounce_0.7s_infinite_0s] h-2.2 transition-all duration-500 ${buttonStyle.eqBar}`} />
-              <span className={`w-[1.5px] rounded-full animate-[bounce_0.6s_infinite_0.2s] h-2.8 transition-all duration-500 ${buttonStyle.eqBar}`} />
+              <span className={`w-[1.5px] rounded-full animate-[bounce_0.7s_infinite_0s] h-2 transition-all duration-500 ${buttonStyle.eqBar}`} />
             </div>
           ) : (
             /* Muted Speaker Icon when OFF */
-            <VolumeX className={`w-3.5 h-3.5 transition-colors duration-500 ${buttonStyle.icon}`} />
+            <VolumeX className={`w-3 h-3 transition-colors duration-500 ${buttonStyle.icon}`} />
           )}
         </div>
 
-        {/* Active Ping Glow indicator */}
+        {/* Right Label & Status Text */}
+        <div className="flex flex-col items-start text-left leading-none pr-0.5 relative z-10">
+          <span className={`font-cormorant text-[10.5px] font-bold tracking-[0.22em] uppercase transition-colors duration-500 ${buttonStyle.titleText}`}>
+            Music
+          </span>
+          <span className={`font-inter text-[7.5px] tracking-[0.18em] uppercase font-semibold transition-colors duration-500 ${buttonStyle.statusText}`}>
+            {isPlaying ? "Playing" : "Muted"}
+          </span>
+        </div>
+
+        {/* Active Soft Pulse Ring when playing */}
         {isPlaying && (
-          <span className={`absolute inset-0 rounded-full border animate-ping opacity-35 pointer-events-none transition-colors duration-500 ${buttonStyle.pingBorder}`} />
+          <span className={`absolute inset-0 rounded-full border animate-pulse opacity-40 pointer-events-none transition-colors duration-500 ${buttonStyle.pingBorder}`} />
         )}
       </motion.button>
     </div>

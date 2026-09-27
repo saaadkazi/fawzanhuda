@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import Lenis from "lenis";
+import dynamic from "next/dynamic";
 import Preloader from "@/components/Preloader";
 import GrandOpening from "@/components/GrandOpening";
 import MusicToggle from "@/components/MusicToggle";
@@ -13,6 +14,10 @@ import Venue from "@/components/Venue";
 import Dua from "@/components/Dua";
 import Footer from "@/components/Footer";
 
+const ThreeCanvas = dynamic(() => import("@/components/canvas/ThreeCanvas"), {
+  ssr: false,
+});
+
 export default function Home() {
   const [status, setStatus] = useState("loading"); // "loading" | "entrance" | "opened"
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
@@ -22,12 +27,12 @@ export default function Home() {
     if (status !== "opened") return;
 
     const lenis = new Lenis({
-      duration: 1.8,
+      duration: 0.9,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // smooth easeOutExponential
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
-      wheelMultiplier: 1.05,
+      wheelMultiplier: 1.0,
     });
 
     let rafId;
@@ -43,54 +48,37 @@ export default function Home() {
     };
   }, [status]);
 
-  const handleStartOpening = () => {
-    setStatus("transitioning");
-    setIsMusicPlaying(true);
-  };
-
-  const handleOpenInvitation = () => {
-    setStatus("opened");
-  };
-
   return (
     <div className="relative w-full min-h-screen bg-brand-bg text-brand-dark selection:bg-brand-gold/30 overflow-x-hidden">
-      
+      {/* Foundational Persistent R3F WebGL Canvas */}
+      <ThreeCanvas />
+
       {/* 1. Fullscreen Preloader (Automatic timed loading + completion flash) */}
       <AnimatePresence>
         {status === "loading" && (
-          <Preloader onComplete={() => setStatus("entrance")} />
+          <Preloader onComplete={() => {
+            setStatus("opened");
+            setIsMusicPlaying(true);
+          }} />
         )}
       </AnimatePresence>
 
-      {/* 2. Floating Background Music Control (Visible after doors swing open) */}
+      {/* 2. Floating Background Music Control */}
       {status === "opened" && (
         <MusicToggle isPlaying={isMusicPlaying} setIsPlaying={setIsMusicPlaying} />
       )}
 
-      {/* 3. Grand Entrance double doors split wrapping Scrollable Content */}
+      {/* 3. Main Scrollable Content */}
       {status !== "loading" && (
-        <GrandOpening 
-          isOpen={status === "opened"} 
-          onOpen={handleOpenInvitation}
-          onStartOpening={handleStartOpening}
-        >
-          {status !== "loading" && (
-            <main className="w-full relative flex flex-col min-h-screen">
-               {/* Critical Hero preloaded instantly in background during transition */}
-              <Hero />
-              
-              {/* Lazy-load other heavy sections ONLY after doors fully resolve */}
-              {status === "opened" && (
-                <>
-                  <Parents />
-                  <ScratchDate />
-                  <Venue />
-                  <Dua />
-                  <Footer />
-                </>
-              )}
-            </main>
-          )}
+        <GrandOpening>
+          <main className="w-full relative flex flex-col min-h-screen">
+            <Hero />
+            <Parents />
+            <ScratchDate />
+            <Venue />
+            <Dua />
+            <Footer />
+          </main>
         </GrandOpening>
       )}
       

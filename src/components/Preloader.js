@@ -1,28 +1,48 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { playChime } from "@/utils/audioSynth";
+
+// Corner Gold Ornament subcomponent matching invitation card style
+const PreloaderCornerOrnament = ({ position }) => {
+  const classMap = {
+    "top-left": "top-6 left-6 rotate-0",
+    "top-right": "top-6 right-6 rotate-90",
+    "bottom-left": "bottom-6 left-6 -rotate-90",
+    "bottom-right": "bottom-6 right-6 rotate-180",
+  };
+  return (
+    <div className={`absolute w-8 h-8 md:w-10 md:h-10 text-[#D4AF37]/40 pointer-events-none z-10 ${classMap[position]}`}>
+      <svg className="w-full h-full" viewBox="0 0 50 50" fill="none" stroke="currentColor" strokeWidth="1.2">
+        <path d="M 0,0 L 40,0 M 0,0 L 0,40" />
+        <path d="M 6,6 C 12,6 16,12 16,16 C 16,20 20,24 24,24" strokeDasharray="1.5,1.5" />
+        <circle cx="6" cy="6" r="1.5" fill="currentColor" />
+      </svg>
+    </div>
+  );
+};
 
 export default function Preloader({ onComplete }) {
   const [progress, setProgress] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
-  const [particles, setParticles] = useState([]);
   const [mounted, setMounted] = useState(false);
   const [assetsReady, setAssetsReady] = useState(false);
 
   useEffect(() => {
     setMounted(true);
 
-    // Asynchronously preload critical fonts and images
+    // Asynchronously preload critical assets with fallback timeout
     const preloadAssets = async () => {
       try {
-        if (typeof document !== "undefined" && document.fonts) {
-          await document.fonts.ready;
-        }
-        
+        const fontPromise = typeof document !== "undefined" && document.fonts
+          ? document.fonts.ready
+          : Promise.resolve();
+
+        const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 800));
+
         const imageUrls = ["/map_preview.png"];
-        const promises = imageUrls.map((url) => {
+        const imagePromises = imageUrls.map((url) => {
           return new Promise((resolve) => {
             const img = new Image();
             img.src = url;
@@ -30,7 +50,11 @@ export default function Preloader({ onComplete }) {
             img.onerror = resolve;
           });
         });
-        await Promise.all(promises);
+
+        await Promise.all([
+          Promise.race([fontPromise, timeoutPromise]),
+          ...imagePromises
+        ]);
       } catch (err) {
         console.warn("Asset preloading encountered issues:", err);
       }
@@ -40,40 +64,33 @@ export default function Preloader({ onComplete }) {
       setAssetsReady(true);
     });
 
-    // Generate drift sparks client-side
-    const generated = Array.from({ length: 22 }).map((_, i) => ({
-      id: i,
-      left: `${Math.random() * 100}%`,
-      size: Math.random() * 2 + 1.5, // 1.5px to 3.5px
-      delay: Math.random() * 3,
-      duration: Math.random() * 5 + 4,
-    }));
-    setParticles(generated);
-
-    // Organic loading timing: Ease-out cubic progress curve
-    const duration = 3500; // 3.5 seconds
-    const intervalTime = 35;
+    // Elegant, smooth cubic ease-out loading curve (2.2s duration)
+    const duration = 2200;
+    const intervalTime = 40;
     const totalSteps = duration / intervalTime;
     let currentStep = 0;
 
     const timer = setInterval(() => {
       currentStep++;
       const t = currentStep / totalSteps;
-      const easedT = 1 - Math.pow(1 - t, 3.5);
+      const easedT = 1 - Math.pow(1 - t, 3.2);
       const nextProgress = Math.min(Math.round(easedT * 100), 100);
       setProgress(nextProgress);
 
       if (currentStep >= totalSteps) {
         clearInterval(timer);
         playChime();
-        setIsFinished(true);
+        // Short intentional delay at 100% for a polished completion feel
+        setTimeout(() => {
+          setIsFinished(true);
+        }, 350);
       }
     }, intervalTime);
 
     return () => clearInterval(timer);
   }, []);
 
-  // Wait for both progress to complete and assets to be ready
+  // Complete preloader when both progress and assets resolve
   useEffect(() => {
     if (isFinished && assetsReady) {
       onComplete();
@@ -81,102 +98,68 @@ export default function Preloader({ onComplete }) {
   }, [isFinished, assetsReady, onComplete]);
 
   // SVG Progress Arc Math
-  const radius = 64;
+  const radius = 72;
   const stroke = 2.5;
   const normalizedRadius = radius - stroke * 2;
   const circumference = normalizedRadius * 2 * Math.PI;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
-  // Trigonometrical lead-edge coordinates for the progress spark
-  // Progress starts at -90deg (top center) and sweeps clockwise 360deg
+  // Orbiting spark lead-edge coordinates
   const angle = (progress / 100) * 360 - 90;
   const radians = (angle * Math.PI) / 180;
-  const sparkX = 64 + normalizedRadius * Math.cos(radians);
-  const sparkY = 64 + normalizedRadius * Math.sin(radians);
+  const sparkX = 72 + normalizedRadius * Math.cos(radians);
+  const sparkY = 72 + normalizedRadius * Math.sin(radians);
 
   return (
     <motion.div
-      initial={{ opacity: 1 }}
+      initial={{ opacity: 1, scale: 1 }}
       exit={{ 
-        opacity: 0, 
-        filter: "blur(25px)",
-        scale: 1.12,
-        transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] } 
+        opacity: 0,
+        scale: 1.03,
+        transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } 
       }}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-b from-[#2A000D] via-[#4A081B] to-[#1A0208] overflow-hidden"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#F6EBDD] overflow-hidden select-none"
     >
-      {/* Moving Golden Rays backdrop (hydration guarded, rounded to 4 decimals) */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-20 z-0 flex items-center justify-center">
-        <svg className="w-[180%] h-[180%] text-[#D4AF37]/5 moving-rays-bg" viewBox="0 0 100 100" preserveAspectRatio="none">
-          {mounted && Array.from({ length: 18 }).map((_, idx) => {
-            const rayAngle = idx * 20;
-            const x2Val = Number((50 + 80 * Math.cos((rayAngle * Math.PI) / 180)).toFixed(4));
-            const y2Val = Number((50 + 80 * Math.sin((rayAngle * Math.PI) / 180)).toFixed(4));
-            return (
-              <line
-                key={idx}
-                x1="50"
-                y1="50"
-                x2={x2Val}
-                y2={y2Val}
-                stroke="currentColor"
-                strokeWidth="0.8"
-              />
-            );
-          })}
-        </svg>
-      </div>
+      {/* 1. Cream Light Background with Faint Golden Islamic Diamond & Circle Motif */}
+      <div 
+        className="absolute inset-0 opacity-[0.055] pointer-events-none z-0" 
+        style={{ 
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
+          backgroundSize: "60px 60px" 
+        }} 
+      />
 
-      {/* Cinematic Fog & Vignette Shadows */}
-      <div className="absolute inset-0 pointer-events-none vignette-overlay z-10" />
+      {/* 2. Soft Ambient Radial Vignette & Central Gold Warmth */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,248,237,0.85)_0%,rgba(246,235,221,0.95)_60%,rgba(235,218,198,1)_100%)] pointer-events-none z-0" />
 
-      {/* Drifting Spark Particles */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
-        {particles.map((p) => (
-          <motion.div
-            key={p.id}
-            initial={{ y: "105vh", opacity: 0 }}
-            animate={{
-              y: "-10vh",
-              opacity: [0, 0.75, 0.75, 0],
-              x: ["0px", `${Math.random() * 50 - 25}px`],
-            }}
-            transition={{
-              duration: p.duration,
-              repeat: Infinity,
-              delay: p.delay,
-              ease: "linear",
-            }}
-            className="absolute rounded-full bg-gradient-to-b from-[#FFF0D6] to-[#D4AF37]"
-            style={{
-              left: p.left,
-              width: p.size,
-              height: p.size,
-              boxShadow: "0 0 6px rgba(212, 175, 55, 0.5)",
-            }}
-          />
-        ))}
-      </div>
+      {/* 3. Luxury Gold Corner Frame Ornaments */}
+      <PreloaderCornerOrnament position="top-left" />
+      <PreloaderCornerOrnament position="top-right" />
+      <PreloaderCornerOrnament position="bottom-left" />
+      <PreloaderCornerOrnament position="bottom-right" />
 
-      {/* Central Monogram and Eased Circular Loader */}
-      <div className="relative z-20 flex flex-col items-center select-none">
+      {/* 4. Central Visual Focal Point: Dark Maroon Seal & Circular Progress Arc */}
+      <div className="relative z-20 flex flex-col items-center">
         
-        {/* Progress Circular Casing */}
-        <div className="relative w-48 h-48 flex items-center justify-center mb-10">
+        {/* Circular Casing for Progress Arc and Dark Maroon Medallion */}
+        <div className="relative w-52 h-52 md:w-60 md:h-60 flex items-center justify-center mb-8">
           
-          {/* Rotating Circular Progress Ring SVG */}
-          <svg className="absolute w-full h-full transform -rotate-90 z-20" viewBox="0 0 128 128">
-            {/* Background thin track */}
+          {/* Outer Soft Gold Ambient Glow */}
+          <div className="absolute w-44 h-44 md:w-48 md:h-48 rounded-full bg-[#D4AF37]/15 blur-2xl pointer-events-none z-0" />
+
+          {/* Rotating Gold Progress Ring Arc */}
+          <svg className="absolute w-full h-full transform -rotate-90 z-20" viewBox="0 0 144 144">
+            {/* Background track */}
             <circle
-              className="text-[#D4AF37]/5"
+              className="text-[#D4AF37]/15"
               stroke="currentColor"
               fill="transparent"
-              strokeWidth={1}
+              strokeWidth={1.5}
               r={normalizedRadius}
-              cx={64}
-              cy={64}
+              cx={72}
+              cy={72}
             />
-            {/* Shimmer progress arc */}
+            {/* Active Gold Progress Arc */}
             <circle
               className="text-[#D4AF37]"
               stroke="currentColor"
@@ -186,72 +169,80 @@ export default function Preloader({ onComplete }) {
               strokeDashoffset={strokeDashoffset}
               strokeLinecap="round"
               r={normalizedRadius}
-              cx={64}
-              cy={64}
+              cx={72}
+              cy={72}
               style={{
-                filter: "drop-shadow(0 0 5px rgba(212,175,55,0.4))",
+                filter: "drop-shadow(0 0 6px rgba(212,175,55,0.5))",
                 transition: "stroke-dashoffset 0.1s linear"
               }}
             />
-            {/* Orbiting Spark (glides exactly at the leading edge of progress) */}
+            {/* Leading Edge Spark Node */}
             {mounted && progress > 0 && (
               <circle
                 cx={sparkX}
                 cy={sparkY}
-                r={2}
-                fill="#FFF0D6"
+                r={2.5}
+                fill="#FFF8ED"
                 style={{
-                  filter: "drop-shadow(0 0 4px #D4AF37) drop-shadow(0 0 8px #D4AF37)",
+                  filter: "drop-shadow(0 0 5px #D4AF37) drop-shadow(0 0 10px #D4AF37)",
                   transition: "cx 0.1s linear, cy 0.1s linear"
                 }}
               />
             )}
           </svg>
 
-          {/* Logo / Monogram inside circular loader */}
+          {/* Focal Point: Luxury Dark Maroon Enamel Seal Medallion */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.72, filter: "blur(12px)" }}
+            initial={{ opacity: 0, scale: 0.82 }}
             animate={{ 
               opacity: 1, 
               scale: 1.0, 
-              filter: "blur(0px)",
-              transition: { duration: 1.6, delay: 0.3, ease: [0.25, 1, 0.5, 1] }
+              transition: { duration: 1.0, ease: [0.25, 1, 0.5, 1] }
             }}
-            className="flex flex-col items-center justify-center font-cormorant z-10"
+            className="w-36 h-36 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-[#4A081B] via-[#310411] to-[#1F000A] p-[4px] shadow-[0_12px_32px_rgba(74,8,27,0.35),0_4px_12px_rgba(0,0,0,0.25)] flex items-center justify-center relative z-10"
           >
-            {/* Soft inner glow backplate */}
-            <div className="absolute w-28 h-28 bg-[#D4AF37]/5 rounded-full blur-xl pointer-events-none z-0" />
+            {/* Double Gold Ring Emboss */}
+            <div className="w-full h-full rounded-full border-[1.5px] border-[#FCF6BA]/60 p-[3px] flex items-center justify-center relative overflow-hidden">
+              <div className="w-full h-full rounded-full border border-[#D4AF37]/40 flex flex-col items-center justify-center text-center p-2 relative">
+                
+                {/* Radial Glaze Specular Highlight */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_35%,rgba(255,255,255,0.2)_0%,transparent_60%)] pointer-events-none z-10" />
 
-            {/* Monogram letters in shimmering gold */}
-            <h1 className="text-4xl md:text-5xl font-semibold tracking-wider gold-shimmer-text font-cormorant relative z-10">
-              F & H
-            </h1>
-            
-            <span className="text-[9px] uppercase tracking-[0.45em] text-[#D4AF37]/75 mt-[2px] font-bold relative z-10">
-              Nikah
-            </span>
+                {/* Monogram letters in shimmering gold script */}
+                <h1 className="text-3xl md:text-4xl font-bold tracking-wider gold-shimmer-text font-cormorant relative z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                  F & H
+                </h1>
+                
+                {/* Fine gold divider line */}
+                <div className="w-6 h-[0.5px] bg-[#D4AF37]/50 my-1 relative z-10">
+                  <div className="absolute inset-0 m-auto w-1 h-1 rounded-full bg-[#D4AF37]" />
+                </div>
+
+                <span className="text-[7.5px] md:text-[8.5px] uppercase tracking-[0.35em] text-[#FFF8ED]/80 font-bold font-cormorant relative z-10">
+                  Nikah Ceremony
+                </span>
+              </div>
+            </div>
           </motion.div>
         </div>
 
-        {/* Loading text with dynamic breathing spacing */}
+        {/* Loading status caption */}
         <motion.p
           animate={{
-            opacity: [0.55, 1, 0.55],
+            opacity: [0.65, 1, 0.65],
             letterSpacing: ["0.32em", "0.36em", "0.32em"],
           }}
-          transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
-          className="font-cormorant text-xs uppercase text-[#F7E8C8] tracking-[0.32em] font-medium"
+          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          className="font-cormorant text-xs md:text-sm uppercase text-[#4A081B] tracking-[0.32em] font-semibold mb-1"
         >
           Loading Your Invitation
         </motion.p>
         
         {/* Progress Percentage */}
-        <span className="font-inter text-[8px] tracking-[0.25em] text-[#D4AF37]/50 mt-3.5 uppercase font-bold">
+        <span className="font-inter text-[9px] tracking-[0.25em] text-[#856124] uppercase font-bold">
           {progress}%
         </span>
       </div>
-
-
     </motion.div>
   );
 }

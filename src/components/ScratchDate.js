@@ -4,6 +4,55 @@ import { useEffect, useRef, useState, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import confetti from "canvas-confetti";
+import FloralOrnament from "./FloralOrnament";
+
+// Card corner ornament matching Hero master design system
+const CardCornerOrnament = ({ position }) => {
+  const classMap = {
+    "top-left": "top-3 left-3 rotate-0",
+    "top-right": "top-3 right-3 rotate-90",
+    "bottom-left": "bottom-3 left-3 -rotate-90",
+    "bottom-right": "bottom-3 right-3 rotate-180",
+  };
+  return (
+    <div className={`absolute w-5 h-5 md:w-7 md:h-7 text-[#D4AF37]/35 pointer-events-none z-10 ${classMap[position]}`}>
+      <svg className="w-full h-full" viewBox="0 0 50 50" fill="none" stroke="currentColor" strokeWidth="1.2">
+        <path d="M 0,0 L 40,0 M 0,0 L 0,40" />
+        <path d="M 6,6 C 12,6 16,12 16,16 C 16,20 20,24 24,24" strokeDasharray="1.5,1.5" />
+        <circle cx="6" cy="6" r="1.2" fill="currentColor" />
+      </svg>
+    </div>
+  );
+};
+
+// Royal Swaying Lanterns matching Hero master design system
+const SwayingLantern = ({ position }) => {
+  const isLeft = position === "left";
+  return (
+    <motion.div
+      animate={{ rotate: isLeft ? [-1.8, 1.8, -1.8] : [1.8, -1.8, 1.8] }}
+      transition={{ duration: 9.0, repeat: Infinity, ease: "easeInOut", delay: isLeft ? 0 : 2.5 }}
+      style={{ transformOrigin: "top center" }}
+      className={`absolute top-0 ${isLeft ? "left-4 md:left-16" : "right-4 md:right-16"} w-12 md:w-20 h-[300px] z-10 pointer-events-none transform-gpu will-change-transform`}
+    >
+      <div className="w-[1px] h-[110px] md:h-[150px] bg-gradient-to-b from-[#856124] via-[#D4AF37] to-[#FCF6BA] mx-auto opacity-75" />
+      <div className="w-9 h-14 md:w-12 md:h-18 mx-auto relative flex flex-col items-center justify-start text-[#D4AF37]">
+        <div 
+          className="absolute top-2.5 w-8 h-8 rounded-full opacity-35 animate-pulse"
+          style={{
+            background: "radial-gradient(circle, rgba(255, 209, 102, 0.45) 0%, transparent 70%)"
+          }}
+        />
+        <svg className="w-full h-full fill-current drop-shadow-[0_2px_5px_rgba(212,175,55,0.4)]" viewBox="0 0 40 60">
+          <path d="M 20 2 L 10 15 L 30 15 Z" />
+          <path d="M 10 15 L 30 15 L 35 45 L 20 55 L 5 45 Z" fill="none" stroke="currentColor" strokeWidth="1" />
+          <circle cx="20" cy="32" r="5" className="fill-[#FFEAA7] animate-pulse" />
+          <circle cx="20" cy="32" r="3.2" className="fill-[#FFD166]" />
+        </svg>
+      </div>
+    </motion.div>
+  );
+};
 
 // Web Audio API Synthesizer for high-fidelity luxury chime sound
 const playChimeSound = () => {
@@ -826,11 +875,25 @@ function ScratchDate() {
 
   return (
     <section 
-      style={{
-        background: `linear-gradient(to bottom, #2A000C 0%, #4a0018 25%, #5A001E 50%, #4a0018 75%, #2A000C 100%)`
-      }}
-      className="pt-28 pb-28 px-6 relative flex flex-col items-center justify-center overflow-hidden"
+      className="pt-28 pb-28 px-6 relative flex flex-col items-center justify-center overflow-hidden bg-[#310411]"
     >
+      {/* 1. Base Gradient & Radial Vignette matching Hero master system */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#1F000A] via-[#310411] to-[#4A081B] pointer-events-none z-0" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(110,15,42,0.45)_0%,rgba(49,4,17,0.85)_65%,rgba(31,0,10,0.98)_100%)] pointer-events-none z-0" />
+
+      {/* 2. Hero Master Golden Hexagon Background SVG Pattern */}
+      <div 
+        className="absolute inset-0 opacity-[0.14] pointer-events-none z-0 transform-gpu"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 17.32 L60 51.96 L30 69.28 L0 51.96 L0 17.32 Z' fill='none' stroke='%23D4AF37' stroke-width='0.6' stroke-opacity='0.12'/%3E%3Ccircle cx='30' cy='34.64' r='6' fill='none' stroke='%23D4AF37' stroke-width='0.5' stroke-opacity='0.1'/%3E%3C/svg%3E")`,
+          backgroundSize: "60px 60px"
+        }}
+      />
+
+      {/* 3. Swaying Royal Gold Palace Lanterns */}
+      <SwayingLantern position="left" />
+      <SwayingLantern position="right" />
+
       {/* Curved section transition divider at the bottom of the continuous panel */}
       <SectionDivider />
 
@@ -848,23 +911,6 @@ function ScratchDate() {
       
       {/* Top Gold Arch Section Divider */}
       <LuxuryDivider className="absolute top-0 left-0 right-0 z-20 -translate-y-[15px] rotate-180" />
-
-      {/* Velvet fabric grain overlay (2.5% opacity) */}
-      <div 
-        className="absolute inset-0 opacity-[0.025] pointer-events-none mix-blend-overlay z-0" 
-        style={{ 
-          backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.12) 0.5px, transparent 0.5px)`, 
-          backgroundSize: "2px 2px" 
-        }} 
-      />
-
-      {/* Low-opacity repeating Islamic geometric pattern watermark (3.5% opacity, large scale) */}
-      <div className="absolute inset-0 opacity-[0.035] pointer-events-none z-0" 
-           style={{ 
-             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
-             backgroundSize: "80px 80px",
-             filter: "blur(0.5px)"
-           }} />
 
       {/* Faint oversized Islamic arch and crescent lines for depth */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-[0.03]">
@@ -1043,22 +1089,16 @@ function ScratchDate() {
         whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.85, ease: "easeOut" }}
-        className="text-center mb-10 relative z-10"
+        className="text-center mb-10 relative z-10 flex flex-col items-center justify-center"
       >
-        <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.3em] text-[#E8C76A] font-semibold flex items-center justify-center gap-1">
-          The Sacred Date
-          <motion.span 
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ repeat: Infinity, duration: 2.5 }}
-            className="inline-block"
-          >
-            ✦
-          </motion.span>
+        <FloralOrnament className="w-16 h-8 text-[#D4AF37]/80 mb-2" />
+        <span className="font-inter text-[9px] md:text-[10px] uppercase tracking-[0.35em] text-[#E8C76A] font-semibold flex items-center justify-center gap-1">
+          The Sacred Date ✦
         </span>
-        <h2 className="font-cormorant text-3xl md:text-4xl text-[#FFF8ED] mt-2 tracking-wide font-light">
+        <h2 className="font-cormorant text-3xl md:text-5xl gold-shimmer-text mt-2 tracking-wide font-bold drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
           Union Date Reveal
         </h2>
-        <div className="w-12 h-[1px] bg-[#D4AF37]/50 mx-auto mt-4" />
+        <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mt-4" />
       </motion.div>
 
       {/* Centered Luxury Reveal Cards container with balanced spacing */}

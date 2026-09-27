@@ -4,6 +4,55 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, memo } from "react";
 import { createPortal } from "react-dom";
 import confetti from "canvas-confetti";
+import FloralOrnament from "./FloralOrnament";
+
+// Card corner ornament matching Hero master design system
+const CardCornerOrnament = ({ position }) => {
+  const classMap = {
+    "top-left": "top-3 left-3 rotate-0",
+    "top-right": "top-3 right-3 rotate-90",
+    "bottom-left": "bottom-3 left-3 -rotate-90",
+    "bottom-right": "bottom-3 right-3 rotate-180",
+  };
+  return (
+    <div className={`absolute w-5 h-5 md:w-7 md:h-7 text-[#D4AF37]/35 pointer-events-none z-10 ${classMap[position]}`}>
+      <svg className="w-full h-full" viewBox="0 0 50 50" fill="none" stroke="currentColor" strokeWidth="1.2">
+        <path d="M 0,0 L 40,0 M 0,0 L 0,40" />
+        <path d="M 6,6 C 12,6 16,12 16,16 C 16,20 20,24 24,24" strokeDasharray="1.5,1.5" />
+        <circle cx="6" cy="6" r="1.2" fill="currentColor" />
+      </svg>
+    </div>
+  );
+};
+
+// Royal Swaying Lanterns matching Hero master design system
+const SwayingLantern = ({ position }) => {
+  const isLeft = position === "left";
+  return (
+    <motion.div
+      animate={{ rotate: isLeft ? [-1.8, 1.8, -1.8] : [1.8, -1.8, 1.8] }}
+      transition={{ duration: 9.0, repeat: Infinity, ease: "easeInOut", delay: isLeft ? 0 : 2.5 }}
+      style={{ transformOrigin: "top center" }}
+      className={`absolute top-0 ${isLeft ? "left-4 md:left-16" : "right-4 md:right-16"} w-12 md:w-20 h-[300px] z-10 pointer-events-none transform-gpu will-change-transform`}
+    >
+      <div className="w-[1px] h-[110px] md:h-[150px] bg-gradient-to-b from-[#856124] via-[#D4AF37] to-[#FCF6BA] mx-auto opacity-75" />
+      <div className="w-9 h-14 md:w-12 md:h-18 mx-auto relative flex flex-col items-center justify-start text-[#D4AF37]">
+        <div 
+          className="absolute top-2.5 w-8 h-8 rounded-full opacity-35 animate-pulse"
+          style={{
+            background: "radial-gradient(circle, rgba(255, 209, 102, 0.45) 0%, transparent 70%)"
+          }}
+        />
+        <svg className="w-full h-full fill-current drop-shadow-[0_2px_5px_rgba(212,175,55,0.4)]" viewBox="0 0 40 60">
+          <path d="M 20 2 L 10 15 L 30 15 Z" />
+          <path d="M 10 15 L 30 15 L 35 45 L 20 55 L 5 45 Z" fill="none" stroke="currentColor" strokeWidth="1" />
+          <circle cx="20" cy="32" r="5" className="fill-[#FFEAA7] animate-pulse" />
+          <circle cx="20" cy="32" r="3.2" className="fill-[#FFD166]" />
+        </svg>
+      </div>
+    </motion.div>
+  );
+};
 
 function Dua() {
   const [stars, setStars] = useState([]);
@@ -122,11 +171,24 @@ function Dua() {
 
   return (
     <section 
-      style={{
-        background: `radial-gradient(circle at center, #7A1237 0%, #5A001E 50%, #2A000C 100%)`
-      }}
-      className="py-32 px-6 relative overflow-hidden flex flex-col items-center justify-center min-h-[65vh] shadow-[inset_0_0_140px_rgba(10,0,2,0.98),inset_0_0_60px_rgba(0,0,0,0.9)]"
+      className="py-32 px-6 relative overflow-hidden flex flex-col items-center justify-center min-h-[65vh] bg-[#310411]"
     >
+      {/* 1. Base Gradient & Radial Vignette matching Hero master system */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#1F000A] via-[#310411] to-[#4A081B] pointer-events-none z-0" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(110,15,42,0.45)_0%,rgba(49,4,17,0.85)_65%,rgba(31,0,10,0.98)_100%)] pointer-events-none z-0" />
+
+      {/* 2. Hero Master Golden Hexagon Background SVG Pattern */}
+      <div 
+        className="absolute inset-0 opacity-[0.14] pointer-events-none z-0 transform-gpu"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 17.32 L60 51.96 L30 69.28 L0 51.96 L0 17.32 Z' fill='none' stroke='%23D4AF37' stroke-width='0.6' stroke-opacity='0.12'/%3E%3Ccircle cx='30' cy='34.64' r='6' fill='none' stroke='%23D4AF37' stroke-width='0.5' stroke-opacity='0.1'/%3E%3C/svg%3E")`,
+          backgroundSize: "60px 60px"
+        }}
+      />
+
+      {/* 3. Swaying Royal Gold Palace Lanterns */}
+      <SwayingLantern position="left" />
+      <SwayingLantern position="right" />
       
       {/* Custom Styles for magical CTA sheen sweep and ripple ring animations */}
       <style dangerouslySetInnerHTML={{ __html: `
@@ -189,24 +251,8 @@ function Dua() {
         }
       `}} />
 
-      {/* Layer 1.1: Velvet fabric grain overlay (2.5% opacity) */}
-      <div 
-        className="absolute inset-0 opacity-[0.025] pointer-events-none mix-blend-overlay z-0" 
-        style={{ 
-          backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.12) 0.5px, transparent 0.5px)`, 
-          backgroundSize: "2px 2px" 
-        }} 
-      />
-
       {/* Top Gold Arch Section Divider */}
       <LuxuryDivider className="absolute top-4 left-0 right-0 z-20 -translate-y-[15px] rotate-180" />
-
-      {/* Low-opacity repeating Islamic geometric pattern watermark (Reduced to 2%) */}
-      <div className="absolute inset-0 opacity-[0.02] pointer-events-none z-0" 
-           style={{ 
-             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3Ccircle cx='30' cy='30' r='10' fill='none' stroke='%23D4AF37' stroke-width='1'/%3E%3C/svg%3E")`, 
-             backgroundSize: "60px 60px" 
-           }} />
 
       {/* Layer 2: Giant faint Islamic Arch Silhouette Frame with soft glow */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
@@ -332,25 +378,16 @@ function Dua() {
                          backgroundSize: "40px 40px" 
                        }} />
 
-                  {/* Elegant gold corner ornaments */}
-                  <div className="absolute top-4 left-4 w-6 h-6 border-t border-l border-[#D4AF37]/35 rounded-tl-md pointer-events-none z-10" />
-                  <div className="absolute top-4 right-4 w-6 h-6 border-t border-r border-[#D4AF37]/35 rounded-tr-md pointer-events-none z-10" />
-                  <div className="absolute bottom-4 left-4 w-6 h-6 border-b border-l border-[#D4AF37]/35 rounded-bl-md pointer-events-none z-10" />
-                  <div className="absolute bottom-4 right-4 w-6 h-6 border-b border-r border-[#D4AF37]/35 rounded-br-md pointer-events-none z-10" />
+                  {/* Hero Master Gold Corner Ornaments */}
+                  <CardCornerOrnament position="top-left" />
+                  <CardCornerOrnament position="top-right" />
+                  <CardCornerOrnament position="bottom-left" />
+                  <CardCornerOrnament position="bottom-right" />
 
-                  {/* Heading with sparkle pulse + rotation */}
-                  <h2 className="font-cormorant text-3xl md:text-4xl text-[#FFF8ED] tracking-wide mb-3 font-light flex items-center justify-center gap-2 relative z-10">
-                    Confirm Your Presence
-                    <motion.span 
-                      className="inline-block text-[#E8C76A]"
-                      animate={{ 
-                        rotate: [0, 15, -15, 0],
-                        filter: ["drop-shadow(0 0 2px #E8C76A)", "drop-shadow(0 0 8px #E8C76A)", "drop-shadow(0 0 2px #E8C76A)"]
-                      }}
-                      transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
-                    >
-                      ✨
-                    </motion.span>
+                  {/* Heading with FloralOrnament & Gold Shimmer */}
+                  <FloralOrnament className="w-16 h-8 text-[#D4AF37]/80 mb-2 relative z-10" />
+                  <h2 className="font-cormorant text-3xl md:text-5xl gold-shimmer-text tracking-wide mb-3 font-bold flex items-center justify-center gap-2 relative z-10 drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
+                    Confirm Your Presence ✨
                   </h2>
                   
                   <p className="font-cormorant italic text-base md:text-lg text-[#FFF8ED]/85 leading-relaxed max-w-md mx-auto mb-8 relative z-10">
