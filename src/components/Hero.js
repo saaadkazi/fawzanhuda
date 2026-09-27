@@ -358,26 +358,10 @@ const LetterInteractiveName = ({ fullName, isBride = false, isMobile }) => {
   );
 };
 
-// Module-level global variable to track if the hero intro has already completed in this session
-let globalHeroIntroPlayed = false;
-
 export default function Hero() {
   const [particles, setParticles] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
   const [isEntering, setIsEntering] = useState(false);
-  const [introPlayed, setIntroPlayed] = useState(false);
-
-  useEffect(() => {
-    if (globalHeroIntroPlayed) {
-      setIntroPlayed(true);
-    } else {
-      const timer = setTimeout(() => {
-        globalHeroIntroPlayed = true;
-        setIntroPlayed(true);
-      }, 6800);
-      return () => clearTimeout(timer);
-    }
-  }, []);
 
   useEffect(() => {
     const checkMobileVal = typeof window !== "undefined" && window.innerWidth < 768;
@@ -734,27 +718,22 @@ export default function Hero() {
         
         {/* Borderless text centerpiece positioned directly inside the architectural arch */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.96, y: 20 }}
+          initial={{ opacity: 0, scale: 0.98, y: 8, filter: "blur(2px)" }}
           animate={{ 
             opacity: isEntering ? 0.3 : 1, 
             scale: 1,
-            y: 0
+            y: 0,
+            filter: "blur(0px)"
           }}
           transition={{ 
-            opacity: isEntering ? { duration: 0.4, ease: "easeOut" } : { duration: 1.2, delay: isMobile ? (introPlayed ? 0 : 0.4) : (introPlayed ? 0 : 4.0), ease: [0.215, 0.61, 0.355, 1] },
-            scale: { duration: 1.2, delay: isMobile ? (introPlayed ? 0 : 0.4) : (introPlayed ? 0 : 4.0), ease: [0.215, 0.61, 0.355, 1] },
-            y: { duration: 1.2, delay: isMobile ? (introPlayed ? 0 : 0.4) : (introPlayed ? 0 : 4.0), ease: [0.215, 0.61, 0.355, 1] }
+            duration: 0.85,
+            ease: [0.22, 1, 0.36, 1]
           }}
           onClick={handleCardTap}
           className="relative w-[92vw] sm:w-[84vw] md:w-[70vw] max-w-[460px] px-2 sm:px-4 py-1 sm:py-2 flex flex-col items-center justify-center pointer-events-auto select-none my-auto"
         >
           {/* Sequential text reveals positioned inside the background arch */}
-          <motion.div 
-            initial={{ opacity: 0, filter: "blur(4px)" }}
-            animate={{ opacity: 1, filter: "blur(0px)" }}
-            transition={{ duration: 0.95, delay: isMobile ? (introPlayed ? 0 : 0.8) : (introPlayed ? 0 : 5.0), ease: "easeOut" }}
-            className="w-full flex flex-col items-center justify-center text-center z-10"
-          >
+          <div className="w-full flex flex-col items-center justify-center text-center z-10">
             {/* Top Islamic star rosette */}
             <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 text-[#856124] mb-[clamp(2px,0.8vh,12px)] relative flex items-center justify-center">
               <svg className="w-full h-full drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.4">
@@ -786,7 +765,7 @@ export default function Hero() {
               <motion.span 
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
-                transition={{ duration: 0.6, delay: 5.8, ease: "easeOut" }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
                 style={{ transformOrigin: "right center" }}
                 className="h-[0.5px] w-10 sm:w-12 bg-gradient-to-r from-transparent to-[#856124]/60" 
               />
@@ -802,7 +781,7 @@ export default function Hero() {
               <motion.span 
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
-                transition={{ duration: 0.6, delay: 5.8, ease: "easeOut" }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
                 style={{ transformOrigin: "left center" }}
                 className="h-[0.5px] w-10 sm:w-12 bg-gradient-to-l from-transparent to-[#856124]/60" 
               />
@@ -837,14 +816,14 @@ export default function Hero() {
             <p className="font-cinzel text-[clamp(8px,2.2vw,10.5px)] tracking-[0.28em] text-[#856124] font-bold">
               09 • 12 • 2026
             </p>
-          </motion.div>
+          </div>
         </motion.div>
 
         {/* Premium Medallion CTA Button ("TAP TO ENTER") with Refined Continuous Idle Motion */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.0, delay: isMobile ? (introPlayed ? 0 : 0.8) : (introPlayed ? 0 : 4.3) }}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.85, ease: "easeOut" }}
           className="mt-[clamp(6px,1.8vh,20px)] mb-1 z-20 flex flex-col items-center justify-center pointer-events-auto"
         >
           <motion.button

@@ -68,19 +68,21 @@ export default function Home() {
         <MusicToggle isPlaying={isMusicPlaying} setIsPlaying={setIsMusicPlaying} />
       )}
 
-      {/* 3. Main Scrollable Content */}
-      {status !== "loading" && (
-        <GrandOpening>
-          <main className="w-full relative flex flex-col min-h-screen">
-            <Hero />
-            <Parents />
-            <ScratchDate />
-            <Venue />
-            <Dua />
-            <Footer />
-          </main>
-        </GrandOpening>
-      )}
+      {/* 3. Main Scrollable Content (Rendered underneath preloader so Hero is ready immediately) */}
+      <GrandOpening>
+        <main className="w-full relative flex flex-col min-h-screen">
+          <Hero />
+          {status === "opened" && (
+            <>
+              <Parents />
+              <ScratchDate />
+              <Venue />
+              <Dua />
+              <Footer />
+            </>
+          )}
+        </main>
+      </GrandOpening>
       
     </div>
   );
